@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<title>Employee Directory - Admin</title>
+<style>
+  /* (All your original CSS kept — unchanged) */
+  /* Reset and base */
+  body, html {
+    margin: 0; padding: 0; height: 100%;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: #fff;
+    color: #333;
+  }
+  #container {
+    display: flex;
+    height: 100vh;
+    transition: all 0.3s;
+  }
+  /* Sidebar */
+  #sidebar {
+    width: 250px;
+    background-color: #f7fdfa;
+    border-right: 1px solid #e6e6e6;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+    transition: all 0.3s;
+  }
+  #sidebar.collapsed {
+    width: 70px;
+    overflow: hidden;
+  }
+  #sidebar.collapsed .brand,
+  #sidebar.collapsed .subtitle,
+  #sidebar.collapsed .user-info .text {
+    display: none;
+  }
+  #sidebar.collapsed nav ul li a {
+    justify-content: center;
+  }
+  #sidebar.collapsed nav ul li a span {
+    display: none;
+  }
+  #sidebar .brand {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #152733;
+    white-space: nowrap;
+  }
+  #sidebar .subtitle {
+    font-size: 0.9rem;
+    color: #a2a9b0;
+    margin-bottom: 30px;
+    white-space: nowrap;
+  }
+  #sidebar nav {
+    flex-grow: 1;
+  }
+  #sidebar nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  #sidebar nav ul li {
+    margin-bottom: 18px;
+  }
+  #sidebar nav ul li a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    color: #152733;
+    padding: 8px 10px;
+    border-radius: 10px;
+    transition: background-color 0.3s, color 0.3s;
+    white-space: nowrap;
+  }
+  #sidebar nav ul li a.active,
+  #sidebar nav ul li a:hover {
+    background-color: #dffbf3;
+    color: #2aa87d;
+  }
+  #sidebar nav ul li a svg {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+  }
+
+  /* User info bottom */
+  #sidebar .user-info {
+    background-color: #dffbf3;
+    border-radius: 10px;
+    padding: 12px 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #2aa87d;
+    white-space: nowrap;
+  }
+  #sidebar .user-info svg {
+    width: 30px;
+    height: 30px;
+    fill: currentColor;
+  }
+  #sidebar .user-info .text {
+    display: flex;
+    flex-direction: column;
+  }
+  #sidebar .user-info .text .name {
+    font-weight: 600;
+  }
+  #sidebar .user-info .text .role {
+    font-size: 0.8rem;
+    color: #7fcfc6;
+  }
+
+  /* Main content */
+  #main-content {
+    flex-grow: 1;
+    padding: 20px 40px;
+    overflow-y: auto;
+    transition: all 0.3s;
+  }
+
+  h1 {
+    font-weight: 700;
+    margin-bottom: 0;
+  }
+  p {
+    color: #888;
+    margin-top: 5px;
+    margin-bottom: 20px;
+  }
+  .stats-container {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  .stat-box {
+    flex: 1;
+    background: #f9fafa;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 8px #eee;
+  }
+  .stat-label {
+    font-weight: 500;
+    color: #555;
+  }
+  .stat-value {
+    font-weight: 700;
+    font-size: 24px;
+    color: #2aa87d;
+  }
+  .stat-value.highlight {
+    color: #f5a623; /* orange for Total Reviews */
+  }
+  .filters {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .filters input[type="search"] {
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    flex: 1;
+  }
+  .filters select {
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    min-width: 130px;
+  }
+  .add-employee-btn {
+    background-color: #2aa87d;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    margin-left: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 0 15px rgb(0 0 0 / 0.05);
+  }
+  thead {
+    background: #f9fafa;
+    color: #666;
+    text-align: left;
+  }
+  th, td {
+    padding: 15px 20px;
+  }
+  tbody tr {
+    border-bottom: 1px solid #eee;
+  }
+  tbody tr:last-child {
+    border-bottom: none;
+  }
+  .role-badge {
+    padding: 5px 10px;
+    border-radius: 15px;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: lowercase;
+  }
+  .admin {
+    background-color: #2aa87d;
+  }
+  .reviewer {
+    background-color: #14c3d1;
+  }
+  .status-badge {
+    padding: 5px 15px;
+    border-radius: 15px;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: lowercase;
+  }
+  .active {
+    background-color: #2aa87d;
+  }
+  .inactive {
+    background-color: #c4c4c4;
+    color: #666;
+  }
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  .edit-icon {
+    cursor: pointer;
+    font-size: 18px;
+    color: #444;
+  }
+  .activate-btn, .deactivate-btn {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+    background: none;
+    padding: 0;
+  }
+  .activate-btn {
+    color: #2aa87d;
+  }
+  .deactivate-btn {
+    color: #f5a623;
+  }
+  
+  /* Toggle button */
+  .toggle-sidebar {
+    position: absolute;
+    top: 20px;
+    right: -15px;
+    background: #fff;
+    border: 1px solid #e6e6e6;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    z-index: 10;
+  }
+  .toggle-sidebar i {
+    color: #2aa87d;
+    font-size: 14px;
+  }
+  
+  /* Modal styles */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+  }
+  .modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  .modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  }
+  .modal-header {
+    margin-bottom: 20px;
+  }
+  .modal-header h2 {
+    margin: 0;
+    color: #152733;
+  }
+  .form-group {
+    margin-bottom: 20px;
+  }
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #555;
+  }
+  .form-group input, .form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 30px;
+  }
+  .btn {
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    border: none;
+  }
+  .btn-cancel {
+    background: #f5f5f5;
+    color: #555;
+  }
+  .btn-submit {
+    background: #2aa87d;
+    color: white;
+  }
+  .hidden {
+    display: none;
+  }
+  /* small responsive */
+  @media (max-width: 900px) {
+    #container { flex-direction: column; height: auto; }
+    #sidebar { width: 100%; order: 2; }
+    #main-content { order: 1; padding: 15px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="container">
+  <aside id="sidebar">
+    <div class="toggle-sidebar" id="toggleSidebar">
+      <i class="fas fa-chevron-left"></i>
+    </div>
+    <div>
+      <div class="brand">EPICAL LAYOUTS</div>
+      <div class="subtitle">Review System</div>
+      <nav>
+        <ul>
+          <li><a href="#"><i class="fa-solid fa-house"></i><span>Dashboard</span></a></li>
+          <li><a href="#"><i class="fa-regular fa-folder-open"></i><span>Projects</span></a></li>
+          <li><a href="#"><i class="fa-solid fa-table-cells"></i><span>Cells</span></a></li>
+          <li><a href="#"><i class="fa-solid fa-square-check"></i><span>IO Review</span></a></li>
+          <li><a href="#" class="active"><i class="fa-solid fa-users"></i><span>Employees</span></a></li>
+          <li><a href="#"><i class="fa-solid fa-download"></i><span>Backup/Export</span></a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="user-info">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20c0-3.31 5.33-5 6-5s6 1.69 6 5v1H6v-1z"/></svg>
+      <div class="text">
+        <div class="name">{{ user.name if user else 'Admin' }}</div>
+        <div class="role">{{ user.role|capitalize if user else 'Admin' }}</div>
+      </div>
+    </div>
+  </aside>
+
+  <main id="main-content">
+    <h1>Employees</h1>
+    <p>Manage your employees efficiently.</p>
+
+    <div class="filters">
+      <input type="search" id="searchInput" placeholder="Search employees..." />
+      <select id="roleFilter">
+        <option value="all">All Roles</option>
+        <option value="admin">Admin</option>
+        <option value="reviewer">Reviewer</option>
+      </select>
+      <select id="statusFilter">
+        <option value="all">All Status</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+      <button class="add-employee-btn" id="addEmployeeBtn">+ Add Employee</button>
+    </div>
+
+    <table id="employeesTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Edit</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for emp in employees %}
+        <tr data-email="{{ emp.emailid|lower }}">
+          <td>{{ emp.name }}</td>
+          <td>{{ emp.emailid }}</td>
+          <td>
+            <span class="role-badge {{ emp.role|lower }}">{{ emp.role|lower }}</span>
+          </td>
+          <td>
+            <span class="status-badge {{ emp.status|lower }}">{{ emp.status|lower }}</span>
+          </td>
+          <td class="actions">
+            <span class="edit-icon"><i class="fa-regular fa-pen-to-square"></i></span>
+          </td>
+          <td>
+            {% if emp.status|lower == 'active' %}
+              <button class="deactivate-btn">Deactivate</button>
+            {% else %}
+              <button class="activate-btn">Activate</button>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </main>
+</div>
+
+<!-- Add Employee Modal -->
+<div class="modal-overlay" id="addEmployeeModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Add New Employee</h2>
+    </div>
+    <form id="addEmployeeForm" action="{{ url_for('add_employee') }}" method="POST">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" name="name" placeholder="Enter full name" required>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" name="emailid" placeholder="Enter email address" required>
+      </div>
+      <div class="form-group">
+        <label>Role</label>
+        <select name="role" required>
+          <option value="Admin">Admin</option>
+          <option value="Reviewer">Reviewer</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Mobile</label>
+        <input type="text" name="mobile" placeholder="Enter mobile number">
+      </div>
+      <div class="form-group">
+        <label>Designation</label>
+        <input type="text" name="designation" placeholder="Enter designation">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Enter password" required>
+      </div>
+      <div class="form-group">
+        <label>Confirm Password</label>
+        <input type="password" name="confirm_password" placeholder="Confirm password" required>
+      </div>
+      <div class="form-group hidden">
+        <label>Status</label>
+        <input type="text" name="status" value="Active">
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-cancel" id="cancelAddEmployee">Cancel</button>
+        <button type="submit" class="btn btn-submit">Add Employee</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Employee Modal -->
+<div class="modal-overlay" id="editEmployeeModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Edit Employee</h2>
+    </div>
+    <!-- We'll submit via JS to /admin/update_employee (see Flask addition below) -->
+    <form id="editEmployeeForm">
+      <input type="hidden" id="originalEmail" name="originalEmail" value="">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="editFullName" name="name" placeholder="Enter full name" required>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="editEmail" name="emailid" placeholder="Enter email address" required>
+      </div>
+      <div class="form-group">
+        <label>Role</label>
+        <select id="editRole" name="role" required>
+          <option value="Reviewer">Reviewer</option>
+          <option value="Admin">Admin</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="editStatus" name="status" required>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-cancel" id="cancelEditEmployee">Cancel</button>
+        <button type="submit" class="btn btn-submit">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // --- Sidebar toggle ---
+  const toggleSidebar = document.getElementById('toggleSidebar');
+  const sidebar = document.getElementById('sidebar');
+  toggleSidebar.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+    const icon = toggleSidebar.querySelector('i');
+    if (sidebar.classList.contains('collapsed')) {
+      icon.classList.remove('fa-chevron-left');
+      icon.classList.add('fa-chevron-right');
+    } else {
+      icon.classList.remove('fa-chevron-right');
+      icon.classList.add('fa-chevron-left');
+    }
+  });
+
+  // --- Modal toggles ---
+  const addEmployeeBtn = document.getElementById('addEmployeeBtn');
+  const addEmployeeModal = document.getElementById('addEmployeeModal');
+  const cancelAddEmployee = document.getElementById('cancelAddEmployee');
+  const addEmployeeForm = document.getElementById('addEmployeeForm');
+
+  addEmployeeBtn.addEventListener('click', () => addEmployeeModal.classList.add('active'));
+  cancelAddEmployee.addEventListener('click', () => addEmployeeModal.classList.remove('active'));
+
+  // Edit modal
+  const editEmployeeModal = document.getElementById('editEmployeeModal');
+  const cancelEditEmployee = document.getElementById('cancelEditEmployee');
+  const editEmployeeForm = document.getElementById('editEmployeeForm');
+  const editFullName = document.getElementById('editFullName');
+  const editEmail = document.getElementById('editEmail');
+  const editRole = document.getElementById('editRole');
+  const editStatus = document.getElementById('editStatus');
+  const originalEmail = document.getElementById('originalEmail');
+
+  cancelEditEmployee.addEventListener('click', () => editEmployeeModal.classList.remove('active'));
+
+  // Close modals on outside click
+  document.querySelectorAll('.modal-overlay').forEach(modal => {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.classList.remove('active');
+    });
+  });
+
+  // --- Add employee: submit via fetch to Flask ---
+  addEmployeeForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(addEmployeeForm);
+
+    try {
+      const resp = await fetch(addEmployeeForm.action, {
+        method: 'POST',
+        body: formData,
+        credentials: 'same-origin'
+      });
+
+      // If backend redirected (Flask redirect), follow it (this happens after flash + redirect)
+      if (resp.redirected) {
+        // optional small delay so flash can be set server-side
+        window.location.href = resp.url;
+        return;
+      }
+
+      // If backend returned JSON (success), update UI without reload
+      const ct = resp.headers.get('content-type') || '';
+      if (ct.includes('application/json')) {
+        const data = await resp.json();
+        if (data.success) {
+          // append row to table
+          appendEmployeeRow(data.employee);
+          addEmployeeModal.classList.remove('active');
+          addEmployeeForm.reset();
+          alert('Employee added successfully!');
+        } else {
+          alert('Failed to add: ' + (data.error || 'Unknown'));
+        }
+        return;
+      }
+
+      // fallback: reload page to show updated data and flash messages
+      window.location.reload();
+    } catch (err) {
+      console.error('Add employee failed:', err);
+      alert('Network or server error while adding employee.');
+    }
+  });
+
+  // helper to append a new row to table
+  function appendEmployeeRow(emp) {
+    // emp is an object with keys: name, emailid, role, status
+    const tbody = document.querySelector('#employeesTable tbody');
+    const tr = document.createElement('tr');
+    tr.setAttribute('data-email', (emp.emailid || '').toLowerCase());
+
+    tr.innerHTML = `
+      <td>${escapeHtml(emp.name || '')}</td>
+      <td>${escapeHtml(emp.emailid || '')}</td>
+      <td><span class="role-badge ${escapeHtml((emp.role||'').toLowerCase())}">${escapeHtml((emp.role||'').toLowerCase())}</span></td>
+      <td><span class="status-badge ${escapeHtml((emp.status||'').toLowerCase())}">${escapeHtml((emp.status||'').toLowerCase())}</span></td>
+      <td class="actions"><span class="edit-icon"><i class="fa-regular fa-pen-to-square"></i></span></td>
+      <td><button class="deactivate-btn">Deactivate</button></td>
+    `;
+    tbody.appendChild(tr);
+    attachRowListeners(tr);
+  }
+
+  // small escape helper
+  function escapeHtml(unsafe) {
+    return (unsafe+'').replace(/[&<>"']/g, function(m) {
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];
+    });
+  }
+
+  // --- Edit flow: open modal with selected row data ---
+  function attachRowListeners(row) {
+    // Edit icon
+    const editIcon = row.querySelector('.edit-icon');
+    if (editIcon) {
+      editIcon.addEventListener('click', (e) => {
+        const r = e.target.closest('tr');
+        const name = r.cells[0].textContent.trim();
+        const email = r.cells[1].textContent.trim();
+        const role = r.cells[2].querySelector('.role-badge').textContent.trim();
+        const status = r.cells[3].querySelector('.status-badge').textContent.trim();
+
+        editFullName.value = name;
+        editEmail.value = email;
+        editRole.value = capitalize(role);
+        editStatus.value = capitalize(status);
+        originalEmail.value = email.toLowerCase();
+
+        // store editing row index for quick DOM update later
+        editEmployeeModal.dataset.editingRow = Array.from(r.parentNode.children).indexOf(r);
+
+        editEmployeeModal.classList.add('active');
+      });
+    }
+
+    // Activate/Deactivate buttons
+    const actionBtn = row.querySelector('td:last-child button');
+    if (actionBtn) {
+      actionBtn.addEventListener('click', (e) => {
+        // toggle locally (this is optional; for persistent change implement server call)
+        const r = e.target.closest('tr');
+        const statusBadge = r.querySelector('.status-badge');
+        if (e.target.classList.contains('activate-btn')) {
+          statusBadge.classList.remove('inactive'); statusBadge.classList.add('active');
+          statusBadge.textContent = 'active';
+          e.target.textContent = 'Deactivate';
+          e.target.classList.remove('activate-btn');
+          e.target.classList.add('deactivate-btn');
+        } else {
+          statusBadge.classList.remove('active'); statusBadge.classList.add('inactive');
+          statusBadge.textContent = 'inactive';
+          e.target.textContent = 'Activate';
+          e.target.classList.remove('deactivate-btn');
+          e.target.classList.add('activate-btn');
+        }
+      });
+    }
+  }
+
+  // attach listeners initially for existing rows
+  document.querySelectorAll('#employeesTable tbody tr').forEach(attachRowListeners);
+
+  function capitalize(s) {
+    if (!s) return s;
+    return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+  }
+
+  // --- Edit submit: send update to backend and update DOM if ok ---
+  editEmployeeForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = new FormData(editEmployeeForm);
+    // include originalEmail to find row in sheet
+    payload.set('originalEmail', originalEmail.value);
+
+    try {
+      const resp = await fetch('/admin/update_employee', {
+        method: 'POST',
+        body: payload,
+        credentials: 'same-origin'
+      });
+
+      if (resp.redirected) {
+        window.location.href = resp.url;
+        return;
+      }
+
+      const ct = resp.headers.get('content-type') || '';
+      if (ct.includes('application/json')) {
+        const data = await resp.json();
+        if (data.success) {
+          // update row in DOM
+          const rows = document.querySelectorAll('#employeesTable tbody tr');
+          const rowIndex = editEmployeeModal.dataset.editingRow;
+          const row = rows[rowIndex];
+          if (row) {
+            row.cells[0].textContent = data.employee.name;
+            row.cells[1].textContent = data.employee.emailid;
+            const roleBadge = row.cells[2].querySelector('.role-badge');
+            roleBadge.textContent = data.employee.role.toLowerCase();
+            roleBadge.className = 'role-badge ' + data.employee.role.toLowerCase();
+            const statusBadge = row.cells[3].querySelector('.status-badge');
+            statusBadge.textContent = data.employee.status.toLowerCase();
+            statusBadge.className = 'status-badge ' + data.employee.status.toLowerCase();
+            // update data-email attribute
+            row.setAttribute('data-email', data.employee.emailid.toLowerCase());
+          }
+          editEmployeeModal.classList.remove('active');
+          alert('Employee updated successfully!');
+        } else {
+          alert('Update failed: ' + (data.error || 'Unknown'));
+        }
+        return;
+      }
+
+      // fallback: reload
+      window.location.reload();
+    } catch (err) {
+      console.error('Update failed:', err);
+      alert('Network or server error while updating employee.');
+    }
+  });
+
+  // --- Filtering logic (unchanged) ---
+  const searchInput = document.getElementById('searchInput');
+  const roleFilter = document.getElementById('roleFilter');
+  const statusFilter = document.getElementById('statusFilter');
+  const employeesTable = document.getElementById('employeesTable');
+
+  function filterEmployees() {
+    const searchTerm = (searchInput.value || '').toLowerCase();
+    const roleValue = roleFilter.value;
+    const statusValue = statusFilter.value;
+
+    document.querySelectorAll('#employeesTable tbody tr').forEach(row => {
+      const name = (row.cells[0].textContent || '').toLowerCase();
+      const email = (row.cells[1].textContent || '').toLowerCase();
+      const role = (row.cells[2].querySelector('.role-badge').textContent || '').toLowerCase();
+      const status = (row.cells[3].querySelector('.status-badge').textContent || '').toLowerCase();
+
+      const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm);
+      const matchesRole = roleValue === 'all' || role === roleValue;
+      const matchesStatus = statusValue === 'all' || status === statusValue;
+
+      row.style.display = (matchesSearch && matchesRole && matchesStatus) ? '' : 'none';
+    });
+  }
+
+  searchInput.addEventListener('input', filterEmployees);
+  roleFilter.addEventListener('change', filterEmployees);
+  statusFilter.addEventListener('change', filterEmployees);
+
+  // helper: attach listeners to rows added later
+  // (already used in appendEmployeeRow)
+</script>
+
+</body>
+</html>

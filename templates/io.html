@@ -6,7 +6,7 @@
     <title>Cell Layout Review</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-<style>
+    <style>
         :root {
             --primary: #2c3e50;
             --primary-light: #34495e;
@@ -22,8 +22,8 @@
             --text-light: #7f8c8d;
             --text-dark: #2c3e50;
             --table-header: #f5f6f7;
-            --header-bg: #12a5a5; /* New variable for distinct header background */
-            --header-text: #ffffff; /* New variable for header text color */
+            --header-bg: #12a5a5;
+            --header-text: #ffffff;
         }
         
         * {
@@ -382,7 +382,7 @@
             flex: 1;
             overflow: auto;
             padding: 0 24px 20px;
-            position: relative; /* Ensure positioning context for sticky header */
+            position: relative;
         }
         
         table {
@@ -399,16 +399,16 @@
         }
             
         th {
-            background: var(--header-bg); /* Distinct header background */
-            color: var(--header-text); /* White text for contrast */
-            font-weight: 600; /* Bolder text */
+            background: var(--header-bg);
+            color: var(--header-text);
+            font-weight: 600;
             font-size: 11px;
             text-transform: uppercase;
-            position: sticky; /* Fixed header */
+            position: sticky;
             top: 0;
-            z-index: 10; /* Ensure header stays above content */
-            box-shadow: 0 2px 2px -1px rgba(0,0,0,0.2); /* Subtle shadow for depth */
-            border-bottom: 2px solid #34495e; /* Darker border for distinction */
+            z-index: 10;
+            box-shadow: 0 2px 2px -1px rgba(0,0,0,0.2);
+            border-bottom: 2px solid #34495e;
         }
         
         tr:hover {
@@ -456,7 +456,6 @@
         .description-text.expanded {
             line-clamp: unset;
             -webkit-line-clamp: unset;
-            -moz-line-clamp: unset;
         }
         
         .show-more-btn {
@@ -697,6 +696,134 @@
             gap: 10px;
         }
 
+        /* Professional Loading Component for Checklist Table */
+        .loading-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(2px);
+        }
+
+        .loading-spinner {
+            border: 5px solid #e0e0e0;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        .loading-text {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-dark);
+            letter-spacing: 0.3px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Enhanced Popup Styles */
+        .popup {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            display: none;
+            min-width: 300px;
+            text-align: center;
+        }
+
+        .popup.show {
+            display: block;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .popup.error {
+            background: var(--danger);
+        }
+
+        .popup.warning {
+            background: var(--warning);
+        }
+
+        /* Delete Confirmation Popup */
+        .delete-confirm-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #ffffff;
+            color: var(--text-dark);
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            z-index: 2000;
+            display: none;
+            min-width: 350px;
+            max-width: 450px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .delete-confirm-popup.show {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .delete-confirm-popup p {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .delete-confirm-popup h3 {
+            margin: 0 0 10px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--danger);
+        }
+
+        .delete-confirm-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .delete-confirm-actions .btn-primary.delete {
+            background: var(--danger);
+        }
+
+        .delete-confirm-actions .btn-primary.delete:hover {
+            background: #c0392b;
+        }
+
         @media (max-width: 1024px) {
             .review-section {
                 grid-template-columns: 1fr 1fr 1fr;
@@ -711,6 +838,10 @@
             .image-view-container {
                 width: 300px;
                 right: -300px;
+            }
+
+            .delete-confirm-popup {
+                min-width: 300px;
             }
         }
         
@@ -806,7 +937,6 @@
             .description-cell, .comment-cell {
                 line-clamp: unset;
                 -webkit-line-clamp: unset;
-               
             }
             
             .show-more-btn {
@@ -816,6 +946,10 @@
             .image-view-container {
                 width: 100%;
                 right: -100%;
+            }
+
+            .delete-confirm-popup {
+                min-width: 90%;
             }
         }
     </style>
@@ -884,18 +1018,22 @@
                 <h2>Review Checklist</h2>
                 <div class="filters">
                     <button class="filter-btn active" data-filter="all">All Items</button>
-                    <button class="filter-btn" data-filter="not-reviewed">NOT REVIEWED</button>
-                    <button class="filter-btn" data-filter="completed">COMPLETED</button>
-                    <button class="filter-btn" data-filter="action-needed">REV & ACTION NEEDED</button>
+                    <button class="filter-btn" data-filter="not-reviewed">Not Reviewed</button>
+                    <button class="filter-btn" data-filter="completed">Reviewed</button>
+                    <button class="filter-btn" data-filter="action-needed">Rev & Action Needed</button>
                 </div>
                 <div class="counters">
-                    <span class="counter pending" id="pending-count">Pending: 0</span>
-                    <span class="counter pass" id="pass-count">Pass: 0</span>
-                    <span class="counter fail" id="fail-count">Fail: 0</span>
+                    <span class="counter pending" id="pending-count">Not Reviewed: 0</span>
+                    <span class="counter pass" id="pass-count">Reviewed: 0</span>
+                    <span class="counter fail" id="fail-count">Rev & Action Needed: 0</span>
                 </div>
             </div>
             
             <div class="table-container">
+                <div class="loading-overlay" id="loading-overlay">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Loading Checklist...</div>
+                </div>
                 <table id="checklist-table">
                     <thead>
                         <tr>
@@ -936,15 +1074,27 @@
                 </div>
             </div>
         </div>
+
+        <div class="popup" id="popup-notification"></div>
+        <div class="delete-confirm-popup" id="delete-confirm-popup">
+            <h3>Confirm Deletion</h3>
+            <p>Are you sure you want to delete this checklist item?</p>
+            <div class="delete-confirm-actions">
+                <button class="btn btn-secondary" id="cancel-delete-btn">Cancel</button>
+                <button class="btn btn-primary delete" id="confirm-delete-btn">Delete</button>
+            </div>
+        </div>
     </div>
 
     <script>
         let checklistData = [];
         let reviewData = {};
         let editingItemId = null;
+        let pendingChanges = { create: [], update: [], delete: [] };
         const API_BASE_URL = '/api';
         let projectData = null;
         let cellData = null;
+        let deleteItemId = null;
 
         // Get project_id and cell_id from URL query parameters
         const urlParams = new URLSearchParams(window.location.search);
@@ -954,12 +1104,13 @@
         document.addEventListener('DOMContentLoaded', async function () {
             if (!projectId || !cellId) {
                 console.error('Missing project_id or cell_id in URL:', { projectId, cellId });
-                alert('Missing project or cell information. Redirecting to projects page.');
-                window.location.href = '/projects';
+                showPopup('Missing project or cell information.', 'error');
+                setTimeout(() => { window.location.href = '/projects'; }, 2000);
                 return;
             }
 
             try {
+                showLoading();
                 await fetchProjectData();
                 await fetchCellData();
                 await fetchChecklistData();
@@ -967,37 +1118,28 @@
                 renderTable();
             } catch (error) {
                 console.error('Initialization error:', error);
-                alert('Failed to load cell review data. Please try again.');
+                showPopup('Failed to load cell review data. Please try again.', 'error');
                 if (error.message.includes('Project not found')) {
-                    window.location.href = '/projects';
+                    setTimeout(() => { window.location.href = '/projects'; }, 2000);
                 }
+            } finally {
+                hideLoading();
             }
 
             // Set initial date if not fetched
             if (!document.getElementById('review-date').value) {
-                const now = new Date();
-                const formattedDate = now.toISOString().slice(0, 16);
+                const now = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
+                const formattedDate = new Date(now).toISOString().slice(0, 16);
                 document.getElementById('review-date').value = formattedDate;
             }
 
-            // Ensure export button event listener is attached
-            const exportButton = document.getElementById('print-btn');
-            if (exportButton) {
-                exportButton.addEventListener('click', () => {
-                    console.log('Export button clicked, triggering exportReport');
-                    exportReport();
-                });
-            } else {
-                console.error('Export button with ID "print-btn" not found in the DOM');
-                alert('Export button not found. Please check the HTML.');
-            }
-
-            // Add event listener for Add Checklist button
+            // Event listeners
             document.getElementById('add-checklist-btn').addEventListener('click', addChecklist);
-
-            // Other event listeners
             document.getElementById('cancel-checklist-btn').addEventListener('click', closeChecklistModal);
             document.getElementById('save-checklist-btn').addEventListener('click', saveChecklistItem);
+            document.getElementById('print-btn').addEventListener('click', exportReport);
+            document.getElementById('cancel-delete-btn').addEventListener('click', closeDeleteConfirm);
+            document.getElementById('confirm-delete-btn').addEventListener('click', confirmDelete);
         });
 
         async function fetchProjectData() {
@@ -1209,7 +1351,7 @@
                 deleteBtn.className = 'action-btn delete';
                 deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
                 deleteBtn.dataset.id = item.id;
-                deleteBtn.addEventListener('click', () => deleteChecklistItem(item.id));
+                deleteBtn.addEventListener('click', () => showDeleteConfirm(item.id));
 
                 actionsCell.appendChild(editBtn);
                 actionsCell.appendChild(deleteBtn);
@@ -1262,12 +1404,14 @@
 
         async function handleChange(event) {
             const id = event.target.dataset.id;
-            const item = checklistData.find(item => item.id == id);
+            let item = checklistData.find(item => item.id == id);
 
             if (!item) {
                 console.error('Checklist item not found:', id);
                 return;
             }
+
+            item = { ...item };
 
             if (event.target.tagName === 'SELECT' && event.target.options[0].value === 'yes') {
                 item.applicable = event.target.value;
@@ -1279,17 +1423,16 @@
                 item.comment = event.target.value;
             }
 
-            try {
-                const response = await fetch(`${API_BASE_URL}/checklist/${id}?project_id=${projectId}&cell_id=${cellId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(item)
-                });
-                if (!response.ok) {
-                    console.error('Failed to update checklist item:', response.status, response.statusText);
-                }
-            } catch (error) {
-                console.error('Error updating checklist item:', error);
+            const existingUpdateIndex = pendingChanges.update.findIndex(change => change.id == id);
+            if (existingUpdateIndex !== -1) {
+                pendingChanges.update[existingUpdateIndex] = item;
+            } else {
+                pendingChanges.update.push(item);
+            }
+
+            const checklistIndex = checklistData.findIndex(item => item.id == id);
+            if (checklistIndex !== -1) {
+                checklistData[checklistIndex] = item;
             }
 
             updateCounters();
@@ -1326,7 +1469,7 @@
                 };
                 reader.readAsDataURL(file);
             } else {
-                alert('Please upload a JPEG or PNG file under 5MB.');
+                showPopup('Please upload a JPEG or PNG file under 5MB.', 'error');
                 document.getElementById('fileInput').value = '';
             }
         }
@@ -1343,18 +1486,35 @@
                     const data = await response.json();
                     reviewData.imageUrl = data.cellimage ? `${API_BASE_URL}/image/${data.cellimage}` : '';
                     document.getElementById('image-view-img').src = reviewData.imageUrl;
+                    showPopup('Image uploaded successfully.');
                 } else {
                     console.error('Failed to upload image:', response.status, response.statusText);
+                    showPopup('Failed to upload image.', 'error');
                 }
             } catch (error) {
                 console.error('Error uploading image:', error);
+                showPopup('Error uploading image.', 'error');
             }
         }
 
         async function saveReview() {
+            showLoading();
             const reviewer = document.getElementById('reviewer').value;
             const layouter = document.getElementById('layouter').value;
-            const reviewdate = document.getElementById('review-date').value;
+            const now = new Date().toLocaleString('en-IN', { 
+                timeZone: 'Asia/Kolkata',
+                hour12: false,
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            const [datePart, timePart] = now.split(', ');
+            const [day, month, year] = datePart.split('/');
+            const reviewdate = `${year}-${month}-${day}T${timePart}`;
+
+            document.getElementById('review-date').value = reviewdate;
 
             const allCompleted = checklistData.every(item => item.status === 'completed');
             const status = allCompleted ? 'completed' : 'in-progress';
@@ -1366,20 +1526,75 @@
                 formData.append('reviewdate', reviewdate);
                 formData.append('status', status);
 
-                const response = await fetch(`${API_BASE_URL}/cells/${cellId}?project_id=${projectId}`, {
+                const cellResponse = await fetch(`${API_BASE_URL}/cells/${cellId}?project_id=${projectId}`, {
                     method: 'PUT',
                     body: formData
                 });
-                if (response.ok) {
-                    alert('Review saved successfully!');
-                    await fetchCellData();
-                } else {
-                    console.error('Failed to save review:', response.status, response.statusText);
-                    alert('Failed to save review.');
+                if (!cellResponse.ok) {
+                    console.error('Failed to save review:', cellResponse.status, cellResponse.statusText);
+                    showPopup('Failed to save review.', 'error');
+                    hideLoading();
+                    return;
                 }
+                await fetchCellData();
+
+                const createPromises = pendingChanges.create.map(async item => {
+                    const response = await fetch(`${API_BASE_URL}/checklist?project_id=${projectId}&cell_id=${cellId}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(item)
+                    });
+                    if (!response.ok) {
+                        throw new Error(`Failed to create checklist item: ${response.status} ${response.statusText}`);
+                    }
+                    return { tempId: item.id, item: await response.json() };
+                });
+
+                const updatePromises = pendingChanges.update.map(async item => {
+                    const response = await fetch(`${API_BASE_URL}/checklist/${item.id}?project_id=${projectId}&cell_id=${cellId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(item)
+                    });
+                    if (!response.ok) {
+                        throw new Error(`Failed to update checklist item ${item.id}: ${response.status} ${response.statusText}`);
+                    }
+                    return response.json();
+                });
+
+                const deletePromises = pendingChanges.delete.map(async id => {
+                    const response = await fetch(`${API_BASE_URL}/checklist/${id}?project_id=${projectId}&cell_id=${cellId}`, {
+                        method: 'DELETE'
+                    });
+                    if (!response.ok) {
+                        throw new Error(`Failed to delete checklist item ${id}: ${response.status} ${response.statusText}`);
+                    }
+                    return id;
+                });
+
+                const [createdItems, updatedItems, deletedIds] = await Promise.all([
+                    Promise.all(createPromises),
+                    Promise.all(updatePromises),
+                    Promise.all(deletePromises)
+                ]);
+
+                createdItems.forEach(({ tempId, item }) => {
+                    const index = checklistData.findIndex(data => data.id === tempId);
+                    if (index !== -1) {
+                        checklistData[index] = item.item;
+                    }
+                });
+
+                checklistData = checklistData.filter(item => !deletedIds.includes(item.id));
+                pendingChanges = { create: [], update: [], delete: [] };
+
+                showPopup('Review saved successfully.');
+                renderTable(document.querySelector('.filter-btn.active')?.dataset.filter || 'all');
             } catch (error) {
                 console.error('Error saving review:', error);
-                alert('Failed to save review.');
+                showPopup('Failed to save review.', 'error');
+            } finally {
+                hideLoading();
             }
 
             updateCounters();
@@ -1399,7 +1614,7 @@
         function exportReport() {
             const reviewer = document.getElementById('reviewer').value || 'Not Assigned';
             const layouter = document.getElementById('layouter').value || 'Not Assigned';
-            const reviewDate = document.getElementById('review-date').value || new Date().toISOString().slice(0, 10);
+            const reviewDate = document.getElementById('review-date').value || new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }).slice(0, 16);
 
             const headers = [
                 'Project ID',
@@ -1441,6 +1656,7 @@
             a.click();
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
+            showPopup('Report exported successfully.');
         }
 
         function toggleImageView() {
@@ -1471,60 +1687,106 @@
             descriptionInput.focus();
         }
 
+        function showLoading() {
+            document.getElementById('loading-overlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-overlay').style.display = 'none';
+        }
+
+        function showPopup(message, type = 'success') {
+            const popup = document.getElementById('popup-notification');
+            popup.textContent = message;
+            popup.className = `popup show ${type === 'error' ? 'error' : type === 'warning' ? 'warning' : ''}`;
+            setTimeout(() => {
+                popup.classList.remove('show');
+            }, 3000);
+        }
+
+        function showDeleteConfirm(id) {
+            deleteItemId = id;
+            const popup = document.getElementById('delete-confirm-popup');
+            popup.classList.add('show');
+        }
+
+        function closeDeleteConfirm() {
+            const popup = document.getElementById('delete-confirm-popup');
+            popup.classList.remove('show');
+            deleteItemId = null;
+        }
+
+        async function confirmDelete() {
+            if (!deleteItemId) return;
+
+            showLoading();
+            if (!deleteItemId.startsWith('temp-')) {
+                pendingChanges.delete.push(deleteItemId);
+            }
+
+            checklistData = checklistData.filter(item => item.id != deleteItemId);
+            showPopup('Checklist item deleted successfully.');
+            renderTable(document.querySelector('.filter-btn.active')?.dataset.filter || 'all');
+            
+            closeDeleteConfirm();
+            hideLoading();
+        }
+
         async function saveChecklistItem() {
             const description = document.getElementById('checklist-description').value.trim();
             if (!description) {
-                alert('Please enter a description.');
+                showPopup('Please enter a description.', 'error');
                 return;
             }
+
+            closeChecklistModal();
+            showLoading();
 
             if (editingItemId) {
                 const item = checklistData.find(item => item.id == editingItemId);
                 if (!item) {
                     console.error('Editing item not found:', editingItemId);
+                    showPopup('Error editing checklist item.', 'error');
+                    hideLoading();
                     return;
                 }
-                item.description = description;
-                try {
-                    const response = await fetch(`${API_BASE_URL}/checklist/${editingItemId}?project_id=${projectId}&cell_id=${cellId}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(item)
-                    });
-                    if (response.ok) {
-                        renderTable(document.querySelector('.filter-btn.active')?.dataset.filter || 'all');
-                        closeChecklistModal();
-                    } else {
-                        console.error('Failed to update checklist item:', response.status, response.statusText);
-                    }
-                } catch (error) {
-                    console.error('Error updating checklist item:', error);
+                const updatedItem = { ...item, description };
+                
+                const existingUpdateIndex = pendingChanges.update.findIndex(change => change.id == editingItemId);
+                if (existingUpdateIndex !== -1) {
+                    pendingChanges.update[existingUpdateIndex] = updatedItem;
+                } else {
+                    pendingChanges.update.push(updatedItem);
                 }
+
+                const checklistIndex = checklistData.findIndex(item => item.id == editingItemId);
+                if (checklistIndex !== -1) {
+                    checklistData[checklistIndex] = updatedItem;
+                }
+
+                showPopup('Checklist item updated successfully.');
+                renderTable(document.querySelector('.filter-btn.active')?.dataset.filter || 'all');
             } else {
+                const tempId = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
                 const newItem = {
+                    id: tempId,
                     description: description,
                     applicable: 'not-applicable',
                     status: 'not-reviewed',
                     comment: ''
                 };
-                try {
-                    const response = await fetch(`${API_BASE_URL}/checklist?project_id=${projectId}&cell_id=${cellId}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(newItem)
-                    });
-                    if (response.ok) {
-                        const data = await response.json();
-                        checklistData.push(data.item);
-                        renderTable(document.querySelector('.filter-btn.active')?.dataset.filter || 'all');
-                        closeChecklistModal();
-                    } else {
-                        console.error('Failed to add checklist item:', response.status, response.statusText);
-                    }
-                } catch (error) {
-                    console.error('Error adding checklist item:', error);
+
+                if (!pendingChanges.create.some(item => item.description === description)) {
+                    pendingChanges.create.push(newItem);
+                    checklistData.push(newItem);
                 }
+
+                showPopup('Checklist item added successfully.');
+                renderTable(document.querySelector('.filter-btn.active')?.dataset.filter || 'all');
             }
+
+            hideLoading();
+            editingItemId = null;
         }
 
         async function editChecklistItem(id) {
@@ -1537,44 +1799,11 @@
         }
 
         async function deleteChecklistItem(id) {
-            if (confirm('Are you sure you want to delete this checklist item?')) {
-                try {
-                    const response = await fetch(`${API_BASE_URL}/checklist/${id}?project_id=${projectId}&cell_id=${cellId}`, {
-                        method: 'DELETE'
-                    });
-                    if (response.ok) {
-                        checklistData = checklistData.filter(item => item.id != id);
-                        renderTable(document.querySelector('.filter-btn.active')?.dataset.filter || 'all');
-                    } else {
-                        console.error('Failed to delete checklist item:', response.status, response.statusText);
-                    }
-                } catch (error) {
-                    console.error('Error deleting checklist item:', error);
-                }
-            }
+            showDeleteConfirm(id);
         }
 
         async function addChecklist() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/add_checklist`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ project_id: projectId, cell_id: cellId })
-                });
-                if (response.ok) {
-                    const result = await response.json();
-                    alert(result.message || 'Checklist added successfully!');
-                    await fetchChecklistData(); // Refresh checklist data
-                    renderTable(document.querySelector('.filter-btn.active')?.dataset.filter || 'all');
-                } else {
-                    const error = await response.json();
-                    alert('Error: ' + (error.error || 'Failed to add checklist'));
-                    console.error('Failed to add checklist:', response.status, response.statusText, error);
-                }
-            } catch (error) {
-                console.error('Error adding checklist:', error);
-                alert('An error occurred while adding the checklist. Please try again.');
-            }
+            openChecklistModal();
         }
 
         function goBack() {

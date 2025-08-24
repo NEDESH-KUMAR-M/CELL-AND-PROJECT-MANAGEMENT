@@ -446,7 +446,7 @@ def login():
         session["user"] = {"email": user["email"], "role": user["role"]}
         session.permanent = False
         if user["role"] == "admin":
-            return redirect(url_for("admin_dashboard"))
+            return redirect(url_for("projects_page"))
         else:
             return redirect(url_for("employee_dashboard"))
     return render_template("login.html")
@@ -1234,7 +1234,65 @@ def get_checklist_items(layoutType):
     else:
         print(f"Unknown layoutType after mapping: '{mapped_layoutType}', returning empty checklist")  # Debug log
         return []  # Default empty for unknown types
-
+# Add this function after the existing api_get_cells route or in the checklist section
+@app.route('/api/checklist', methods=['GET'])
+@login_required()
+def api_get_checklist():
+    project_id = request.args.get('project_id')
+    cell_id = request.args.get('cell_id')
+    
+    if not project_id or not cell_id:
+        return jsonify(error='project_id and cell_id required'), 400
+    
+    try:
+        project_sheet_id = get_project_sheet_id(project_id)
+        if not project_sheet_id:
+            return jsonify(error='Project sheet not found'), 404
+        
+        cell_info_ws = get_project_sheet_worksheet(project_sheet_id, "cell_information")
+        if not cell_info_ws:
+            return jsonify(error='cell_information sheet not found'), 404
+        
+        cells = cell_info_ws.get_all_records()
+        subsheet_name = None
+        layoutType = None
+        for cell in cells:
+            if str(cell.get('id', '')) == cell_id:
+                subsheet_name = cell.get('subsheet_name')
+                layoutType = cell.get('layoutType', 'customlayout')
+                break
+        
+        if not subsheet_name:
+            return jsonify(error='Cell not found'), 404
+        
+        checklist_ws = get_project_sheet_worksheet(project_sheet_id, subsheet_name)
+        if not checklist_ws:
+            return jsonify(error='Checklist sheet not found'), 404
+        
+        records = checklist_ws.get_all_records()
+        checklist_items = []
+        headers = ['id', 'description', 'applicable', 'status', 'comment']
+        
+        for record in records:
+            item = {h: record.get(h, '') for h in headers}
+            item['id'] = str(record.get('id', ''))  # Ensure ID is string for consistency
+            checklist_items.append(item)
+        
+        # If no items exist, initialize with default items based on layoutType
+        if not checklist_items:
+            create_checklist(checklist_ws, layoutType)
+            set_checklist_dropdowns(project_sheet_id, subsheet_name)
+            records = checklist_ws.get_all_records()
+            for record in records:
+                item = {h: record.get(h, '') for h in headers}
+                item['id'] = str(record.get('id', ''))  # Ensure ID is string
+                checklist_items.append(item)
+        
+        return jsonify(checklist_items)
+    
+    except Exception as e:
+        print(f"Error fetching checklist for cell {cell_id} in project {project_id}: {e}")
+        return jsonify(error=str(e)), 500
 # New endpoint to update checklist item
 @app.route('/api/checklist/<string:item_id>', methods=['PUT'])
 @login_required()

@@ -134,17 +134,22 @@
     .user-info i {
       font-size: 24px;
     }
-    
+    .user-text {
+      max-width: 170px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     .user-text .name {
       font-size: 0.85rem;
       font-weight: 600;
     }
-    
+
     .user-text .role {
       font-size: 0.8rem;
       color: var(--success);
     }
-    
     .toggle-btn {
       width: 30px;
       height: 30px;
@@ -435,6 +440,31 @@
       background-position: center;
       background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect x="2" y="2" width="60" height="60" rx="8" fill="%230fb8b0"/><rect x="12" y="12" width="40" height="40" rx="6" fill="none" stroke="%23ffffff" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><g stroke="%23ffffff" stroke-width="3" stroke-linecap="round"><line x1="18" y1="4" x2="18" y2="12"/><line x1="26" y1="4" x2="26" y2="12"/><line x1="34" y1="4" x2="34" y2="12"/><line x1="42" y1="4" x2="42" y2="12"/></g><g stroke="%23ffffff" stroke-width="3" stroke-linecap="round"><line x1="18" y1="60" x2="18" y2="52"/><line x1="26" y1="60" x2="26" y2="52"/><line x1="34" y1="60" x2="34" y2="52"/><line x1="42" y1="60" x2="42" y2="52"/></g><g stroke="%23ffffff" stroke-width="3" stroke-linecap="round"><line x1="4" y1="18" x2="12" y2="18"/><line x1="4" y1="26" x2="12" y2="26"/><line x1="60" y1="18" x2="52" y2="18"/><line x1="60" y1="26" x2="52" y2="26"/><line x1="60" y1="34" x2="52" y2="34"/><line x1="60" y1="42" x2="52" y2="42"/></g><rect x="24" y="24" width="16" height="16" rx="2" fill="%23ffffff"/></svg>');
     }
+    
+    /* Loading Spinner Styles */
+    .loading-modal {
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      z-index: 1100; /* Above project modal */
+    }
+    
+    .loading-modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid #10b981;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
@@ -613,6 +643,11 @@
   </div>
 </div>
 
+<!-- Loading Modal -->
+<div id="loading-modal" class="loading-modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 invisible">
+  <div class="spinner"></div>
+</div>
+
 <script>
   // Global state
   let allProjects = [];
@@ -621,6 +656,7 @@
   const projectsList = document.getElementById('projects-list');
   const projectCountEl = document.getElementById('project-count');
   const modal = document.getElementById('project-modal');
+  const loadingModal = document.getElementById('loading-modal');
   const modalTitle = document.getElementById('modal-title');
   const projectForm = document.getElementById('project-form');
   const saveProjectBtn = document.getElementById('save-project');
@@ -871,6 +907,9 @@
       return;
     }
 
+    // Show loading modal
+    loadingModal.classList.add('active');
+
     const projectId = document.getElementById('project-id').value;
     const formData = new FormData();
 
@@ -908,6 +947,9 @@
     } catch (error) {
       console.error('Failed to save project:', error);
       alert(`Failed to save project: ${error.message}`);
+    } finally {
+      // Hide loading modal
+      loadingModal.classList.remove('active');
     }
   });
 
@@ -975,30 +1017,34 @@
       filterProjects();
     });
   });
-  searchInput.addEventListener('input', filterProjects);
-  
+  searchInput.addEventListener('input', debounce(filterProjects, 300));
+
+  function debounce(func, wait) {
+    let timeout;
+    return function (...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+  }
+
   function filterProjects() {
-    const statusFilter = document.querySelector('.filter-btn.active').dataset.filter;
-    const searchTerm = searchInput.value.toLowerCase();
+    const statusFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+    const searchTerm = searchInput.value.toLowerCase().trim();
     let visibleCount = 0;
 
     document.querySelectorAll('.project-card').forEach(card => {
       const projectStatus = card.dataset.status;
       const projectText = card.textContent.toLowerCase();
-      
-      const matchesStatus = (statusFilter === 'all') || (projectStatus === statusFilter);
-      const matchesSearch = projectText.includes(searchTerm);
 
-      if (matchesStatus && matchesSearch) {
-        card.style.display = 'block';
-        visibleCount++;
-      } else {
-        card.style.display = 'none';
-      }
+      const matchesStatus = statusFilter === 'all' || projectStatus === statusFilter;
+      const matchesSearch = searchTerm === '' || projectText.includes(searchTerm);
+
+      card.style.display = matchesStatus && matchesSearch ? 'block' : 'none';
+      if (matchesStatus && matchesSearch) visibleCount++;
     });
+
     projectCountEl.textContent = `Showing ${visibleCount} of ${allProjects.length} projects`;
   }
-
   // ----- INITIALIZATION -----
   document.addEventListener('DOMContentLoaded', () => {
     fetchProjects();

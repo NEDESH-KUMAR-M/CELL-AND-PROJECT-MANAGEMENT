@@ -203,7 +203,7 @@ body {
       <h1 class="title">Project Management</h1>
 
       <!-- Form -->
-      <form method="POST" action="/" class="login-form">
+      <form method="POST" action="{{ url_for('login') }}" class="login-form">
         <div class="input-field">
           <i class="fa-solid fa-envelope icon"></i>
           <input type="email" name="email" placeholder="Email" required />

@@ -1,0 +1,1593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cell Layout Review</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<style>
+        :root {
+            --primary: #2c3e50;
+            --primary-light: #34495e;
+            --secondary: #7f8c8d;
+            --success: #27ae60;
+            --success-light: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --light-gray: #dfe6e9;
+            --border: #bdc3c7;
+            --border-dark: #95a5a6;
+            --text-light: #7f8c8d;
+            --text-dark: #2c3e50;
+            --table-header: #f5f6f7;
+            --header-bg: #12a5a5; /* New variable for distinct header background */
+            --header-text: #ffffff; /* New variable for header text color */
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: var(--light-gray);
+            color: var(--text-dark);
+            font-size: 13px;
+            line-height: 1.5;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .container {
+            flex: 1;
+            max-width: 1800px;
+            margin: 0 auto;
+            background: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            border-left: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            position: relative;
+        }
+        
+        .header {
+            padding: 14px 24px;
+            background: #f8f9fa;
+            color: #495057;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        }
+        .header-info {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            letter-spacing: 0.3px;
+            color: #212529;
+        }
+        
+        .subtitle {
+            margin: 4px 0 0;
+            font-size: 12px;
+            color: #6c757d;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 400;
+        }
+        
+        .tags {
+            display: inline-block;
+            padding: 4px 10px;
+            margin-right: 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(0,0,0,0.08);
+            margin-top: 8px;
+            color: #495057;
+        }
+
+        .tags.cell { 
+            background: #e0f7fa;
+            color: #00838f;
+            border: 1px solid #b2ebf2;
+        }
+        
+        .tags.in-progress { 
+            background: #fff3e0;
+            color: #ef6c00;
+            border: 1px solid #ffe0b2;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            margin-left: 20px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+        }
+        
+        .btn-primary {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--success-light);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--text-dark);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: #f5f5f5;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+            box-shadow: none;
+        }
+        
+        .btn-back {
+            background: transparent;
+            color: var(--primary);
+            border: none;
+            padding: 8px 12px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+        
+        .btn-back:hover {
+            background: rgba(0,0,0,0.05);
+            border-radius: 4px;
+        }
+        
+        .progress-container {
+            padding: 12px 24px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--light-gray);
+            border-radius: 4px;
+            margin: 0 15px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--success);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            font-size: 12px;
+            font-weight: 500;
+            min-width: 45px;
+            text-align: right;
+            color: var(--text-dark);
+        }
+        
+        .review-section {
+            padding: 16px 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 120px;
+            gap: 18px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            background: white;
+        }
+        
+        .info-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        
+        .info-group label {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-bottom: 6px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        select, input {
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 13px;
+            width: 100%;
+            background: white;
+            transition: all 0.2s ease;
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 14px;
+            padding-right: 32px;
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(44, 62, 80, 0.1);
+        }
+        
+        .upload-preview {
+            width: 100%;
+            height: 100%;
+            border: 1px dashed var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+            background-color: var(--light);
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        
+        .upload-preview:hover {
+            border-color: var(--primary);
+            background-color: #f0f4f8;
+        }
+        
+        .upload-preview i {
+            font-size: 24px;
+            color: var(--text-light);
+        }
+        
+        .checklist-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: white;
+        }
+        
+        .checklist-header {
+            padding: 12px 24px;
+            background: var(--table-header);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        
+        .checklist-header h2 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-dark);
+            letter-spacing: 0.3px;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .filter-btn {
+            padding: 6px 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            background: white;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #495057;
+        }
+
+        .filter-btn.active {
+            background: #495057;
+            color: white;
+            border-color: #495057;
+        }
+        
+        .counters {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .counter {
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .counter.pending { 
+            color: #ff9800;
+            font-weight: 600;
+        }
+        
+        .counter.pass { 
+            color: #4caf50;
+            font-weight: 600;
+        }
+        
+        .counter.fail { 
+            color: #f44336;
+            font-weight: 600;
+        }
+        
+        .table-container {
+            flex: 1;
+            overflow: auto;
+            padding: 0 24px 20px;
+            position: relative; /* Ensure positioning context for sticky header */
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+            
+        th {
+            background: var(--header-bg); /* Distinct header background */
+            color: var(--header-text); /* White text for contrast */
+            font-weight: 600; /* Bolder text */
+            font-size: 11px;
+            text-transform: uppercase;
+            position: sticky; /* Fixed header */
+            top: 0;
+            z-index: 10; /* Ensure header stays above content */
+            box-shadow: 0 2px 2px -1px rgba(0,0,0,0.2); /* Subtle shadow for depth */
+            border-bottom: 2px solid #34495e; /* Darker border for distinction */
+        }
+        
+        tr:hover {
+            background: rgba(0,0,0,0.02);
+        }
+        
+        .description-col {
+            width: 40%;
+        }
+        
+        .applicable-col {
+            width: 12%;
+        }
+        
+        .status-col {
+            width: 18%;
+        }
+        
+        .comment-col {
+            width: 25%;
+        }
+        
+        .actions-col {
+            width: 5%;
+        }
+        
+        .description-cell {
+            white-space: normal;
+            word-break: break-word;
+            max-height: none;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.4;
+            position: relative;
+        }
+        
+        .description-text {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .description-text.expanded {
+            line-clamp: unset;
+            -webkit-line-clamp: unset;
+            -moz-line-clamp: unset;
+        }
+        
+        .show-more-btn {
+            background: none;
+            border: none;
+            color: #3498db;
+            cursor: pointer;
+            padding: 0;
+            margin-top: 5px;
+            font-size: 12px;
+            display: none;
+        }
+        
+        .comment-cell {
+            white-space: normal;
+            word-break: break-word;
+            max-height: none;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+            line-height: 1.4;
+        }
+        
+        select.applicable-yes {
+            background-color: rgba(39, 174, 96, 0.08);
+            border-color: rgba(39, 174, 96, 0.3);
+            color: var(--success);
+            font-weight: 500;
+        }
+        
+        select.applicable-no {
+            background-color: rgba(243, 156, 18, 0.08);
+            border-color: rgba(243, 156, 18, 0.3);
+            color: var(--warning);
+            font-weight: 500;
+        }
+        
+        select.applicable-not-applicable {
+            background-color: rgba(127, 140, 141, 0.08);
+            border-color: rgba(127, 140, 141, 0.3);
+            color: var(--text-light);
+            font-weight: 500;
+        }
+        
+        select.status-action-needed {
+            background-color: rgba(231, 76, 60, 0.08);
+            border-color: rgba(231, 76, 60, 0.3);
+            color: var(--danger);
+            font-weight: 500;
+        }
+        
+        select.status-completed {
+            background-color: rgba(39, 174, 96, 0.08);
+            border-color: rgba(39, 174, 96, 0.3);
+            color: var(--success);
+            font-weight: 500;
+        }
+        
+        select.status-not-reviewed {
+            background-color: rgba(243, 156, 18, 0.08);
+            border-color: rgba(243, 156, 18, 0.3);
+            color: var(--warning);
+            font-weight: 500;
+        }
+        
+        input.comment {
+            font-size: 13px;
+            padding: 8px 12px;
+            width: 100%;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        input.comment:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(44, 62, 80, 0.1);
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+        
+        .action-btn:hover {
+            color: var(--primary);
+        }
+        
+        .action-btn.delete:hover {
+            color: var(--danger);
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f0f4f8;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #95a5a6;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #7f8c8d;
+        }
+
+        .image-view-container {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100%;
+            background: #fff;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .image-view-container.open {
+            right: 0;
+        }
+
+        .image-view-header {
+            padding: 14px 24px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .image-view-header h2 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 500;
+            color: #212529;
+        }
+
+        .image-view-content {
+            flex: 1;
+            padding: 20px;
+            overflow: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--light);
+        }
+
+        .image-view-content img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .toggle-image-view-btn {
+            position: absolute;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            background: #fff;
+            border: 1px solid var(--border);
+            border-right: none;
+            border-radius: 4px 0 0 4px;
+            padding: 10px 8px;
+            cursor: pointer;
+            z-index: 1001;
+            transition: all 0.2s ease;
+        }
+
+        .toggle-image-view-btn:hover {
+            background: #f5f5f5;
+        }
+
+        .toggle-image-view-btn i {
+            font-size: 16px;
+            color: var(--text-dark);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 4px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .modal-content h2 {
+            margin: 0 0 20px;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .modal-content textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            resize: vertical;
+            margin-bottom: 10px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        @media (max-width: 1024px) {
+            .review-section {
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 15px;
+            }
+            
+            .upload-preview {
+                grid-column: span 1;
+                height: 90px;
+            }
+
+            .image-view-container {
+                width: 300px;
+                right: -300px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                padding: 12px 16px;
+            }
+            
+            .header-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .header-actions {
+                width: 100%;
+                justify-content: flex-end;
+                margin-left: 0;
+                margin-top: 8px;
+            }
+            
+            .review-section {
+                grid-template-columns: 1fr 1fr;
+                padding: 12px 16px;
+                gap: 12px;
+            }
+            
+            .upload-preview {
+                grid-column: span 2;
+                height: 70px;
+            }
+            
+            .checklist-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                padding: 12px 16px;
+            }
+            
+            .filters, .counters {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .table-container {
+                padding: 0 16px 15px;
+            }
+            
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            
+            thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            
+            tr {
+                border: 1px solid var(--border);
+                margin-bottom: 10px;
+                padding: 8px;
+            }
+            
+            td {
+                border: none;
+                border-bottom: 1px solid var(--border);
+                position: relative;
+                padding-left: 45%;
+                padding-top: 10px;
+                padding-bottom: 10px;
+            }
+            
+            td:before {
+                content: attr(data-label);
+                position: absolute;
+                left: 12px;
+                width: 40%;
+                font-weight: 500;
+                color: var(--text-light);
+                font-size: 11px;
+                text-transform: uppercase;
+            }
+            
+            .description-col, .applicable-col, 
+            .status-col, .comment-col, .actions-col {
+                width: 100%;
+            }
+            
+            .description-cell, .comment-cell {
+                line-clamp: unset;
+                -webkit-line-clamp: unset;
+               
+            }
+            
+            .show-more-btn {
+                display: block;
+            }
+
+            .image-view-container {
+                width: 100%;
+                right: -100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-info">
+                <button class="btn-back" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div>
+                    <h1 id="header-title">Loading...</h1>
+                    <p class="subtitle" id="header-subtitle">Cell Level</p>
+                    <div id="header-tags">
+                        <span class="tags cell">Loading...</span>
+                        <span class="tags in-progress">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary" id="add-checklist-btn">
+                    <i class="fas fa-plus"></i> Add Checklist
+                </button>
+                <button class="btn btn-primary" id="save-btn">
+                    <i class="fas fa-save"></i> Save Review
+                </button>
+                <button class="btn btn-secondary" id="print-btn">
+                    <i class="fas fa-print"></i> Export Report
+                </button>
+            </div>
+        </div>
+        
+        <div class="progress-container">
+            <span>Review Progress</span>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <span class="progress-text" id="progress-text">0%</span>
+        </div>
+        
+        <div class="review-section">
+            <div class="info-group">
+                <label>Reviewer</label>
+                <select id="reviewer"></select>
+            </div>
+            <div class="info-group">
+                <label>Layouter</label>
+                <select id="layouter"></select>
+            </div>
+            <div class="info-group">
+                <label>Review Date</label>
+                <input type="datetime-local" id="review-date">
+            </div>
+            <div class="info-group">
+                <label>Cell Image</label>
+                <div class="upload-preview" id="upload-preview" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-image"></i>
+                </div>
+                <input type="file" id="fileInput" accept="image/jpeg,image/png" style="display:none;" onchange="previewImage()">
+            </div>
+        </div>
+        
+        <div class="checklist-section">
+            <div class="checklist-header">
+                <h2>Review Checklist</h2>
+                <div class="filters">
+                    <button class="filter-btn active" data-filter="all">All Items</button>
+                    <button class="filter-btn" data-filter="not-reviewed">NOT REVIEWED</button>
+                    <button class="filter-btn" data-filter="completed">COMPLETED</button>
+                    <button class="filter-btn" data-filter="action-needed">REV & ACTION NEEDED</button>
+                </div>
+                <div class="counters">
+                    <span class="counter pending" id="pending-count">Pending: 0</span>
+                    <span class="counter pass" id="pass-count">Pass: 0</span>
+                    <span class="counter fail" id="fail-count">Fail: 0</span>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table id="checklist-table">
+                    <thead>
+                        <tr>
+                            <th class="description-col">Description</th>
+                            <th class="applicable-col">Applicable</th>
+                            <th class="status-col">Status</th>
+                            <th class="comment-col">Comment</th>
+                            <th class="actions-col"></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <button class="toggle-image-view-btn" id="toggle-image-view">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="image-view-container" id="image-view">
+            <div class="image-view-header">
+                <h2>Cell Image View</h2>
+                <button class="btn btn-secondary" id="close-image-view">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="image-view-content" id="image-view-content">
+                <img id="image-view-img" src="" alt="Cell Image">
+            </div>
+        </div>
+
+        <div class="modal" id="checklist-modal">
+            <div class="modal-content">
+                <h2 id="modal-title">Add New Checklist Item</h2>
+                <textarea id="checklist-description" placeholder="Enter checklist description..."></textarea>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="cancel-checklist-btn">Cancel</button>
+                    <button class="btn btn-primary" id="save-checklist-btn">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let checklistData = [];
+        let reviewData = {};
+        let editingItemId = null;
+        const API_BASE_URL = '/api';
+        let projectData = null;
+        let cellData = null;
+
+        // Get project_id and cell_id from URL query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectId = urlParams.get('project_id');
+        const cellId = urlParams.get('cell_id');
+
+        document.addEventListener('DOMContentLoaded', async function () {
+            if (!projectId || !cellId) {
+                console.error('Missing project_id or cell_id in URL:', { projectId, cellId });
+                alert('Missing project or cell information. Redirecting to projects page.');
+                window.location.href = '/projects';
+                return;
+            }
+
+            try {
+                await fetchProjectData();
+                await fetchCellData();
+                await fetchChecklistData();
+                await fetchReviewersAndLayouters();
+                renderTable();
+            } catch (error) {
+                console.error('Initialization error:', error);
+                alert('Failed to load cell review data. Please try again.');
+                if (error.message.includes('Project not found')) {
+                    window.location.href = '/projects';
+                }
+            }
+
+            // Set initial date if not fetched
+            if (!document.getElementById('review-date').value) {
+                const now = new Date();
+                const formattedDate = now.toISOString().slice(0, 16);
+                document.getElementById('review-date').value = formattedDate;
+            }
+
+            // Ensure export button event listener is attached
+            const exportButton = document.getElementById('print-btn');
+            if (exportButton) {
+                exportButton.addEventListener('click', () => {
+                    console.log('Export button clicked, triggering exportReport');
+                    exportReport();
+                });
+            } else {
+                console.error('Export button with ID "print-btn" not found in the DOM');
+                alert('Export button not found. Please check the HTML.');
+            }
+
+            // Add event listener for Add Checklist button
+            document.getElementById('add-checklist-btn').addEventListener('click', addChecklist);
+
+            // Other event listeners
+            document.getElementById('cancel-checklist-btn').addEventListener('click', closeChecklistModal);
+            document.getElementById('save-checklist-btn').addEventListener('click', saveChecklistItem);
+        });
+
+        async function fetchProjectData() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/projects/${projectId}`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch project data: ${response.status} ${response.statusText}`);
+                }
+                projectData = await response.json();
+                console.log('Fetched project data:', projectData);
+                if (!projectData || !projectData.id) {
+                    throw new Error('Project not found or invalid data');
+                }
+            } catch (error) {
+                console.error('Error fetching project data:', error);
+                throw error;
+            }
+        }
+
+        async function fetchCellData() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/cells/${cellId}?project_id=${projectId}`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch cell data: ${response.status} ${response.statusText}`);
+                }
+                cellData = await response.json();
+                console.log('Fetched cell data:', cellData);
+                if (!cellData || !cellData.id) {
+                    throw new Error('Cell not found or invalid data');
+                }
+
+                reviewData = {
+                    title: `${cellData.name} Review`,
+                    subtitle: `${cellData.layoutType.charAt(0).toUpperCase() + cellData.layoutType.slice(1)} Level • ${projectData.clientName || 'Unknown Client'}`,
+                    reviewer: cellData.reviewer || '',
+                    layouter: cellData.layouters && cellData.layouters.length > 0 ? cellData.layouters[0] : '',
+                    date: cellData.reviewdate || cellData.createdAt || '',
+                    imageUrl: cellData.cellimage ? `${API_BASE_URL}/image/${cellData.cellimage}` : '',
+                    tags: [
+                        { class: cellData.layoutType, text: cellData.layoutType.charAt(0).toUpperCase() + cellData.layoutType.slice(1) },
+                        { class: (cellData.status || 'not-started'), text: (cellData.status || 'Not Started').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) }
+                    ]
+                };
+
+                document.getElementById('header-title').textContent = reviewData.title;
+                document.getElementById('header-subtitle').textContent = reviewData.subtitle;
+
+                const tagsContainer = document.getElementById('header-tags');
+                tagsContainer.innerHTML = '';
+                reviewData.tags.forEach(tag => {
+                    const span = document.createElement('span');
+                    span.className = `tags ${tag.class}`;
+                    span.textContent = tag.text;
+                    tagsContainer.appendChild(span);
+                });
+
+                document.getElementById('reviewer').value = reviewData.reviewer;
+                document.getElementById('layouter').value = reviewData.layouter;
+
+                let dateStr = reviewData.date;
+                if (dateStr) {
+                    if (dateStr.match(/^\d{2}\/\d{2}\/\d{4}/)) {
+                        const [datePart, timePart] = dateStr.split(' ');
+                        const [day, month, year] = datePart.split('/');
+                        const [hour = 0, min = 0, sec = 0] = timePart ? timePart.split(':') : [];
+                        dateStr = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hour.padStart(2, '0')}:${min.padStart(2, '0')}`;
+                    } else if (dateStr.match(/^\d{4}-\d{2}-\d{2}/)) {
+                        // Already in ISO format
+                    } else {
+                        dateStr = '';
+                    }
+                }
+                document.getElementById('review-date').value = dateStr ? dateStr.slice(0, 16) : '';
+
+                if (reviewData.imageUrl) {
+                    const preview = document.getElementById('upload-preview');
+                    preview.style.backgroundImage = `url(${reviewData.imageUrl})`;
+                    preview.innerHTML = '';
+                    document.getElementById('image-view-img').src = reviewData.imageUrl;
+                }
+            } catch (error) {
+                console.error('Error fetching cell data:', error);
+                throw error;
+            }
+        }
+
+        async function fetchChecklistData() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/checklist?project_id=${projectId}&cell_id=${cellId}`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch checklist data: ${response.status} ${response.statusText}`);
+                }
+                checklistData = await response.json();
+                console.log('Fetched checklist data:', checklistData);
+            } catch (error) {
+                console.error('Error fetching checklist data:', error);
+                checklistData = [];
+            }
+        }
+
+        async function fetchReviewersAndLayouters() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/employees`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch employees: ${response.status} ${response.statusText}`);
+                }
+                const employees = await response.json();
+                console.log('Fetched employees:', employees);
+
+                const reviewerSelect = document.getElementById('reviewer');
+                const layouterSelect = document.getElementById('layouter');
+                reviewerSelect.innerHTML = '<option value="">Select Reviewer</option>';
+                layouterSelect.innerHTML = '<option value="">Select Layouter</option>';
+
+                employees.forEach(emp => {
+                    if (emp.role.toLowerCase() === 'reviewer') {
+                        const option1 = document.createElement('option');
+                        option1.value = emp.emailid;
+                        option1.textContent = emp.name || emp.emailid;
+                        reviewerSelect.appendChild(option1);
+
+                        const option2 = document.createElement('option');
+                        option2.value = emp.emailid;
+                        option2.textContent = emp.name || emp.emailid;
+                        layouterSelect.appendChild(option2);
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching employees:', error);
+            }
+        }
+
+        function renderTable(filter = 'all') {
+            const tbody = document.querySelector('#checklist-table tbody');
+            tbody.innerHTML = '';
+
+            checklistData.forEach(item => {
+                if (filter !== 'all' && item.status !== filter) return;
+
+                const row = document.createElement('tr');
+
+                const descCell = document.createElement('td');
+                descCell.className = 'description-cell';
+                descCell.setAttribute('data-label', 'Description');
+
+                const descText = document.createElement('div');
+                descText.className = 'description-text';
+                descText.textContent = item.description;
+
+                const showMoreBtn = document.createElement('button');
+                showMoreBtn.className = 'show-more-btn';
+                showMoreBtn.textContent = 'More';
+                showMoreBtn.dataset.id = item.id;
+
+                descText.addEventListener('DOMSubtreeModified', function () {
+                    checkTextOverflow(descText, showMoreBtn);
+                });
+
+                descCell.appendChild(descText);
+                descCell.appendChild(showMoreBtn);
+                row.appendChild(descCell);
+
+                const appCell = document.createElement('td');
+                const appSelect = document.createElement('select');
+                appSelect.className = `applicable-${item.applicable}`;
+                appSelect.dataset.id = item.id;
+                appSelect.innerHTML = `
+                    <option value="yes" ${item.applicable === 'yes' ? 'selected' : ''}>Yes</option>
+                    <option value="no" ${item.applicable === 'no' ? 'selected' : ''}>No</option>
+                    <option value="not-applicable" ${item.applicable === 'not-applicable' ? 'selected' : ''}>Not Applicable</option>
+                `;
+                appCell.setAttribute('data-label', 'Applicable');
+                appCell.appendChild(appSelect);
+                row.appendChild(appCell);
+
+                const statusCell = document.createElement('td');
+                const statusSelect = document.createElement('select');
+                statusSelect.className = `status-${item.status.replace(' ', '-')}`;
+                statusSelect.dataset.id = item.id;
+                statusSelect.innerHTML = `
+                    <option value="action-needed" ${item.status === 'action-needed' ? 'selected' : ''}>Rev & Action Needed</option>
+                    <option value="completed" ${item.status === 'completed' ? 'selected' : ''}>Rev & Completed</option>
+                    <option value="not-reviewed" ${item.status === 'not-reviewed' ? 'selected' : ''}>Not Reviewed</option>
+                `;
+                statusCell.setAttribute('data-label', 'Status');
+                statusCell.appendChild(statusSelect);
+                row.appendChild(statusCell);
+
+                const commentCell = document.createElement('td');
+                const commentInput = document.createElement('input');
+                commentInput.type = 'text';
+                commentInput.className = 'comment';
+                commentInput.dataset.id = item.id;
+                commentInput.value = item.comment || '';
+                commentInput.placeholder = 'Add detailed comment...';
+                commentCell.setAttribute('data-label', 'Comment');
+                commentCell.appendChild(commentInput);
+                row.appendChild(commentCell);
+
+                const actionsCell = document.createElement('td');
+                actionsCell.setAttribute('data-label', 'Actions');
+                const editBtn = document.createElement('button');
+                editBtn.className = 'action-btn';
+                editBtn.innerHTML = '<i class="fas fa-edit"></i>';
+                editBtn.dataset.id = item.id;
+                editBtn.addEventListener('click', () => editChecklistItem(item.id));
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'action-btn delete';
+                deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                deleteBtn.dataset.id = item.id;
+                deleteBtn.addEventListener('click', () => deleteChecklistItem(item.id));
+
+                actionsCell.appendChild(editBtn);
+                actionsCell.appendChild(deleteBtn);
+                row.appendChild(actionsCell);
+
+                tbody.appendChild(row);
+            });
+
+            document.querySelectorAll('.description-text').forEach(descText => {
+                const showMoreBtn = descText.nextElementSibling;
+                checkTextOverflow(descText, showMoreBtn);
+            });
+
+            updateCounters();
+            updateProgress();
+        }
+
+        function checkTextOverflow(descText, showMoreBtn) {
+            if (descText.scrollHeight > descText.clientHeight) {
+                showMoreBtn.style.display = 'block';
+            } else {
+                showMoreBtn.style.display = 'none';
+            }
+        }
+
+        function toggleDescription(btn) {
+            const descText = btn.previousElementSibling;
+            descText.classList.toggle('expanded');
+            btn.textContent = descText.classList.contains('expanded') ? 'Less' : 'More';
+        }
+
+        function updateCounters() {
+            const pending = checklistData.filter(item => item.status === 'not-reviewed').length;
+            const pass = checklistData.filter(item => item.status === 'completed').length;
+            const fail = checklistData.filter(item => item.status === 'action-needed').length;
+
+            document.getElementById('pending-count').textContent = `Pending: ${pending}`;
+            document.getElementById('pass-count').textContent = `Pass: ${pass}`;
+            document.getElementById('fail-count').textContent = `Fail: ${fail}`;
+        }
+
+        function updateProgress() {
+            const totalItems = checklistData.length;
+            const completedItems = checklistData.filter(item => item.status === 'completed').length;
+            const progress = totalItems === 0 ? 0 : Math.round((completedItems / totalItems) * 100);
+
+            document.getElementById('progress-text').textContent = `${progress}%`;
+            document.getElementById('progress-fill').style.width = `${progress}%`;
+        }
+
+        async function handleChange(event) {
+            const id = event.target.dataset.id;
+            const item = checklistData.find(item => item.id == id);
+
+            if (!item) {
+                console.error('Checklist item not found:', id);
+                return;
+            }
+
+            if (event.target.tagName === 'SELECT' && event.target.options[0].value === 'yes') {
+                item.applicable = event.target.value;
+                event.target.className = `applicable-${event.target.value}`;
+            } else if (event.target.tagName === 'SELECT' && event.target.options[0].value === 'action-needed') {
+                item.status = event.target.value;
+                event.target.className = `status-${event.target.value.replace(' ', '-')}`;
+            } else if (event.target.classList.contains('comment')) {
+                item.comment = event.target.value;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/checklist/${id}?project_id=${projectId}&cell_id=${cellId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(item)
+                });
+                if (!response.ok) {
+                    console.error('Failed to update checklist item:', response.status, response.statusText);
+                }
+            } catch (error) {
+                console.error('Error updating checklist item:', error);
+            }
+
+            updateCounters();
+            updateProgress();
+        }
+
+        function handleFilter(event) {
+            if (event.target.tagName !== 'BUTTON') return;
+
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            event.target.classList.add('active');
+            renderTable(event.target.dataset.filter);
+        }
+
+        function handleShowMore(event) {
+            if (event.target.classList.contains('show-more-btn')) {
+                toggleDescription(event.target);
+            }
+        }
+
+        async function previewImage() {
+            const file = document.getElementById('fileInput').files[0];
+            if (file && (file.type === 'image/jpeg' || file.type === 'image/png') && file.size <= 5 * 1024 * 1024) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const preview = document.getElementById('upload-preview');
+                    preview.style.backgroundImage = `url(${e.target.result})`;
+                    preview.innerHTML = '';
+                    document.getElementById('image-view-img').src = e.target.result;
+                    uploadImage(file);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert('Please upload a JPEG or PNG file under 5MB.');
+                document.getElementById('fileInput').value = '';
+            }
+        }
+
+        async function uploadImage(file) {
+            const formData = new FormData();
+            formData.append('cellImage', file);
+            try {
+                const response = await fetch(`${API_BASE_URL}/cells/${cellId}/image?project_id=${projectId}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    reviewData.imageUrl = data.cellimage ? `${API_BASE_URL}/image/${data.cellimage}` : '';
+                    document.getElementById('image-view-img').src = reviewData.imageUrl;
+                } else {
+                    console.error('Failed to upload image:', response.status, response.statusText);
+                }
+            } catch (error) {
+                console.error('Error uploading image:', error);
+            }
+        }
+
+        async function saveReview() {
+            const reviewer = document.getElementById('reviewer').value;
+            const layouter = document.getElementById('layouter').value;
+            const reviewdate = document.getElementById('review-date').value;
+
+            const allCompleted = checklistData.every(item => item.status === 'completed');
+            const status = allCompleted ? 'completed' : 'in-progress';
+
+            try {
+                const formData = new FormData();
+                formData.append('reviewer', reviewer);
+                formData.append('layouters', layouter);
+                formData.append('reviewdate', reviewdate);
+                formData.append('status', status);
+
+                const response = await fetch(`${API_BASE_URL}/cells/${cellId}?project_id=${projectId}`, {
+                    method: 'PUT',
+                    body: formData
+                });
+                if (response.ok) {
+                    alert('Review saved successfully!');
+                    await fetchCellData();
+                } else {
+                    console.error('Failed to save review:', response.status, response.statusText);
+                    alert('Failed to save review.');
+                }
+            } catch (error) {
+                console.error('Error saving review:', error);
+                alert('Failed to save review.');
+            }
+
+            updateCounters();
+            updateProgress();
+        }
+
+        function escapeCSVField(str) {
+            if (str == null || str === '') {
+                return '';
+            }
+            if (typeof str !== 'string') {
+                str = String(str);
+            }
+            return `"${str.replace(/"/g, '""')}"`;
+        }
+
+        function exportReport() {
+            const reviewer = document.getElementById('reviewer').value || 'Not Assigned';
+            const layouter = document.getElementById('layouter').value || 'Not Assigned';
+            const reviewDate = document.getElementById('review-date').value || new Date().toISOString().slice(0, 10);
+
+            const headers = [
+                'Project ID',
+                'Cell ID',
+                'Reviewer',
+                'Layouter',
+                'Review Date',
+                'ID',
+                'Description',
+                'Applicable',
+                'Status',
+                'Comment'
+            ];
+
+            const rows = checklistData.map(item => [
+                projectId,
+                cellId,
+                reviewer,
+                layouter,
+                reviewDate,
+                item.id || '',
+                item.description || '',
+                item.applicable || 'not-applicable',
+                item.status || 'not-reviewed',
+                item.comment || ''
+            ].map(escapeCSVField));
+
+            const csvContent = [
+                headers.map(escapeCSVField).join(','),
+                ...rows.map(row => row.join(','))
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `cell_review_${cellId}_${new Date().toISOString().slice(0, 10)}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function toggleImageView() {
+            const imageView = document.getElementById('image-view');
+            const toggleBtn = document.getElementById('toggle-image-view');
+            const isOpen = imageView.classList.contains('open');
+            imageView.classList.toggle('open');
+            toggleBtn.querySelector('i').className = isOpen ? 'fas fa-arrow-left' : 'fas fa-arrow-right';
+        }
+
+        async function openChecklistModal(id = null) {
+            const modal = document.getElementById('checklist-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const descriptionInput = document.getElementById('checklist-description');
+
+            if (id) {
+                const item = checklistData.find(item => item.id == id);
+                modalTitle.textContent = 'Edit Checklist Item';
+                descriptionInput.value = item ? item.description : '';
+                editingItemId = id;
+            } else {
+                modalTitle.textContent = 'Add New Checklist Item';
+                descriptionInput.value = '';
+                editingItemId = null;
+            }
+
+            modal.style.display = 'flex';
+            descriptionInput.focus();
+        }
+
+        async function saveChecklistItem() {
+            const description = document.getElementById('checklist-description').value.trim();
+            if (!description) {
+                alert('Please enter a description.');
+                return;
+            }
+
+            if (editingItemId) {
+                const item = checklistData.find(item => item.id == editingItemId);
+                if (!item) {
+                    console.error('Editing item not found:', editingItemId);
+                    return;
+                }
+                item.description = description;
+                try {
+                    const response = await fetch(`${API_BASE_URL}/checklist/${editingItemId}?project_id=${projectId}&cell_id=${cellId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(item)
+                    });
+                    if (response.ok) {
+                        renderTable(document.querySelector('.filter-btn.active')?.dataset.filter || 'all');
+                        closeChecklistModal();
+                    } else {
+                        console.error('Failed to update checklist item:', response.status, response.statusText);
+                    }
+                } catch (error) {
+                    console.error('Error updating checklist item:', error);
+                }
+            } else {
+                const newItem = {
+                    description: description,
+                    applicable: 'not-applicable',
+                    status: 'not-reviewed',
+                    comment: ''
+                };
+                try {
+                    const response = await fetch(`${API_BASE_URL}/checklist?project_id=${projectId}&cell_id=${cellId}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(newItem)
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        checklistData.push(data.item);
+                        renderTable(document.querySelector('.filter-btn.active')?.dataset.filter || 'all');
+                        closeChecklistModal();
+                    } else {
+                        console.error('Failed to add checklist item:', response.status, response.statusText);
+                    }
+                } catch (error) {
+                    console.error('Error adding checklist item:', error);
+                }
+            }
+        }
+
+        async function editChecklistItem(id) {
+            openChecklistModal(id);
+        }
+
+        function closeChecklistModal() {
+            document.getElementById('checklist-modal').style.display = 'none';
+            editingItemId = null;
+        }
+
+        async function deleteChecklistItem(id) {
+            if (confirm('Are you sure you want to delete this checklist item?')) {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/checklist/${id}?project_id=${projectId}&cell_id=${cellId}`, {
+                        method: 'DELETE'
+                    });
+                    if (response.ok) {
+                        checklistData = checklistData.filter(item => item.id != id);
+                        renderTable(document.querySelector('.filter-btn.active')?.dataset.filter || 'all');
+                    } else {
+                        console.error('Failed to delete checklist item:', response.status, response.statusText);
+                    }
+                } catch (error) {
+                    console.error('Error deleting checklist item:', error);
+                }
+            }
+        }
+
+        async function addChecklist() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/add_checklist`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ project_id: projectId, cell_id: cellId })
+                });
+                if (response.ok) {
+                    const result = await response.json();
+                    alert(result.message || 'Checklist added successfully!');
+                    await fetchChecklistData(); // Refresh checklist data
+                    renderTable(document.querySelector('.filter-btn.active')?.dataset.filter || 'all');
+                } else {
+                    const error = await response.json();
+                    alert('Error: ' + (error.error || 'Failed to add checklist'));
+                    console.error('Failed to add checklist:', response.status, response.statusText, error);
+                }
+            } catch (error) {
+                console.error('Error adding checklist:', error);
+                alert('An error occurred while adding the checklist. Please try again.');
+            }
+        }
+
+        function goBack() {
+            console.log('Navigating back to /open_project/' + projectId);
+            window.location.href = `/open_project/${projectId}`;
+        }
+
+        document.querySelector('#checklist-table').addEventListener('change', handleChange);
+        document.querySelector('#checklist-table').addEventListener('click', handleShowMore);
+        document.querySelector('.filters').addEventListener('click', handleFilter);
+        document.getElementById('save-btn').addEventListener('click', saveReview);
+        document.getElementById('toggle-image-view').addEventListener('click', toggleImageView);
+        document.getElementById('close-image-view').addEventListener('click', toggleImageView);
+    </script>
+</body>
+</html>

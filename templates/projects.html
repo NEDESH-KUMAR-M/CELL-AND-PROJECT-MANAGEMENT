@@ -465,6 +465,43 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+
+    /* Notification Popup Styles */
+    .notification-popup {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-10px);
+      z-index: 1200;
+      background-color: #10b981;
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      max-width: 300px;
+    }
+    .notification-popup.active {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .notification-popup.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .notification-popup i {
+      font-size: 1.25rem;
+    }
+
+    .notification-popup span {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
@@ -648,6 +685,12 @@
   <div class="spinner"></div>
 </div>
 
+<!-- Notification Popup -->
+<div id="notification-popup" class="notification-popup">
+  <i class="fas fa-check-circle"></i>
+  <span id="notification-message"></span>
+</div>
+
 <script>
   // Global state
   let allProjects = [];
@@ -669,6 +712,8 @@
   const sidebar = document.getElementById('sidebar');
   const toggleBtn = document.getElementById('toggleBtn');
   const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+  const notificationPopup = document.getElementById('notification-popup');
+  const notificationMessage = document.getElementById('notification-message');
 
   // ----- SIDEBAR AND NAVIGATION -----
 
@@ -900,6 +945,15 @@
     }
   });
 
+  // Show notification popup
+  function showNotification(message) {
+    notificationMessage.textContent = message;
+    notificationPopup.classList.add('active');
+    setTimeout(() => {
+      notificationPopup.classList.remove('active');
+    }, 3000); // Hide after 3 seconds
+  }
+
   saveProjectBtn.addEventListener('click', async (e) => {
     e.preventDefault();
     if (!projectForm.checkValidity()) {
@@ -938,15 +992,15 @@
       const result = await response.json();
 
       if (response.ok) {
-        alert(result.message);
+        showNotification(projectId ? 'Project updated successfully!' : 'Project created successfully!');
         closeModalHandler();
         fetchProjects();
       } else {
-        alert(`Error: ${result.error || 'An unknown error occurred.'}`);
+        showNotification(`Error: ${result.error || 'An unknown error occurred.'}`);
       }
     } catch (error) {
       console.error('Failed to save project:', error);
-      alert(`Failed to save project: ${error.message}`);
+      showNotification(`Failed to save project: ${error.message}`);
     } finally {
       // Hide loading modal
       loadingModal.classList.remove('active');

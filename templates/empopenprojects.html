@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #16a34a;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-500: #6b7280;
+            --gray-700: #374151;
+            --gray-900: #111827;
+            --sidebar-primary: #2c3e50;
+            --sidebar-primary-light: #34495e;
+            --sidebar-secondary: #7f8c8d;
+            --sidebar-light: #ecf0f1;
+            --sidebar-light-gray: #dfe6e9;
+            --sidebar-border: #bdc3c7;
+            --sidebar-border-dark: #95a5a6;
+            --sidebar-text-light: #7f8c8d;
+            --sidebar-text-dark: #2c3e50;
+            --sidebar-table-header: #f5f6f7;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.4;
+            color: var(--gray-900);
+            background-color: #f9fafb;
+            font-size: 13px;
+            overflow-x: hidden;
+        }
+        
+        #container {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Sidebar Styles */
+        #sidebar {
+            width: 250px;
+            background-color: #f7fdfa;
+            border-right: 1px solid #e6e6e6;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 100;
+        }
+        
+        #sidebar.collapsed {
+            width: 70px;
+        }
+        
+        .sidebar-content {
+            padding: 20px;
+            padding-bottom: 0px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        
+        #sidebar.collapsed .brand,
+        #sidebar.collapsed .nav-text,
+        #sidebar.collapsed .user-text {
+            display: none;
+        }
+        
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .brand {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--sidebar-text-dark);
+            white-space: nowrap;
+        }
+        
+        .sidebar-nav {
+            flex-grow: 1;
+        }
+        
+        .sidebar-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-nav li {
+            margin-bottom: 10px;
+        }
+        
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            color: var(--sidebar-text-dark);
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        
+        .sidebar-nav a.active,
+        .sidebar-nav a:hover {
+            background-color: rgba(39, 174, 96, 0.1);
+            color: var(--success);
+        }
+        
+        .sidebar-nav i {
+            min-width: 20px;
+            text-align: center;
+        }
+        
+        .user-info {
+            background-color: rgba(39, 174, 96, 0.1);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--success);
+            margin-top: auto;
+        }
+        
+        #sidebar.collapsed .user-info {
+            padding: 12px 8px;
+            justify-content: center;
+        }
+        
+        .user-info i {
+            font-size: 24px;
+        }
+        
+        .toggle-btn {
+            width: 30px;
+            height: 30px;
+            background: white;
+            border: 1px solid var(--sidebar-border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
+        
+        .toggle-btn:hover {
+            background: #f5f5f5;
+        }
+        
+        .toggle-btn i {
+            color: var(--success);
+            font-size: 14px;
+            transition: transform 0.3s ease;
+        }
+        
+        #sidebar.collapsed .toggle-btn i {
+            transform: rotate(180deg);
+        }
+        
+        /* Mobile menu toggle */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            z-index: 90;
+            cursor: pointer;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            #sidebar {
+                position: fixed;
+                transform: translateX(-100%);
+            }
+            
+            #sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .mobile-menu-toggle {
+                display: flex;
+                align-items: center;
+            }
+            
+            #main-content {
+                margin-left: 0;
+            }
+        }
+
+        /* Main Content */
+        #main-content {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            transition: all 0.3s;
+            background: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-left: 1px solid var(--sidebar-border);
+            border-right: 1px solid var(--sidebar-border);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        /* Header Styles */
+        .header {
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            background-color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .project-info h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+        
+        .project-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--gray-500);
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            background-color: var(--success);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.45rem 0.9rem;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+        }
+        .table-container {
+            height: 800px;
+            overflow-y: auto;
+            padding-bottom: 0px;
+        }
+        .table-responsive {
+            max-height: 645px;
+            overflow-y: auto;
+        }
+        tbody {
+            display: block;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        thead, tbody tr {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--gray-300);
+            color: var(--gray-700);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--gray-100);
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 1.5rem 0;
+        }
+        
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            gap: 0.75rem;
+        }
+        
+        .toolbar-left {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+        }
+        
+        .filter-btn {
+            padding: 0.45rem 0.8rem;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background-color: transparent;
+            color: var(--gray-500);
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+        
+        .filter-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .search-bar {
+            position: relative;
+            min-width: 180px;
+            max-width: 220px;
+        }
+        
+        .search-bar input {
+            width: 100%;
+            padding: 0.45rem 0.8rem 0.45rem 2rem;
+            border-radius: 4px;
+            border: 1px solid var(--gray-300);
+            font-size: 0.8rem;
+        }
+        
+        .search-bar i {
+            position: absolute;
+            left: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-500);
+            font-size: 0.8rem;
+        }
+        
+        .filter-select, .date-picker {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.6rem center;
+            background-size: 14px 10px;
+            padding: 0.45rem 2rem 0.45rem 0.8rem;
+            border-radius: 4px;
+            border: 1px solid var(--gray-300);
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            cursor: pointer;
+            background-color: white;
+            height: 32px;
+            min-width: 120px;
+        }
+        
+        .date-picker {
+            background-image: none;
+            padding: 0.45rem 0.8rem;
+        }
+        
+        .filter-select:focus, .date-picker:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+        }
+        
+        .icon-btn {
+            padding: 0.45rem;
+            width: 32px;
+            height: 32px;
+        }
+        
+        /* Table Styles */
+        .table-container {
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .cells-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+        
+        .cells-table th {
+            text-align: left;
+            padding: 0.7rem 0.8rem;
+            background-color: var(--gray-100);
+            color: var(--gray-700);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--gray-300);
+        }
+        
+        .cells-table td {
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid var(--gray-200);
+            vertical-align: middle;
+        }
+        
+        .cells-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .cells-table tr:hover td {
+            background-color: var(--gray-100);
+        }
+        
+        .status {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.2rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        
+        .status-not-started {
+            background-color: #fee2e2;
+            color: var(--danger);
+        }
+        
+        .status-in-progress {
+            background-color: #fef3c7;
+            color: var(--warning);
+        }
+        
+        .status-completed {
+            background-color: #dcfce7;
+            color: var(--success);
+        }
+        
+        .layouter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.2rem;
+        }
+        
+        .layouter-tag {
+            background-color: var(--gray-100);
+            padding: 0.2rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+        
+        .add-layouter {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 9999px;
+            background-color: var(--gray-200);
+            color: var(--gray-700);
+            cursor: pointer;
+            border: none;
+            font-size: 0.7rem;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 0.4rem;
+        }
+        
+        .action-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: transparent;
+            border: 1px solid var(--gray-300);
+            color: var(--gray-500);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.8rem;
+        }
+        
+        .action-btn:hover {
+            background-color: var(--gray-100);
+            color: var(--primary);
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem;
+            border-top: 1px solid var(--gray-200);
+            font-size: 0.8rem;
+        }
+        
+        .pagination-controls {
+            display: flex;
+            gap: 0.4rem;
+        }
+        
+        .page-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: transparent;
+            border: 1px solid var(--gray-300);
+            color: var(--gray-700);
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+        
+        .page-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        /* Progress Tracker */
+        .progress-tracker-industrial {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
+            height: 28px;
+        }
+        
+        .progress-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            min-width: 60px;
+            text-align: right;
+        }
+        
+        .progress-bar-industrial {
+            width: 180px;
+            height: 5px;
+            background: #E5E7EB;
+            border-radius: 3px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        .progress-fill-industrial {
+            height: 100%;
+            background: var(--success);
+            border-radius: 3px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .progress-percent-industrial {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--gray-500);
+            min-width: 35px;
+            text-align: left;
+        }
+
+        .cell-count {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--gray-500);
+            min-width: 80px;
+            text-align: left;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 1.5rem auto;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: modalFadeIn 0.3s ease-out;
+        }
+        
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--gray-500);
+            cursor: pointer;
+            padding: 0.2rem;
+        }
+        
+        .modal-body {
+            padding: 1.25rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 4px;
+            font-size: 0.8rem;
+            transition: border-color 0.2s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+        }
+        
+        .select-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.6rem center;
+            background-size: 14px 10px;
+            padding-right: 2rem;
+        }
+        
+        .modal-footer {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.6rem;
+        }
+        
+        .layouter-input-group {
+            display: flex;
+            gap: 0.4rem;
+        }
+        
+        .layouter-input {
+            flex: 1;
+        }
+        
+        .chip-icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-color: transparent;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect x="2" y="2" width="60" height="60" rx="8" fill="%230fb8b0"/><rect x="12" y="12" width="40" height="40" rx="6" fill="none" stroke="%23ffffff" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><g stroke="%23ffffff" stroke-width="3" stroke-linecap="round"><line x1="18" y1="4" x2="18" y2="12"/><line x1="26" y1="4" x2="26" y2="12"/><line x1="34" y1="4" x2="34" y2="12"/><line x1="42" y1="4" x2="42" y2="12"/></g><g stroke="%23ffffff" stroke-width="3" stroke-linecap="round"><line x1="18" y1="60" x2="18" y2="52"/><line x1="26" y1="60" x2="26" y2="52"/><line x1="34" y1="60" x2="34" y2="52"/><line x1="42" y1="60" x2="42" y2="52"/></g><g stroke="%23ffffff" stroke-width="3" stroke-linecap="round"><line x1="4" y1="18" x2="12" y2="18"/><line x1="4" y1="26" x2="12" y2="26"/><line x1="4" y1="34" x2="12" y2="34"/><line x1="4" y1="42" x2="12" y2="42"/></g><g stroke="%23ffffff" stroke-width="3" stroke-linecap="round"><line x1="60" y1="18" x2="52" y2="18"/><line x1="60" y1="26" x2="52" y2="26"/><line x1="60" y1="34" x2="52" y2="34"/><line x1="60" y1="42" x2="52" y2="42"/></g><rect x="24" y="24" width="16" height="16" rx="2" fill="%23ffffff"/></svg>');
+        }
+        
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 300px;
+            max-width: 400px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-align: center;
+            opacity: 0;
+            z-index: 2000;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .notification.success {
+            background-color: #dcfce7;
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+        
+        .notification.error {
+            background-color: #fee2e2;
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+        
+        /* Delete Confirmation Modal */
+        .delete-modal {
+            display: none;
+            position: fixed;
+            z-index: 150;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .delete-modal-content {
+            background-color: white;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: modalFadeIn 0.3s ease-out;
+        }
+        
+        .delete-modal-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .delete-modal-header h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+        
+        .delete-modal-body {
+            padding: 1.25rem;
+            font-size: 0.9rem;
+            color: var(--gray-700);
+            text-align: center;
+        }
+        
+        .delete-modal-footer {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.6rem;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #b91c1c;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.8rem;
+            }
+            
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .toolbar-left {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-btn, .filter-select, .date-picker, .icon-btn {
+                width: 100%;
+                max-width: none;
+            }
+            
+            .search-bar {
+                min-width: 100%;
+                max-width: none;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .toolbar-left {
+                flex-wrap: nowrap;
+            }
+        }
+        
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--gray-200);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <!-- Mobile menu toggle button -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i> Menu
+    </button>
+
+    <div id="container">
+        <!-- Sidebar -->
+        <aside id="sidebar">
+            <div class="sidebar-content">
+                <div class="sidebar-header">
+                    <div class="brand" style="padding-right: 10px;">Cell</div>
+                    <button class="toggle-btn" id="toggleBtn">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                </div>
+                
+                <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                    <a href="{{ url_for('employee_dashboard') }}" class="active">
+                        <i class="fas fa-chart-bar"></i>
+                        <span class="nav-text">Projects</span>
+                    </a>
+                    </li>
+
+                </ul>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content Wrapper -->
+        <main id="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="container">
+                    <div class="header-content">
+                        <div class="logo-container">
+                            <div class="logo" id="projectLogo">--</div>
+                            <div class="project-info">
+                                <h1 id="projectTitle">Loading...</h1>
+                                <div class="project-meta">
+                                    <span id="projectClient">&nbsp;</span>
+                                    <span>•</span>
+                                    <span id="projectVersion">Version: -</span>
+                                    <span class="status-badge" id="projectStatus">
+                                        <i class="fas fa-circle" id="projectStatusIcon" style="font-size: 6px; margin-right: 4px;"></i>
+                                        <span id="projectStatusText">-</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="progress-tracker-industrial">
+                            <span class="progress-label">Progress</span>
+                            <div class="progress-bar-industrial">
+                                <div class="progress-fill-industrial" id="progressFill" style="width: 0%"></div>
+                            </div>
+                            <span class="progress-percent-industrial" id="progressPercent">0%</span>
+                            <span class="cell-count">Total Cells: <span id="totalCellsHeader">0</span></span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <div class="container">
+                    <!-- Toolbar -->
+                    <div class="toolbar">
+                        <div class="toolbar-left">
+                            <button class="filter-btn active" data-filter="all">All</button>
+                            <button class="filter-btn" data-filter="in-progress">In Progress</button>
+                            <button class="filter-btn" data-filter="completed">Completed</button>
+                            <button class="filter-btn" data-filter="not-started">Not Started</button>
+                            <select id="layoutTypeFilter" class="filter-select">
+                                <option value="all" selected>All Layout Types</option>
+                                <option value="io">IO</option>
+                                <option value="cell">Cell</option>
+                                <option value="top">Top</option>
+                                <option value="tapeout">Tape Out</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                            <select id="sortSelect" class="filter-select">
+                                <option value="" selected disabled>Sort by</option>
+                                <option value="name-asc">Alphabetical (A-Z)</option>
+                                <option value="name-desc">Alphabetical (Z-A)</option>
+                                <option value="date-asc">Date (Oldest First)</option>
+                                <option value="date-desc">Date (Newest First)</option>
+                                <option value="layout-custom">Layout Type (Custom Order)</option>
+                            </select>
+                            <input type="date" id="fromDate" class="date-picker" title="From Date">
+                            <input type="date" id="toDate" class="date-picker" title="To Date">
+                            <button class="btn btn-outline icon-btn" id="configOrderBtn"><i class="fas fa-cog"></i></button>
+                        </div>
+                        <div class="right-toolbar" style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div class="search-bar">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="searchInput" placeholder="Search cells...">
+                            </div>
+                            <button class="btn btn-primary" id="addCellBtn">
+                                <i class="fas fa-plus"></i>
+                                Add Cell
+                            </button>
+                            <button class="btn btn-outline icon-btn" id="printBtn">
+                                <i class="fas fa-print"></i>
+                            </button>
+                            <button class="btn btn-outline icon-btn" id="refreshBtn">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="table-container">
+                        <div class="table-responsive">
+                            <table class="cells-table">
+                                <thead>
+                                    <tr>
+                                        <th>Cell Name</th>
+                                        <th>Layout Type</th>
+                                        <th>Review Status</th>
+                                        <th>Reviewed Date</th>
+                                        <th>Layouters</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cellsTableBody">
+                                    <!-- Cells will be populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Cell Modal -->
+    <div id="cellModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Cell</h2>
+                <button class="close-btn" id="closeModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="cellName">Cell Name</label>
+                    <input type="text" id="cellName" class="form-control" placeholder="Enter cell name">
+                </div>
+                <div class="form-group">
+                    <label for="layoutType">Layout Type</label>
+                    <select id="layoutType" class="form-control select-control">
+                        <option value="io">IO</option>
+                        <option value="cell">Cell</option>
+                        <option value="top">Top</option>
+                        <option value="tapeout">Tape Out</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status" class="form-control select-control">
+                        <option value="not-started">Not Started</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Layouters</label>
+                    <div class="layouter-input-group">
+                        <div class="layouter-input">
+                            <input type="text" id="layouterInput" class="form-control" placeholder="Enter layouter name">
+                        </div>
+                        <button class="btn btn-outline" id="addLayouterBtn">
+                            <i class="fas fa-plus"></i>
+                            Add
+                        </button>
+                    </div>
+                    <div class="layouter-tags" id="layouterTags"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelBtn">Cancel</button>
+                <button class="btn btn-primary" id="saveBtn">Save Cell</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Layout Order Modal -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Set Layout Type Order</h2>
+                <button class="close-btn" id="closeOrderModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <ul id="layoutOrderList" style="list-style: none; padding: 0;"></ul>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="saveOrderBtn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="delete-modal">
+        <div class="delete-modal-content">
+            <div class="delete-modal-header">
+                <h2>Confirm Deletion</h2>
+                <button class="close-btn" id="closeDeleteModal">&times;</button>
+            </div>
+            <div class="delete-modal-body">
+                <p>Are you sure you want to delete this cell? This action cannot be undone.</p>
+            </div>
+            <div class="delete-modal-footer">
+                <button class="btn btn-outline" id="cancelDeleteBtn">Cancel</button>
+                <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+// API Configuration (use relative path so it works in deployed environment)
+const API_BASE_URL = '/api';
+
+// DOM Elements
+const cellsTableBody = document.getElementById("cellsTableBody");
+const addCellBtn = document.getElementById("addCellBtn");
+const printBtn = document.getElementById("printBtn");
+const refreshBtn = document.getElementById("refreshBtn");
+const cellModal = document.getElementById("cellModal");
+const closeModalBtn = document.getElementById("closeModalBtn");
+const cancelBtn = document.getElementById("cancelBtn");
+const saveBtn = document.getElementById("saveBtn");
+const modalTitle = document.getElementById("modalTitle");
+const cellNameInput = document.getElementById("cellName");
+const layoutTypeSelect = document.getElementById("layoutType");
+const statusSelect = document.getElementById("status");
+const layouterInput = document.getElementById("layouterInput");
+const addLayouterBtn = document.getElementById("addLayouterBtn");
+const layouterTags = document.getElementById("layouterTags");
+const searchInput = document.getElementById("searchInput");
+const totalCellsHeader = document.getElementById("totalCellsHeader");
+const layoutTypeFilter = document.getElementById("layoutTypeFilter");
+const sortSelect = document.getElementById("sortSelect");
+const fromDate = document.getElementById("fromDate");
+const toDate = document.getElementById("toDate");
+const configOrderBtn = document.getElementById("configOrderBtn");
+const orderModal = document.getElementById("orderModal");
+const closeOrderModal = document.getElementById("closeOrderModal");
+const saveOrderBtn = document.getElementById("saveOrderBtn");
+const progressFill = document.getElementById("progressFill");
+const progressPercent = document.getElementById("progressPercent");
+const loadingOverlay = document.getElementById("loadingOverlay");
+const notification = document.getElementById("notification");
+const projectLogo = document.getElementById("projectLogo");
+const projectTitle = document.getElementById("projectTitle");
+const projectClient = document.getElementById("projectClient");
+const projectVersion = document.getElementById("projectVersion");
+const projectStatusText = document.getElementById("projectStatusText");
+const projectStatusIcon = document.getElementById("projectStatusIcon");
+const sidebar = document.getElementById('sidebar');
+const toggleBtn = document.getElementById('toggleBtn');
+const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+const deleteModal = document.getElementById("deleteModal");
+const closeDeleteModal = document.getElementById("closeDeleteModal");
+const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+
+// Sidebar toggle functionality
+toggleBtn.addEventListener('click', () => {
+  sidebar.classList.toggle('collapsed');
+});
+
+mobileMenuToggle.addEventListener('click', () => {
+  sidebar.classList.toggle('active');
+});
+
+// State
+let cells = [];
+let filteredCells = [];
+let layouters = [];
+let isEditing = false;
+let currentEditId = null;
+let currentDeleteId = null;
+let currentFilter = "all";
+let currentLayoutFilter = "all";
+let currentSort = "";
+const layoutTypes = ['io', 'cell', 'top', 'tapeout', 'custom'];
+let layoutOrder = [...layoutTypes];
+let projectId = null;
+let projectData = null;
+
+// Helper: get project id from query string or template
+function getProjectId() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('id') || params.get('project_id') || projectId;
+}
+
+// API Functions
+async function fetchCells() {
+    showLoading();
+    try {
+        projectId = getProjectId();
+        if (!projectId) throw new Error('Missing project id');
+        const response = await fetch(`${API_BASE_URL}/cells?project_id=${projectId}`);
+        if (!response.ok) throw new Error('Failed to fetch cells');
+
+        cells = await response.json();
+        cells = cells.map(c => ({
+            id: c.id || c.row || c._id || String(c.id),
+            name: c.name || c.cellname || c.title || 'Untitled',
+            layoutType: c.layoutType || c.layout_type || c.type || 'customlayout',
+            status: c.status || (c.reviewStatus || 'not-started'),
+            layouters: c.layouters || c.reviewers || c.assigned || [],
+            createdAt: c.createdAt || c.createdate || c.date || new Date().toISOString(),
+        }));
+
+        filteredCells = [...cells];
+        renderCells();
+        updateProgress();
+        showNotification('Cells loaded successfully', 'success');
+    } catch (error) {
+        console.error('Error fetching cells:', error);
+        showNotification('Failed to load cells', 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+async function fetchProject() {
+    if (!projectId) return;
+    try {
+        const res = await fetch(`${API_BASE_URL}/projects/${projectId}`);
+        if (!res.ok) throw new Error('Failed to fetch project');
+        projectData = await res.json();
+        setHeaderFromProject(projectData);
+    } catch (err) {
+        console.error('Error fetching project:', err);
+        showNotification('Failed to load project info', 'error');
+    }
+}
+
+function setHeaderFromProject(p) {
+    projectTitle.textContent = p.projectName || p.projectname || 'Untitled Project';
+    projectClient.textContent = p.clientName || p.clientname || '';
+    projectVersion.textContent = p.version ? `Version: ${p.version}` : (p.versionText || '');
+    const st = (p.status || p.statusText || 'Active').toString();
+    projectStatusText.textContent = st.charAt(0).toUpperCase() + st.slice(1);
+    if (st.toLowerCase().includes('completed')) {
+        projectStatusIcon.style.color = 'green';
+    } else if (st.toLowerCase().includes('in-progress') || st.toLowerCase().includes('in progress')) {
+        projectStatusIcon.style.color = 'orange';
+    } else {
+        projectStatusIcon.style.color = '#10b981';
+    }
+    const initials = computeInitials(p.clientName || p.projectName || '');
+    projectLogo.textContent = initials;
+}
+
+function computeInitials(text) {
+    if (!text) return '--';
+    const words = text.trim().split(/\s+/);
+    if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+    return (words[0][0] + words[1][0]).toUpperCase();
+}
+
+async function saveCellToAPI(cellData) {
+    showLoading();
+    try {
+        const url = isEditing ? `${API_BASE_URL}/cells/${currentEditId}?project_id=${projectId}` : `${API_BASE_URL}/cells?project_id=${projectId}`;
+        const method = isEditing ? 'PUT' : 'POST';
+        const response = await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(cellData)
+        });
+        if (!response.ok) throw new Error('Failed to save cell');
+        await fetchCells(); // Refresh cells after saving
+        showNotification(`Cell ${isEditing ? 'updated' : 'added'} successfully`, 'success');
+    } catch (error) {
+        console.error('Error saving cell:', error);
+        showNotification(`Failed to ${isEditing ? 'update' : 'add'} cell`, 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+async function deleteCellFromAPI(id) {
+    showLoading();
+    try {
+        const response = await fetch(`${API_BASE_URL}/cells/${id}?project_id=${projectId}`, { method: 'DELETE' });
+        if (!response.ok) throw new Error('Failed to delete cell');
+        await fetchCells(); // Refresh cells after deletion
+        showNotification('Cell deleted successfully', 'success');
+    } catch (error) {
+        console.error('Error deleting cell:', error);
+        showNotification('Failed to delete cell', 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+// UI Functions
+function showLoading() {
+    loadingOverlay.style.display = 'flex';
+}
+
+function hideLoading() {
+    loadingOverlay.style.display = 'none';
+}
+
+function showNotification(message, type) {
+    notification.textContent = message;
+    notification.className = `notification ${type}`;
+    notification.classList.add('show');
+    setTimeout(() => {
+        notification.classList.remove('show');
+        notification.className = 'notification'; // Reset class to avoid lingering styles
+    }, 3000);
+}
+
+function updateProgress() {
+    const totalCells = cells.length;
+    const completedCells = cells.filter(cell => cell.status === 'completed').length;
+    const progress = totalCells > 0 ? Math.round((completedCells / totalCells) * 100) : 0;
+    progressFill.style.width = `${progress}%`;
+    progressPercent.textContent = `${progress}%`;
+    totalCellsHeader.textContent = totalCells;
+}
+
+function showDeleteModal(id) {
+    currentDeleteId = id;
+    deleteModal.style.display = 'flex';
+}
+
+function hideDeleteModal() {
+    deleteModal.style.display = 'none';
+    currentDeleteId = null;
+}
+
+function renderCells(cellsToRender = filteredCells) {
+    cellsTableBody.innerHTML = "";
+    if (cellsToRender.length === 0) {
+        cellsTableBody.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 20px;">
+                    No cells found matching your criteria
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    cellsToRender.forEach(cell => {
+        const row = document.createElement("tr");
+        row.dataset.id = cell.id;
+        let statusClass = "", statusText = "";
+        switch (cell.status) {
+            case "not-started": statusClass = "status-not-started"; statusText = "Not Started"; break;
+            case "in-progress": statusClass = "status-in-progress"; statusText = "In Progress"; break;
+            case "completed": statusClass = "status-completed"; statusText = "Completed"; break;
+        }
+        let layoutersHTML = cell.layouters.map(layouter => `<span class="layouter-tag">${layouter}</span>`).join('');
+        if (cell.layouters.length === 0) layoutersHTML = '<span class="layouter-tag">None</span>';
+        row.innerHTML = `
+            <td>${cell.name}</td>
+            <td>${cell.layoutType.charAt(0).toUpperCase() + cell.layoutType.slice(1)}</td>
+            <td><span class="status ${statusClass}">${statusText}</span></td>
+            <td>${new Date(cell.createdAt).toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })}</td>
+            <td><div class="layouter-tags">${layoutersHTML}</div></td>
+            <td>
+                <div class="actions">
+                    <button class="action-btn edit-btn" data-id="${cell.id}"><i class="fas fa-pencil-alt"></i></button>
+                    <button class="action-btn delete-btn" data-id="${cell.id}"><i class="fas fa-trash"></i></button>
+                    <button class="action-btn open-btn" data-id="${cell.id}"><i class="fas fa-external-link-alt"></i></button>
+                </div>
+            </td>
+        `;
+        cellsTableBody.appendChild(row);
+    });
+    document.querySelectorAll(".edit-btn").forEach(btn => btn.addEventListener("click", (e) => editCell(btn.dataset.id)));
+    document.querySelectorAll(".delete-btn").forEach(btn => btn.addEventListener("click", (e) => {
+        showDeleteModal(btn.dataset.id);
+    }));
+    document.querySelectorAll(".open-btn").forEach(btn => btn.addEventListener("click", (e) => openCell(btn.dataset.id)));
+}
+
+function applyFilters() {
+    const query = searchInput.value.toLowerCase();
+    filteredCells = cells.filter(cell => 
+        cell.name.toLowerCase().includes(query) || cell.layouters.some(l => l.toLowerCase().includes(query))
+    );
+    if (currentFilter !== "all") filteredCells = filteredCells.filter(cell => cell.status === currentFilter);
+    if (currentLayoutFilter !== "all") filteredCells = filteredCells.filter(cell => cell.layoutType === currentLayoutFilter);
+    const from = fromDate.value ? new Date(fromDate.value) : null;
+    const to = toDate.value ? new Date(toDate.value + 'T23:59:59') : null;
+    if (from || to) filteredCells = filteredCells.filter(cell => {
+        const cellDate = new Date(cell.createdAt);
+        return (!from || cellDate >= from) && (!to || cellDate <= to);
+    });
+    if (currentSort) {
+        switch (currentSort) {
+            case "name-asc": filteredCells.sort((a, b) => a.name.localeCompare(b.name)); break;
+            case "name-desc": filteredCells.sort((a, b) => b.name.localeCompare(b.name)); break;
+            case "date-asc": filteredCells.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)); break;
+            case "date-desc": filteredCells.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); break;
+            case "layout-custom": filteredCells.sort((a, b) => layoutOrder.indexOf(a.layoutType) - layoutOrder.indexOf(b.layoutType)); break;
+        }
+    }
+    renderCells();
+}
+
+function openCell(id) {
+    const cell = filteredCells.find(c => c.id === id);
+    if (!cell) return;
+
+    // Map layoutType to Flask routes
+    const layoutPageMap = {
+        'io': 'iolayout',
+        'cell': 'celllayout',
+        'top': 'toplayout',
+        'tapeout': 'tapelayout',
+        'custom': 'customlayout'
+    };
+
+    const targetPage = layoutPageMap[cell.layoutType.toLowerCase()] || 'celllayout';
+    window.location.href = `/${targetPage}?project_id=${projectId}&cell_id=${id}`;
+}
+
+function editCell(id) {
+    const cell = cells.find(c => c.id === id);
+    if (!cell) return;
+    isEditing = true; currentEditId = id; modalTitle.textContent = "Edit Cell";
+    cellNameInput.value = cell.name; layoutTypeSelect.value = cell.layoutType;
+    statusSelect.value = cell.status; layouters = [...cell.layouters]; updateLayouterTags();
+    cellModal.style.display = "block";
+}
+
+function addNewCell() {
+    isEditing = false; currentEditId = null; modalTitle.textContent = "Add New Cell";
+    cellNameInput.value = ""; layoutTypeSelect.value = "io"; statusSelect.value = "not-started";
+    layouters = []; updateLayouterTags(); cellModal.style.display = "block";
+}
+
+function updateLayouterTags() {
+    layouterTags.innerHTML = "";
+    layouters.forEach((layouter, index) => {
+        const tag = document.createElement("span");
+        tag.className = "layouter-tag";
+        tag.innerHTML = `${layouter}<span class="remove-tag" data-index="${index}"><i class="fas fa-times" style="font-size: 8px;"></i></span>`;
+        layouterTags.appendChild(tag);
+    });
+    document.querySelectorAll(".remove-tag").forEach(btn => btn.addEventListener("click", (e) => {
+        layouters.splice(parseInt(btn.dataset.index), 1); updateLayouterTags();
+    }));
+}
+
+function saveCell() {
+    const name = cellNameInput.value.trim();
+    const layoutType = layoutTypeSelect.value;
+    const status = statusSelect.value;
+    if (!name) { 
+        showNotification('Please enter a cell name', 'error');
+        return; 
+    }
+    const cellData = { name, layoutType, status, layouters: [...layouters] };
+    saveCellToAPI(cellData); 
+    cellModal.style.display = "none";
+}
+
+function openOrderModal() {
+    const list = document.getElementById("layoutOrderList");
+    list.innerHTML = ""; layoutOrder.forEach(type => {
+        const li = document.createElement("li"); li.draggable = true; li.dataset.type = type;
+        li.innerHTML = `<i class="fas fa-grip-lines" style="margin-right: 10px; color: var(--gray-500);"></i> ${type.toUpperCase()}`;
+        li.style.padding = "10px"; li.style.borderBottom = "1px solid var(--gray-200)"; li.style.cursor = "move";
+        list.appendChild(li);
+    });
+    list.addEventListener("dragstart", (e) => e.target.tagName === "LI" && e.target.classList.add("dragging"));
+    list.addEventListener("dragover", (e) => { e.preventDefault(); const dragging = document.querySelector(".dragging");
+        if (!dragging) return; const afterElement = getDragAfterElement(list, e.clientY);
+        if (afterElement == null) list.appendChild(dragging); else list.insertBefore(dragging, afterElement);
+    });
+    list.addEventListener("dragend", (e) => e.target.tagName === "LI" && e.target.classList.remove("dragging"));
+    orderModal.style.display = "block";
+}
+
+function getDragAfterElement(container, y) {
+    const draggableElements = [...container.querySelectorAll("li:not(.dragging)")];
+    return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        return offset < 0 && offset > closest.offset ? { offset: offset, element: child } : closest;
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+// Event Listeners
+addCellBtn.addEventListener("click", addNewCell);
+printBtn.addEventListener("click", () => window.print());
+refreshBtn.addEventListener("click", fetchCells);
+closeModalBtn.addEventListener("click", () => cellModal.style.display = "none");
+cancelBtn.addEventListener("click", () => cellModal.style.display = "none");
+saveBtn.addEventListener("click", saveCell);
+addLayouterBtn.addEventListener("click", () => {
+    const name = layouterInput.value.trim();
+    if (name && !layouters.includes(name)) { 
+        layouters.push(name); 
+        updateLayouterTags(); 
+        layouterInput.value = ""; 
+    } else if (!name) {
+        showNotification('Please enter a layouter name', 'error');
+    }
+});
+layouterInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+        addLayouterBtn.click();
+    }
+});
+searchInput.addEventListener("input", applyFilters);
+document.querySelectorAll(".filter-btn").forEach(btn => btn.addEventListener("click", () => {
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active"); 
+    currentFilter = btn.dataset.filter; 
+    applyFilters();
+}));
+layoutTypeFilter.addEventListener("change", (e) => { 
+    currentLayoutFilter = e.target.value; 
+    applyFilters(); 
+});
+sortSelect.addEventListener("change", (e) => { 
+    currentSort = e.target.value; 
+    applyFilters(); 
+});
+fromDate.addEventListener("change", applyFilters);
+toDate.addEventListener("change", applyFilters);
+configOrderBtn.addEventListener("click", openOrderModal);
+closeOrderModal.addEventListener("click", () => orderModal.style.display = "none");
+saveOrderBtn.addEventListener("click", () => {
+    const items = document.querySelectorAll("#layoutOrderList li");
+    layoutOrder = Array.from(items).map(li => li.dataset.type);
+    orderModal.style.display = "none";
+    if (currentSort === "layout-custom") applyFilters();
+});
+closeDeleteModal.addEventListener("click", hideDeleteModal);
+cancelDeleteBtn.addEventListener("click", hideDeleteModal);
+confirmDeleteBtn.addEventListener("click", () => {
+    if (currentDeleteId) {
+        deleteCellFromAPI(currentDeleteId);
+        hideDeleteModal();
+    }
+});
+
+// Initialize
+document.addEventListener('DOMContentLoaded', async () => {
+    // Explicitly ensure delete modal is hidden on page load
+    deleteModal.style.display = 'none';
+    
+    projectId = "{{ project.id }}"; // This will be replaced by Flask with the actual project ID
+    if (!projectId) {
+        showNotification('Missing project id in URL or template', 'error');
+        return;
+    }
+    await fetchProject();
+    await fetchCells();
+
+    // Set default dates (last 30 days)
+    const today = new Date();
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(today.getDate() - 30);
+    fromDate.valueAsDate = thirtyDaysAgo;
+    toDate.valueAsDate = today;
+});
+</script>
+<script src="sidebar.js"></script>
+</body>
+</html>

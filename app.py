@@ -488,7 +488,7 @@ def admin_dashboard():
 @app.route("/employee")
 @login_required(required_role="reviewer")
 def employee_dashboard():
-    return redirect(url_for('projects_page'))
+    return render_template("empdash.html")
 
 @app.route("/open_project/<int:project_id>")
 @login_required()
@@ -523,6 +523,43 @@ def open_project(project_id):
         }
         
         return render_template("openproject.html", project=project)
+    except Exception as e:
+        print(f"Error opening project: {str(e)}")  # Log the error
+        flash(f"Error opening project: {str(e)}", 'error')
+        return redirect(url_for('projects_page'))
+@app.route("/employee/open_project/<int:project_id>")
+@login_required()
+def employee_open_project(project_id):
+    try:
+        ws = get_worksheet(PROJECTS_SHEET_NAME)
+        headers = [h.strip().lower() for h in ws.row_values(1)]
+        row_values = ws.row_values(project_id)
+        
+        if not row_values:
+            flash("Project not found", 'error')
+            return redirect(url_for('projects_page'))
+            
+        if len(row_values) < len(headers):
+            row_values += [''] * (len(headers) - len(row_values))
+            
+        record = dict(zip(headers, row_values))
+        project = {
+            'id': project_id,
+            'clientName': record.get('clientname', ''),
+            'projectName': record.get('projectname', ''),
+            'description': record.get('description', ''),
+            'version': record.get('version', ''),
+            'status': record.get('status', ''),
+            'reviewers': [r.strip() for r in record.get('reviewers', '').split(',') if r.strip()],
+            'technologies': [t.strip() for t in record.get('technologies', '').split(',') if t.strip()],
+            'projectimage': record.get('projectimage', ''),
+            'createdate': record.get('createdate', ''),
+            'enddate': record.get('enddate', ''),
+            'sheetid': record.get('sheetid', ''),
+            'folderid': record.get('folderid', '')
+        }
+        
+        return render_template("empopenprojects.html", project=project)
     except Exception as e:
         print(f"Error opening project: {str(e)}")  # Log the error
         flash(f"Error opening project: {str(e)}", 'error')
@@ -1426,6 +1463,7 @@ def api_add_checklist_item():
     except Exception as e:
         print(f"Error adding checklist item: {e}")
         return jsonify(error=str(e)), 500
+
 
 # New endpoint to delete checklist item
 @app.route('/api/checklist/<string:item_id>', methods=['DELETE'])

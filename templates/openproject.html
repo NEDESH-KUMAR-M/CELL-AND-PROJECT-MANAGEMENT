@@ -817,6 +817,69 @@
             border: 1px solid var(--danger);
         }
         
+        /* Delete Confirmation Modal */
+        .delete-modal {
+            display: none;
+            position: fixed;
+            z-index: 150;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .delete-modal-content {
+            background-color: white;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: modalFadeIn 0.3s ease-out;
+        }
+        
+        .delete-modal-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .delete-modal-header h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+        
+        .delete-modal-body {
+            padding: 1.25rem;
+            font-size: 0.9rem;
+            color: var(--gray-700);
+            text-align: center;
+        }
+        
+        .delete-modal-footer {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.6rem;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #b91c1c;
+        }
+        
         /* Responsive Adjustments */
         @media (max-width: 768px) {
             .header-content {
@@ -1015,7 +1078,7 @@
                                         <th>Cell Name</th>
                                         <th>Layout Type</th>
                                         <th>Review Status</th>
-                                        <th>Created Date</th>
+                                        <th>Reviewed Date</th>
                                         <th>Layouters</th>
                                         <th></th>
                                     </tr>
@@ -1098,6 +1161,23 @@
         </div>
     </div>
 
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="delete-modal">
+        <div class="delete-modal-content">
+            <div class="delete-modal-header">
+                <h2>Confirm Deletion</h2>
+                <button class="close-btn" id="closeDeleteModal">&times;</button>
+            </div>
+            <div class="delete-modal-body">
+                <p>Are you sure you want to delete this cell? This action cannot be undone.</p>
+            </div>
+            <div class="delete-modal-footer">
+                <button class="btn btn-outline" id="cancelDeleteBtn">Cancel</button>
+                <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+
 <script>
 // API Configuration (use relative path so it works in deployed environment)
 const API_BASE_URL = '/api';
@@ -1141,6 +1221,10 @@ const projectStatusIcon = document.getElementById("projectStatusIcon");
 const sidebar = document.getElementById('sidebar');
 const toggleBtn = document.getElementById('toggleBtn');
 const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+const deleteModal = document.getElementById("deleteModal");
+const closeDeleteModal = document.getElementById("closeDeleteModal");
+const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
 
 // Sidebar toggle functionality
 toggleBtn.addEventListener('click', () => {
@@ -1157,6 +1241,7 @@ let filteredCells = [];
 let layouters = [];
 let isEditing = false;
 let currentEditId = null;
+let currentDeleteId = null;
 let currentFilter = "all";
 let currentLayoutFilter = "all";
 let currentSort = "";
@@ -1303,6 +1388,16 @@ function updateProgress() {
     totalCellsHeader.textContent = totalCells;
 }
 
+function showDeleteModal(id) {
+    currentDeleteId = id;
+    deleteModal.style.display = 'flex';
+}
+
+function hideDeleteModal() {
+    deleteModal.style.display = 'none';
+    currentDeleteId = null;
+}
+
 function renderCells(cellsToRender = filteredCells) {
     cellsTableBody.innerHTML = "";
     if (cellsToRender.length === 0) {
@@ -1344,7 +1439,7 @@ function renderCells(cellsToRender = filteredCells) {
     });
     document.querySelectorAll(".edit-btn").forEach(btn => btn.addEventListener("click", (e) => editCell(btn.dataset.id)));
     document.querySelectorAll(".delete-btn").forEach(btn => btn.addEventListener("click", (e) => {
-        if (confirm("Are you sure you want to delete this cell?")) deleteCellFromAPI(btn.dataset.id);
+        showDeleteModal(btn.dataset.id);
     }));
     document.querySelectorAll(".open-btn").forEach(btn => btn.addEventListener("click", (e) => openCell(btn.dataset.id)));
 }
@@ -1365,7 +1460,7 @@ function applyFilters() {
     if (currentSort) {
         switch (currentSort) {
             case "name-asc": filteredCells.sort((a, b) => a.name.localeCompare(b.name)); break;
-            case "name-desc": filteredCells.sort((a, b) => b.name.localeCompare(a.name)); break;
+            case "name-desc": filteredCells.sort((a, b) => b.name.localeCompare(b.name)); break;
             case "date-asc": filteredCells.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)); break;
             case "date-desc": filteredCells.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); break;
             case "layout-custom": filteredCells.sort((a, b) => layoutOrder.indexOf(a.layoutType) - layoutOrder.indexOf(b.layoutType)); break;
@@ -1505,9 +1600,20 @@ saveOrderBtn.addEventListener("click", () => {
     orderModal.style.display = "none";
     if (currentSort === "layout-custom") applyFilters();
 });
+closeDeleteModal.addEventListener("click", hideDeleteModal);
+cancelDeleteBtn.addEventListener("click", hideDeleteModal);
+confirmDeleteBtn.addEventListener("click", () => {
+    if (currentDeleteId) {
+        deleteCellFromAPI(currentDeleteId);
+        hideDeleteModal();
+    }
+});
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
+    // Explicitly ensure delete modal is hidden on page load
+    deleteModal.style.display = 'none';
+    
     projectId = "{{ project.id }}"; // This will be replaced by Flask with the actual project ID
     if (!projectId) {
         showNotification('Missing project id in URL or template', 'error');

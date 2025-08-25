@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="/static/login.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>/* Base Reset */
+/* Base Reset */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -33,12 +34,15 @@ body {
 .login-card {
   background-color: #ffffff;
   border-radius: 20px;
-  padding: 2.5rem;
+  padding: 3rem; /* Increased from 2.5rem */
   box-shadow: 0 10px 25px rgba(0, 128, 0, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
+  max-width: 600px; /* Increased from 420px */
+  width: 100%;
 }
+
 
 /* Logo */
 .logo img {
@@ -173,6 +177,13 @@ body {
   color: #15803d;
   border-color: #86efac;
 }
+.footer {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #6b7280;
+  font-weight: bold; /* Tailwind's gray-500 */
+}
 
 
 /* Responsive */
@@ -189,13 +200,14 @@ body {
     font-size: 0.95rem;
   }
 }
-</style> 
+
+  </style>
 </head>
 <body>
  
-
   <div class="container">
     <div class="login-card">
+
       <!-- Logo and Title -->
       <div class="logo">
         <img src="{{ url_for('static', filename='image/logo.png') }}" alt="Logo" />
@@ -203,7 +215,7 @@ body {
       <h1 class="title">Project Management</h1>
 
       <!-- Form -->
-      <form method="POST" action="{{ url_for('login') }}" class="login-form">
+      <form method="POST" action="/" class="login-form">
         <div class="input-field">
           <i class="fa-solid fa-envelope icon"></i>
           <input type="email" name="email" placeholder="Email" required />
@@ -227,56 +239,19 @@ body {
             {% endfor %}
         </div>
         {% endif %}
-    {% endwith %}
-
+        {% endwith %}
       </form>
-      <footer style="text-align:center; margin-top: 2rem; color: #888; font-size: 0.95em;">
-    © 2025 EPICAL LAYOUTS. All rights reserved.
-  </footer>
     </div>
+
+    <!-- Footer -->
+ <div class="footer">
+    © Epical Layouts Pvt. Ltd. All Rights Reserved.
   </div>
-  <script>
-    // Password visibility toggle (optional enhancement)
-    document.querySelectorAll('.input-field input[type="password"]').forEach(function(input) {
-      // Create toggle button
-      const toggle = document.createElement('i');
-      toggle.className = 'fa-solid fa-eye icon';
-      toggle.style.position = 'absolute';
-      toggle.style.right = '14px';
-      toggle.style.cursor = 'pointer';
-      toggle.title = 'Show/Hide Password';
-      input.parentElement.appendChild(toggle);
+</div>
 
-      toggle.addEventListener('click', function() {
-        if (input.type === 'password') {
-          input.type = 'text';
-          toggle.className = 'fa-solid fa-eye-slash icon';
-        } else {
-          input.type = 'password';
-          toggle.className = 'fa-solid fa-eye icon';
-        }
-      });
-    });
-
-    // Client-side form validation (optional, as HTML5 already validates)
-    document.querySelector('.login-form').addEventListener('submit', function(e) {
-      const email = this.email.value.trim();
-      const password = this.password.value.trim();
-      if (!email || !password) {
-        e.preventDefault();
-        alert('Please fill in both email and password.');
-      }
-    });
-
-    // Close flash messages (for dynamically rendered messages)
-    document.querySelectorAll('.close-inline').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        this.parentElement.style.display = 'none';
-      });
-    });
-  </script>
+  
+  <script src="{{ url_for('static', filename='script/script.js') }}"></script>
 </body>
 </html>
-
 
 

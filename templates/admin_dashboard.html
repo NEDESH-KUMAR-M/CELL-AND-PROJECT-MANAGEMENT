@@ -16,6 +16,7 @@
     font-size: 13px;
     line-height: 1.5;
     overflow-x: hidden;
+    padding-top: px; /* Adjusted for fixed header height */
   }
   
   :root {
@@ -33,12 +34,184 @@
     --text-light: #7f8c8d;
     --text-dark: #2c3e50;
     --table-header: #f5f6f7;
+    --header-bg: #138D83;
+    --header-text: #ffffff;
   }
   
   #container {
     display: flex;
     height: 100vh;
     position: relative;
+  }
+
+  /* New Fixed Header Styles */
+  .fixed-header {
+            background-color: #138D83;
+            color: white;
+            padding: 10px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .company-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    object-fit: contain;
+    background-color: #ffffff;
+    padding: 4px;
+  }
+
+  .company-name {
+    font-size: 1.55rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .app-name {
+    font-size: 1.55rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .profile-section {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .profile-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .profile-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+
+  .profile-button i {
+    font-size: 1.25rem;
+    color: #ffffff;
+  }
+
+  .profile-button span {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #ffffff;
+  }
+
+  .profile-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background-color: #ffffff !important;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      min-width: 160px;
+      z-index: 1300;
+      overflow: hidden;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+
+  }
+
+  .profile-menu.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+  }
+
+  .profile-menu a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      color: #374151;
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: background-color 0.2s ease;
+  }
+
+  .profile-menu a:hover {
+    background-color: #f3f4f6;
+  }
+
+  .profile-menu a i {
+    margin-right: 8px;
+  }
+
+  .profile-menu a[href="/logout"] {
+    color: var(--danger);
+  }
+
+  @media (max-width: 768px) {
+    .fixed-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 16px;
+    }
+
+    .header-left, .header-right {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .company-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      padding: 3px;
+    }
+
+    .company-name {
+      font-size: 1rem;
+    }
+
+    .app-name {
+      font-size: 0.875rem;
+    }
+
+    .profile-button span {
+      display: none;
+    }
+
+    .profile-button {
+      padding: 6px;
+    }
+
+    .profile-menu {
+      right: 16px;
+      min-width: 120px;
+    }
   }
 
   /* Sidebar Styles */
@@ -224,7 +397,7 @@
   /* Main content */
   #main-content {
     flex-grow: 1;
-    padding: 20px;
+    padding: 10px;
     overflow-y: auto;
     transition: all 0.3s;
     background: #fff;
@@ -576,26 +749,26 @@
 
   /* Notification Popup Styles */
   .notification {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-10px);
-      z-index: 1200;
-      background-color: #10b981;
-      color: white;
-      padding: 1rem 1.5rem;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      opacity: 0;
-      transition: opacity 0.3s ease, transform 0.3s ease;
-      max-width: 300px;
-    }
-    .notification-popup.active {
-      transform: translateX(-50%) translateY(0);
-    }
+    position: fixed;
+    top: 84px; /* Adjusted to appear below fixed header */
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px);
+    z-index: 1200;
+    background-color: #10b981;
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    max-width: 300px;
+  }
+  .notification-popup.active {
+    transform: translateX(-50%) translateY(0);
+  }
   .notification.active {
     opacity: 1;
     visibility: visible;
@@ -612,6 +785,26 @@
 </style>
 </head>
 <body>
+<!-- New Fixed Header -->
+<header class="fixed-header">
+  <div class="header-left">
+    <img src="static/image/Logo.png" alt="Company Logo" class="company-logo">
+    <span class="company-name">EPICAL LAYOUTS PVT LTD</span>
+  </div>
+  <div class="header-right">
+    <span class="app-name">EPRM – Epical Project Review Management</span>
+    <div class="profile-section">
+      <button class="profile-button" id="profile-button">
+        <i class="fas fa-user-circle"></i>
+        <span id="username">{{ session['user']['name'] if session.get('user') and session['user'].get('name') else 'User' }}</span>
+      </button>
+      <div class="profile-menu" id="profile-menu">
+        <a href="/profile"><i class="fas fa-user"></i> Open Profile</a>
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </div>
+  </div>
+</header>
 
 <!-- Mobile menu toggle button -->
 <button class="mobile-menu-toggle" id="mobileMenuToggle">
@@ -776,283 +969,297 @@
 </div>
 
 <script>
-  // Sidebar toggle (assuming sidebar.js is missing, inline it here)
-  document.addEventListener('DOMContentLoaded', () => {
-    const sidebar = document.getElementById('sidebar');
-    const toggleBtn = document.getElementById('toggleBtn');
-    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+// Profile menu toggle functionality
+const profileButton = document.getElementById('profile-button');
+const profileMenu = document.getElementById('profile-menu');
 
-    toggleBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('collapsed');
-    });
+profileButton.addEventListener('click', () => {
+  profileMenu.classList.toggle('active');
+});
 
-    mobileMenuToggle.addEventListener('click', () => {
-      sidebar.classList.toggle('active');
-    });
+document.addEventListener('click', (e) => {
+  if (!profileButton.contains(e.target) && !profileMenu.contains(e.target)) {
+    profileMenu.classList.remove('active');
+  }
+});
+
+// Sidebar toggle (assuming sidebar.js is missing, inline it here)
+document.addEventListener('DOMContentLoaded', () => {
+  const sidebar = document.getElementById('sidebar');
+  const toggleBtn = document.getElementById('toggleBtn');
+  const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+
+  toggleBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
   });
 
-  // Notification function
-  function showNotification(message, isError = false) {
-    const notification = document.getElementById('notificationPopup');
-    const notificationMessage = document.getElementById('notificationMessage');
-    notificationMessage.textContent = message;
-    notification.classList.toggle('error', isError);
-    notification.classList.add('active');
+  mobileMenuToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('active');
+  });
+});
+
+// Notification function
+function showNotification(message, isError = false) {
+  const notification = document.getElementById('notificationPopup');
+  const notificationMessage = document.getElementById('notificationMessage');
+  notificationMessage.textContent = message;
+  notification.classList.toggle('error', isError);
+  notification.classList.add('active');
+  setTimeout(() => {
+    notification.classList.remove('active');
+  }, 3000); // Hide after 3 seconds
+}
+
+// Add Employee Modal
+const addEmployeeBtn = document.getElementById('addEmployeeBtn');
+const addEmployeeModal = document.getElementById('addEmployeeModal');
+const cancelAddEmployee = document.getElementById('cancelAddEmployee');
+const addEmployeeForm = document.getElementById('addEmployeeForm');
+const loadingModal = document.getElementById('loadingModal');
+
+addEmployeeBtn.addEventListener('click', () => {
+  addEmployeeModal.classList.add('active');
+});
+
+cancelAddEmployee.addEventListener('click', () => {
+  addEmployeeModal.classList.remove('active');
+});
+
+// Edit Employee Modal
+const editEmployeeModal = document.getElementById('editEmployeeModal');
+const cancelEditEmployee = document.getElementById('cancelEditEmployee');
+const editEmployeeForm = document.getElementById('editEmployeeForm');
+const editFullName = document.getElementById('editFullName');
+const editEmail = document.getElementById('editEmail');
+const editRole = document.getElementById('editRole');
+const originalEmail = document.getElementById('originalEmail');
+
+cancelEditEmployee.addEventListener('click', () => {
+  editEmployeeModal.classList.remove('active');
+});
+
+// Close modals when clicking outside
+document.querySelectorAll('.modal-overlay').forEach(modal => {
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.classList.remove('active');
+    }
+  });
+});
+
+// Employees table
+const employeesTable = document.getElementById('employeesTable');
+const searchInput = document.getElementById('searchInput');
+const roleFilter = document.getElementById('roleFilter');
+const statusFilter = document.getElementById('statusFilter');
+
+// Debounce function to prevent rapid clicks
+function debounce(func, wait) {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
+
+// Toggle status handler
+const toggleStatus = debounce(async (email, currentStatus) => {
+  const newStatus = currentStatus === 'active' ? 'Inactive' : 'Active';
+  const fd = new FormData();
+  fd.append('originalEmail', email);
+  fd.append('status', newStatus);
+  try {
+    // Ensure loading modal is visible
+    loadingModal.style.display = 'flex';
     setTimeout(() => {
-      notification.classList.remove('active');
-    }, 3000); // Hide after 3 seconds
-  }
-
-  // Add Employee Modal
-  const addEmployeeBtn = document.getElementById('addEmployeeBtn');
-  const addEmployeeModal = document.getElementById('addEmployeeModal');
-  const cancelAddEmployee = document.getElementById('cancelAddEmployee');
-  const addEmployeeForm = document.getElementById('addEmployeeForm');
-  const loadingModal = document.getElementById('loadingModal');
-  
-  addEmployeeBtn.addEventListener('click', () => {
-    addEmployeeModal.classList.add('active');
-  });
-  
-  cancelAddEmployee.addEventListener('click', () => {
-    addEmployeeModal.classList.remove('active');
-  });
-  
-  // Edit Employee Modal
-  const editEmployeeModal = document.getElementById('editEmployeeModal');
-  const cancelEditEmployee = document.getElementById('cancelEditEmployee');
-  const editEmployeeForm = document.getElementById('editEmployeeForm');
-  const editFullName = document.getElementById('editFullName');
-  const editEmail = document.getElementById('editEmail');
-  const editRole = document.getElementById('editRole');
-  const originalEmail = document.getElementById('originalEmail');
-  
-  cancelEditEmployee.addEventListener('click', () => {
-    editEmployeeModal.classList.remove('active');
-  });
-  
-  // Close modals when clicking outside
-  document.querySelectorAll('.modal-overlay').forEach(modal => {
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.classList.remove('active');
-      }
+      loadingModal.classList.add('active');
+    }, 10); // Slight delay to ensure CSS transition
+    const response = await fetch('/admin/update_employee', {
+      method: 'POST',
+      body: fd
     });
-  });
-  
-  // Employees table
-  const employeesTable = document.getElementById('employeesTable');
-  const searchInput = document.getElementById('searchInput');
-  const roleFilter = document.getElementById('roleFilter');
-  const statusFilter = document.getElementById('statusFilter');
-  
-  // Debounce function to prevent rapid clicks
-  function debounce(func, wait) {
-    let timeout;
-    return function (...args) {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func.apply(this, args), wait);
-    };
-  }
-  
-  // Toggle status handler
-  const toggleStatus = debounce(async (email, currentStatus) => {
-    const newStatus = currentStatus === 'active' ? 'Inactive' : 'Active';
-    const fd = new FormData();
-    fd.append('originalEmail', email);
-    fd.append('status', newStatus);
-    try {
-      // Ensure loading modal is visible
-      loadingModal.style.display = 'flex';
-      setTimeout(() => {
-        loadingModal.classList.add('active');
-      }, 10); // Slight delay to ensure CSS transition
-      const response = await fetch('/admin/update_employee', {
-        method: 'POST',
-        body: fd
-      });
-      const data = await response.json();
-      if (data.success) {
-        await fetchEmployees(); // Refresh the table with updated data
-        showNotification(`Employee ${newStatus.toLowerCase()} successfully`);
-      } else {
-        showNotification(data.error || 'Failed to update status', true);
-      }
-    } catch (error) {
-      showNotification('Error: ' + error.message, true);
-    } finally {
-      loadingModal.classList.remove('active');
-      setTimeout(() => {
-        loadingModal.style.display = 'none';
-      }, 300); // Match transition duration
+    const data = await response.json();
+    if (data.success) {
+      await fetchEmployees(); // Refresh the table with updated data
+      showNotification(`Employee ${newStatus.toLowerCase()} successfully`);
+    } else {
+      showNotification(data.error || 'Failed to update status', true);
     }
-  }, 300);
-  
-  // Fetch employees and populate table
-  async function fetchEmployees() {
-    try {
-      const response = await fetch('/api/employees');
-      if (!response.ok) throw new Error('Failed to fetch employees');
-      const employees = await response.json();
-      const tbody = document.getElementById('employeesTbody');
-      tbody.innerHTML = '';
-      employees.forEach(emp => {
-        const roleLower = emp.role.toLowerCase();
-        const statusLower = emp.status.toLowerCase();
-        const html = `
-          <tr>
-            <td>${emp.name}</td>
-            <td>${emp.emailid}</td>
-            <td><span class="role-badge ${roleLower}">${roleLower}</span></td>
-            <td><span class="status-badge ${statusLower}">${statusLower}</span></td>
-            <td class="actions">
-              <span class="edit-icon" data-name="${emp.name}" data-email="${emp.emailid}" data-role="${emp.role}" data-status="${emp.status}"><i class="fa-regular fa-pen-to-square"></i></span>
-            </td>
-            <td>
-              <button class="${statusLower === 'active' ? 'deactivate-btn' : 'activate-btn'}" data-email="${emp.emailid}" data-status="${statusLower}">
-                ${statusLower === 'active' ? 'Deactivate' : 'Activate'}
-              </button>
-            </td>
-          </tr>
-        `;
-        tbody.insertAdjacentHTML('beforeend', html);
-      });
-      
-      // Add event listeners to toggle buttons
-      document.querySelectorAll('.activate-btn, .deactivate-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const email = btn.dataset.email;
-          const status = btn.dataset.status;
-          toggleStatus(email, status);
-        });
-      });
-      
-      filterEmployees(); // Apply filters after populating
-    } catch (error) {
-      console.error('Error fetching employees:', error);
-      showNotification('Error fetching employees: ' + error.message, true);
-    }
+  } catch (error) {
+    showNotification('Error: ' + error.message, true);
+  } finally {
+    loadingModal.classList.remove('active');
+    setTimeout(() => {
+      loadingModal.style.display = 'none';
+    }, 300); // Match transition duration
   }
+}, 300);
 
-  // Filter functionality
-  function filterEmployees() {
-    const searchTerm = searchInput.value.toLowerCase();
-    const roleValue = roleFilter.value;
-    const statusValue = statusFilter.value;
-    const rows = document.querySelectorAll('#employeesTbody tr');
-    rows.forEach(row => {
-      const name = row.cells[0].textContent.toLowerCase();
-      const email = row.cells[1].textContent.toLowerCase();
-      const role = row.cells[2].querySelector('.role-badge').textContent.toLowerCase();
-      const status = row.cells[3].querySelector('.status-badge').textContent.toLowerCase();
-      
-      const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm);
-      const matchesRole = roleValue === 'all' || role === roleValue;
-      const matchesStatus = statusValue === 'all' || status === statusValue;
-      
-      row.style.display = (matchesSearch && matchesRole && matchesStatus) ? '' : 'none';
+// Fetch employees and populate table
+async function fetchEmployees() {
+  try {
+    const response = await fetch('/api/employees');
+    if (!response.ok) throw new Error('Failed to fetch employees');
+    const employees = await response.json();
+    const tbody = document.getElementById('employeesTbody');
+    tbody.innerHTML = '';
+    employees.forEach(emp => {
+      const roleLower = emp.role.toLowerCase();
+      const statusLower = emp.status.toLowerCase();
+      const html = `
+        <tr>
+          <td>${emp.name}</td>
+          <td>${emp.emailid}</td>
+          <td><span class="role-badge ${roleLower}">${roleLower}</span></td>
+          <td><span class="status-badge ${statusLower}">${statusLower}</span></td>
+          <td class="actions">
+            <span class="edit-icon" data-name="${emp.name}" data-email="${emp.emailid}" data-role="${emp.role}" data-status="${emp.status}"><i class="fa-regular fa-pen-to-square"></i></span>
+          </td>
+          <td>
+            <button class="${statusLower === 'active' ? 'deactivate-btn' : 'activate-btn'}" data-email="${emp.emailid}" data-status="${statusLower}">
+              ${statusLower === 'active' ? 'Deactivate' : 'Activate'}
+            </button>
+          </td>
+        </tr>
+      `;
+      tbody.insertAdjacentHTML('beforeend', html);
     });
+    
+    // Add event listeners to toggle buttons
+    document.querySelectorAll('.activate-btn, .deactivate-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const email = btn.dataset.email;
+        const status = btn.dataset.status;
+        toggleStatus(email, status);
+      });
+    });
+    
+    filterEmployees(); // Apply filters after populating
+  } catch (error) {
+    console.error('Error fetching employees:', error);
+    showNotification('Error fetching employees: ' + error.message, true);
   }
-  
-  // Add employee submit
-  addEmployeeForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const form = e.target;
-    const password = form.querySelector('[name="password"]').value;
-    const confirm_password = form.querySelector('[name="confirm_password"]').value;
-    if (password !== confirm_password) {
-      showNotification('Passwords do not match!', true);
-      return;
-    }
-    try {
-      // Ensure loading modal is visible
-      loadingModal.style.display = 'flex';
-      setTimeout(() => {
-        loadingModal.classList.add('active');
-      }, 10); // Slight delay to ensure CSS transition
-      const response = await fetch('/admin/add_employee', {
-        method: 'POST',
-        body: new FormData(form)
-      });
-      if (!response.ok) {
-        const text = await response.text();
-        throw new Error(text);
-      }
-      const data = await response.json();
-      if (data.success) {
-        await fetchEmployees();
-        addEmployeeModal.classList.remove('active');
-        form.reset();
-        showNotification('Employee added successfully');
-      } else {
-        showNotification(data.error || 'Failed to add employee', true);
-      }
-    } catch (error) {
-      console.error('Add employee error:', error);
-      showNotification('Error: ' + error.message, true);
-    } finally {
-      loadingModal.classList.remove('active');
-      setTimeout(() => {
-        loadingModal.style.display = 'none';
-      }, 300); // Match transition duration
-    }
-  });
-  
-  // Edit employee open
-  document.addEventListener('click', (e) => {
-    const icon = e.target.closest('.edit-icon');
-    if (icon) {
-      const name = icon.dataset.name;
-      const email = icon.dataset.email;
-      const role = icon.dataset.role;
-      const status = icon.dataset.status;
-      editFullName.value = name;
-      editEmail.value = email;
-      editRole.value = role;
-      originalEmail.value = email;
-      editEmployeeModal.classList.add('active');
-    }
-  });
+}
 
-  // Edit employee submit
-  editEmployeeForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const form = e.target;
-    try {
-      // Ensure loading modal is visible
-      loadingModal.style.display = 'flex';
-      setTimeout(() => {
-        loadingModal.classList.add('active');
-      }, 10); // Slight delay to ensure CSS transition
-      const response = await fetch('/admin/update_employee', {
-        method: 'POST',
-        body: new FormData(form)
-      });
-      const data = await response.json();
-      if (data.success) {
-        await fetchEmployees();
-        editEmployeeModal.classList.remove('active');
-        showNotification('Employee updated successfully');
-      } else {
-        showNotification(data.error || 'Failed to update employee', true);
-      }
-    } catch (error) {
-      showNotification('Error: ' + error.message, true);
-    } finally {
-      loadingModal.classList.remove('active');
-      setTimeout(() => {
-        loadingModal.style.display = 'none';
-      }, 300); // Match transition duration
-    }
+// Filter functionality
+function filterEmployees() {
+  const searchTerm = searchInput.value.toLowerCase();
+  const roleValue = roleFilter.value;
+  const statusValue = statusFilter.value;
+  const rows = document.querySelectorAll('#employeesTbody tr');
+  rows.forEach(row => {
+    const name = row.cells[0].textContent.toLowerCase();
+    const email = row.cells[1].textContent.toLowerCase();
+    const role = row.cells[2].querySelector('.role-badge').textContent.toLowerCase();
+    const status = row.cells[3].querySelector('.status-badge').textContent.toLowerCase();
+    
+    const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm);
+    const matchesRole = roleValue === 'all' || role === roleValue;
+    const matchesStatus = statusValue === 'all' || status === statusValue;
+    
+    row.style.display = (matchesSearch && matchesRole && matchesStatus) ? '' : 'none';
   });
-  
-  // Initial fetch
-  window.addEventListener('load', fetchEmployees);
+}
 
-  // Apply filters on input/change
-  searchInput.addEventListener('input', filterEmployees);
-  roleFilter.addEventListener('change', filterEmployees);
-  statusFilter.addEventListener('change', filterEmployees);
+// Add employee submit
+addEmployeeForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const password = form.querySelector('[name="password"]').value;
+  const confirm_password = form.querySelector('[name="confirm_password"]').value;
+  if (password !== confirm_password) {
+    showNotification('Passwords do not match!', true);
+    return;
+  }
+  try {
+    // Ensure loading modal is visible
+    loadingModal.style.display = 'flex';
+    setTimeout(() => {
+      loadingModal.classList.add('active');
+    }, 10); // Slight delay to ensure CSS transition
+    const response = await fetch('/admin/add_employee', {
+      method: 'POST',
+      body: new FormData(form)
+    });
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(text);
+    }
+    const data = await response.json();
+    if (data.success) {
+      await fetchEmployees();
+      addEmployeeModal.classList.remove('active');
+      form.reset();
+      showNotification('Employee added successfully');
+    } else {
+      showNotification(data.error || 'Failed to add employee', true);
+    }
+  } catch (error) {
+    console.error('Add employee error:', error);
+    showNotification('Error: ' + error.message, true);
+  } finally {
+    loadingModal.classList.remove('active');
+    setTimeout(() => {
+      loadingModal.style.display = 'none';
+    }, 300); // Match transition duration
+  }
+});
+
+// Edit employee open
+document.addEventListener('click', (e) => {
+  const icon = e.target.closest('.edit-icon');
+  if (icon) {
+    const name = icon.dataset.name;
+    const email = icon.dataset.email;
+    const role = icon.dataset.role;
+    const status = icon.dataset.status;
+    editFullName.value = name;
+    editEmail.value = email;
+    editRole.value = role;
+    originalEmail.value = email;
+    editEmployeeModal.classList.add('active');
+  }
+});
+
+// Edit employee submit
+editEmployeeForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  try {
+    // Ensure loading modal is visible
+    loadingModal.style.display = 'flex';
+    setTimeout(() => {
+      loadingModal.classList.add('active');
+    }, 10); // Slight delay to ensure CSS transition
+    const response = await fetch('/admin/update_employee', {
+      method: 'POST',
+      body: new FormData(form)
+    });
+    const data = await response.json();
+    if (data.success) {
+      await fetchEmployees();
+      editEmployeeModal.classList.remove('active');
+      showNotification('Employee updated successfully');
+    } else {
+      showNotification(data.error || 'Failed to update employee', true);
+    }
+  } catch (error) {
+    showNotification('Error: ' + error.message, true);
+  } finally {
+    loadingModal.classList.remove('active');
+    setTimeout(() => {
+      loadingModal.style.display = 'none';
+    }, 300); // Match transition duration
+  }
+});
+
+// Initial fetch
+window.addEventListener('load', fetchEmployees);
+
+// Apply filters on input/change
+searchInput.addEventListener('input', filterEmployees);
+roleFilter.addEventListener('change', filterEmployees);
+statusFilter.addEventListener('change', filterEmployees);
 </script>
 <script src="sidebar.js"></script>
 </body>

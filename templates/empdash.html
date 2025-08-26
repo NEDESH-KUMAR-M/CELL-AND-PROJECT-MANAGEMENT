@@ -546,7 +546,7 @@
     .company-header {
       background-color: #138D83;
       color: white;
-      padding: 1rem 1.5rem;
+      padding: 10px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -568,9 +568,11 @@
     }
 
     .app-name {
-      font-size: 1rem;
-      font-weight: 500;
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
       color: rgba(255, 255, 255, 0.9);
+      
     }
 
     .profile-section {
@@ -630,27 +632,32 @@
         padding: 6px;
       }
     }
+
   </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
 
 <!-- Company Header -->
+<!-- Company Header -->
 <header class="company-header">
   <div class="flex items-center gap-3">
-    <img src="static\image\Logo.png" alt="EPICAL Layouts Pvt Ltd Logo" class="company-logo">
+    <img src="static\image\Logo.png" alt="EPICAL Layouts Pvt Ltd Logo" class="company-logo bg-white p-1 rounded-lg">
     <div>
       <h1 class="company-title">EPICAL LAYOUTS PVT LTD</h1>
-     
     </div>
   </div>
-  <div class="profile-section">
-    <button class="profile-button" id="profile-button">
-      <i class="fas fa-user-circle"></i>
-      <span>{{ session['user']['email'] if session.get('user') else 'Admin' }}</span>
-    </button>
-    <div class="profile-menu" id="profile-menu">
-      <a href="/profile"><i class="fas fa-user"></i> Open Profile</a>
-      <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  <!-- Group app-name and profile-section to align right -->
+  <div class="flex items-center gap-8">
+    <div class="app-name">EPRM – Epical Project Review Management </div>
+    <div class="profile-section">
+      <button class="profile-button" id="profile-button">
+        <i class="fas fa-user-circle"></i>
+        <span>{{ session['user']['name'] if session.get('user') and session['user'].get('name') else 'User' }}</span>
+      </button>
+      <div class="profile-menu" id="profile-menu">
+        <a href="/profile"><i class="fas fa-user"></i> Open Profile</a>
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
     </div>
   </div>
 </header>
@@ -1100,6 +1107,8 @@
       notificationPopup.classList.remove('active');
     }, 3000); // Hide after 3 seconds
   }
+
+
 
   saveProjectBtn.addEventListener('click', async (e) => {
     e.preventDefault();

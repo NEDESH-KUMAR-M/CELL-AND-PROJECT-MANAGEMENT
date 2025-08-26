@@ -77,6 +77,7 @@ def fetch_user_by_email(email):
         idx_password = headers.index("password")
         idx_role = headers.index("role")
         idx_status = headers.index("status")
+        idx_name = headers.index("name")  # Add name index
     except ValueError:
         raise RuntimeError("Sheet must have headers: name | emailid | role | mobile | designation | status | password")
     for r in rows[1:]:
@@ -84,10 +85,11 @@ def fetch_user_by_email(email):
             continue
         if r[idx_email].strip().lower() == email.strip().lower():
             return {
-                "email": email.strip(),
+                "emailid": r[idx_email].strip(),  # Use "emailid" to match sheet
                 "password": r[idx_password].strip() if len(r) > idx_password else "",
                 "role": r[idx_role].strip().lower() if len(r) > idx_role else "",
-                "status": r[idx_status].strip().lower() if len(r) > idx_status else ""
+                "status": r[idx_status].strip().lower() if len(r) > idx_status else "",
+                "name": r[idx_name].strip() if len(r) > idx_name else ""  # Add name
             }
     return None
 
@@ -431,6 +433,7 @@ def login():
             return redirect(url_for("login"))
         try:
             user = fetch_user_by_email(email)
+            print("User data:", user)  # Debug
         except Exception as e:
             flash(f"Authentication error: {e}", "error")
             return redirect(url_for("login"))
@@ -443,7 +446,12 @@ def login():
         if user["role"] not in ("admin", "reviewer"):
             flash("Unauthorized role.", "error")
             return redirect(url_for("login"))
-        session["user"] = {"email": user["email"], "role": user["role"]}
+        session["user"] = {
+            "email": user["emailid"],  # Use "emailid" to match sheet
+            "role": user["role"],
+            "name": user["name"] or "Unknown"  # Use "name" with fallback
+        }
+        print("Session user:", session["user"])  # Debug
         session.permanent = False
         if user["role"] == "admin":
             return redirect(url_for("projects_page"))

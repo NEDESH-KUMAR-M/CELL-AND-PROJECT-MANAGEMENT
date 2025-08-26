@@ -22,7 +22,7 @@
             --text-light: #7f8c8d;
             --text-dark: #2c3e50;
             --table-header: #f5f6f7;
-            --header-bg: #12a5a5;
+            --header-bg: #138D83;
             --header-text: #ffffff;
         }
         
@@ -44,15 +44,159 @@
             overflow: hidden;
         }
         
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--header-bg);
+            color: var(--header-text);
+            padding: 10px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .company-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            object-fit: contain;
+        }
+
+        .company-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .profile-symbol {
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .username {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--header-text);
+            max-width: 150px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .app-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .profile-section {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .profile-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3); /* Add white border */
+        }
+
+        .profile-button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5); /* Lighten border on hover */
+        }
+
+        .profile-button i {
+            font-size: 1.25rem;
+            color: #ffffff; /* Change icon color to white */
+        }
+
+        .profile-button span {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #ffffff; /* Make text white too for consistency */
+        }
+
+        .profile-menu {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: white;
+            color: var(--text-dark);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 2001;
+            display: none;
+            min-width: 150px;
+        }
+
+        .profile-menu.active {
+            display: block;
+        }
+
+        .profile-menu a {
+            display: block;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: background 0.2s ease;
+        }
+
+        .profile-menu a:hover {
+            background: var(--light);
+        }
+
+        .profile-menu a i {
+            margin-right: 8px;
+        }
+
+        .profile-menu a[href="/logout"] {
+            color: var(--danger);
+        }
+
+        @media (max-width: 768px) {
+            .profile-menu {
+                right: 16px;
+                min-width: 120px;
+            }
+        }
+
         .container {
             flex: 1;
             max-width: 1800px;
-            margin: 0 auto;
+            margin: 60px auto 0;
             background: #fff;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
-            height: 100%;
+            height: calc(100% - 60px);
             border-left: 1px solid var(--border);
             border-right: 1px solid var(--border);
             position: relative;
@@ -158,7 +302,7 @@
         .btn-secondary {
             background: white;
             color: var(--text-dark);
-            border: 1px solid var(--border);
+            border: 1px solid #ffffff;
         }
         
         .btn-secondary:hover {
@@ -333,7 +477,7 @@
         
         .filter-btn {
             padding: 6px 14px;
-            border: 1px solid #e0e0e0;
+            border: 1px solid #ffffff;
             border-radius: 4px;
             font-size: 11px;
             font-weight: 500;
@@ -577,10 +721,10 @@
 
         .image-view-container {
             position: fixed;
-            top: 0;
+            top: 60px;
             right: -400px;
             width: 400px;
-            height: 100%;
+            height: calc(100% - 60px);
             background: #fff;
             box-shadow: -2px 0 5px rgba(0,0,0,0.1);
             transition: right 0.3s ease;
@@ -631,7 +775,7 @@
             right: 0;
             transform: translateY(-50%);
             background: #fff;
-            border: 1px solid var(--border);
+            border: 1px solid #ffffff;
             border-right: none;
             border-radius: 4px 0 0 4px;
             padding: 10px 8px;
@@ -738,7 +882,7 @@
         /* Enhanced Popup Styles */
         .popup {
             position: fixed;
-            top: 20px;
+            top: 80px;
             left: 50%;
             transform: translateX(-50%);
             background: var(--success);
@@ -846,6 +990,18 @@
         }
         
         @media (max-width: 768px) {
+            .fixed-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                padding: 10px 16px;
+            }
+
+            .header-left, .header-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
             .header {
                 flex-direction: column;
                 align-items: flex-start;
@@ -951,10 +1107,61 @@
             .delete-confirm-popup {
                 min-width: 90%;
             }
+
+            .company-header {
+                padding: 0.75rem 1rem;
+            }
+
+            .company-logo {
+                width: 32px;
+                height: 32px;
+            }
+
+            .company-name {
+                font-size: 1rem;
+            }
+
+            .app-name {
+                font-size: 0.875rem;
+            }
+
+            .profile-button span {
+                display: none;
+            }
+
+            .profile-button {
+                padding: 6px;
+            }
+
+            .profile-menu {
+                right: 16px;
+                min-width: 120px;
+            }
         }
+        
     </style>
 </head>
 <body>
+    <div class="fixed-header">
+        <div class="header-left">
+            <img src="static\image\Logo.png" alt="Company Logo" class="company-logo">
+            <span class="company-name">EPICAL LAYOUTS PVT LTD</span>
+        </div>
+        <div class="header-right">
+            <span class="app-name">EPRM – Epical Project Review Management</span>
+            <div class="profile-section">
+                <button class="profile-button" id="profile-button">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="username">{{ session['user']['name'] if session.get('user') and session['user'].get('name') else 'User' }}</span>
+                </button>
+                <div class="profile-menu" id="profile-menu">
+                    <a href="/profile"><i class="fas fa-user"></i> Open Profile</a>
+                    <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" id="user-role" value="{{ session['user']['role'] if session.get('user') and session['user'].get('role') else 'user' }}">
     <div class="container">
         <div class="header">
             <div class="header-info">
@@ -1140,7 +1347,20 @@
             document.getElementById('print-btn').addEventListener('click', exportReport);
             document.getElementById('cancel-delete-btn').addEventListener('click', closeDeleteConfirm);
             document.getElementById('confirm-delete-btn').addEventListener('click', confirmDelete);
+            const profileButton = document.getElementById('profile-button');
+            const profileMenu = document.getElementById('profile-menu');
+            profileButton.addEventListener('click', () => {
+                profileMenu.classList.toggle('active');
+            });
+            document.addEventListener('click', (e) => {
+                if (!profileButton.contains(e.target) && !profileMenu.contains(e.target)) {
+                    profileMenu.classList.remove('active');
+                }
+            });
         });
+
+
+
 
         async function fetchProjectData() {
             try {
@@ -1802,15 +2022,20 @@
             showDeleteConfirm(id);
         }
 
-        async function addChecklist() {
+        function addChecklist() {
             openChecklistModal();
         }
 
         function goBack() {
-            console.log('Navigating back to /open_project/' + projectId);
-            window.location.href = `/open_project/${projectId}`;
+            const userRole = document.getElementById('user-role').value;
+            if (userRole === 'admin') {
+                console.log('Navigating back to /admin_dashboard for admin');
+                window.location.href = `/open_project/${projectId}`;
+            } else {
+                console.log('Navigating back to /open_project/' + projectId + ' for non-admin');
+                window.location.href = `/employee/open_project/${projectId}`;
+            }
         }
-
         document.querySelector('#checklist-table').addEventListener('change', handleChange);
         document.querySelector('#checklist-table').addEventListener('click', handleShowMore);
         document.querySelector('.filters').addEventListener('click', handleFilter);

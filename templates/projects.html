@@ -502,10 +502,161 @@
       font-size: 0.9rem;
       font-weight: 500;
     }
+      /* Profile Menu Styles */
+    .profile-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      min-width: 160px;
+      z-index: 1300;
+      overflow: hidden;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+    }
+
+    .profile-menu.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .profile-menu a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      color: #374151;
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: background-color 0.2s ease;
+    }
+
+    .profile-menu a:hover {
+      background-color: #f3f4f6;
+    }
+
+    /* New Header Styles */
+    .company-header {
+      background-color: #138D83;
+      color: white;
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .company-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      object-fit: contain;
+    }
+
+    .company-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .app-name {
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: rgba(255, 255, 255, 0.9);
+      
+    }
+
+    .profile-section {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .profile-button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .profile-button:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .profile-button i {
+      font-size: 1.25rem;
+    }
+
+    .profile-button span {
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .company-header {
+        padding: 0.75rem 1rem;
+      }
+
+      .company-logo {
+        width: 32px;
+        height: 32px;
+      }
+
+      .company-title {
+        font-size: 1rem;
+      }
+
+      .app-name {
+        font-size: 0.875rem;
+      }
+
+      .profile-button span {
+        display: none;
+      }
+
+      .profile-button {
+        padding: 6px;
+      }
+    }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
-
+<!-- Company Header -->
+<header class="company-header">
+  <div class="flex items-center gap-3">
+    <img src="static\image\Logo.png" alt="EPICAL Layouts Pvt Ltd Logo" class="company-logo bg-white p-1 rounded-lg">
+    <div>
+      <h1 class="company-title">EPICAL LAYOUTS PVT LTD</h1>
+    </div>
+  </div>
+  <!-- Group app-name and profile-section to align right -->
+  <div class="flex items-center gap-8">
+    <div class="app-name">EPRM – Epical Project Review Management </div>
+    <div class="profile-section">
+      <button class="profile-button" id="profile-button">
+        <i class="fas fa-user-circle"></i>
+        <span>{{ session['user']['name'] if session.get('user') and session['user'].get('name') else 'User' }}</span>
+      </button>
+      <div class="profile-menu" id="profile-menu">
+        <a href="/profile"><i class="fas fa-user"></i> Open Profile</a>
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </div>
+  </div>
+</header>
 <!-- Mobile menu toggle button -->
 <button class="mobile-menu-toggle" id="mobileMenuToggle">
   <i class="fas fa-bars"></i> Menu
@@ -714,7 +865,19 @@
   const mobileMenuToggle = document.getElementById('mobileMenuToggle');
   const notificationPopup = document.getElementById('notification-popup');
   const notificationMessage = document.getElementById('notification-message');
+  const profileButton = document.getElementById('profile-button');
+  const profileMenu = document.getElementById('profile-menu');
+  // Profile menu toggle functionality
+  profileButton.addEventListener('click', () => {
+    profileMenu.classList.toggle('active');
+  });
 
+  // Close profile menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!profileButton.contains(e.target) && !profileMenu.contains(e.target)) {
+      profileMenu.classList.remove('active');
+    }
+  });
   // ----- SIDEBAR AND NAVIGATION -----
 
   // Sidebar toggle functionality

@@ -25,11 +25,11 @@
             --header-bg: #138D83;
             --header-text: #ffffff;
         }
-        
+       
         * {
             box-sizing: border-box;
         }
-        
+       
         body {
             font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
             margin: 0;
@@ -43,7 +43,7 @@
             flex-direction: column;
             overflow: hidden;
         }
-        
+       
         .fixed-header {
             position: fixed;
             top: 0;
@@ -58,13 +58,11 @@
             z-index: 2000;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-
         .header-left {
             display: flex;
             align-items: center;
             gap: 15px;
         }
-
         .company-logo {
             width: 40px;
             height: 40px;
@@ -78,18 +76,15 @@
             font-weight: 600;
             letter-spacing: 0.02em;
         }
-
         .header-right {
             display: flex;
             align-items: center;
             gap: 15px;
         }
-
         .profile-symbol {
             font-size: 24px;
             cursor: pointer;
         }
-
         .username {
             font-size: 14px;
             font-weight: 500;
@@ -99,21 +94,18 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-
         .app-name {
             font-size: 1.25rem;
             font-weight: 600;
             letter-spacing: 0.02em;
             color: rgba(255, 255, 255, 0.9);
         }
-
         .profile-section {
             position: relative;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
-
         .profile-button {
             display: flex;
             align-items: center;
@@ -125,23 +117,19 @@
             transition: background-color 0.2s ease;
             border: 1px solid rgba(255, 255, 255, 0.3); /* Add white border */
         }
-
         .profile-button:hover {
             background-color: rgba(255, 255, 255, 0.2);
             border-color: rgba(255, 255, 255, 0.5); /* Lighten border on hover */
         }
-
         .profile-button i {
             font-size: 1.25rem;
             color: #ffffff; /* Change icon color to white */
         }
-
         .profile-button span {
             font-size: 0.875rem;
             font-weight: 500;
             color: #ffffff; /* Make text white too for consistency */
         }
-
         .profile-menu {
             position: absolute;
             top: 50px;
@@ -155,11 +143,9 @@
             display: none;
             min-width: 150px;
         }
-
         .profile-menu.active {
             display: block;
         }
-
         .profile-menu a {
             display: block;
             padding: 10px 20px;
@@ -169,26 +155,21 @@
             text-decoration: none;
             transition: background 0.2s ease;
         }
-
         .profile-menu a:hover {
             background: var(--light);
         }
-
         .profile-menu a i {
             margin-right: 8px;
         }
-
         .profile-menu a[href="/logout"] {
             color: var(--danger);
         }
-
         @media (max-width: 768px) {
             .profile-menu {
                 right: 16px;
                 min-width: 120px;
             }
         }
-
         .container {
             flex: 1;
             max-width: 1800px;
@@ -202,7 +183,7 @@
             border-right: 1px solid var(--border);
             position: relative;
         }
-        
+       
         .header {
             padding: 14px 24px;
             background: #f8f9fa;
@@ -221,7 +202,7 @@
             align-items: center;
             gap: 16px;
         }
-        
+       
         h1 {
             margin: 0;
             font-size: 18px;
@@ -232,7 +213,7 @@
             letter-spacing: 0.3px;
             color: #212529;
         }
-        
+       
         .subtitle {
             margin: 4px 0 0;
             font-size: 12px;
@@ -242,7 +223,7 @@
             text-overflow: ellipsis;
             font-weight: 400;
         }
-        
+       
         .tags {
             display: inline-block;
             padding: 4px 10px;
@@ -256,25 +237,24 @@
             margin-top: 8px;
             color: #495057;
         }
-
-        .tags.cell { 
+        .tags.cell {
             background: #e0f7fa;
             color: #00838f;
             border: 1px solid #b2ebf2;
         }
-        
-        .tags.in-progress { 
+       
+        .tags.in-progress {
             background: #fff3e0;
             color: #ef6c00;
             border: 1px solid #ffe0b2;
         }
-        
+       
         .header-actions {
             display: flex;
             gap: 10px;
             margin-left: 20px;
         }
-        
+       
         .btn {
             padding: 8px 16px;
             border: none;
@@ -289,33 +269,33 @@
             white-space: nowrap;
             letter-spacing: 0.3px;
         }
-        
+       
         .btn-primary {
             background: var(--success);
             color: white;
         }
-        
+       
         .btn-primary:hover {
             background: var(--success-light);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        
+       
         .btn-secondary {
             background: white;
             color: var(--text-dark);
             border: 1px solid #ffffff;
         }
-        
+       
         .btn-secondary:hover {
             background: #f5f5f5;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        
+       
         .btn:active {
             transform: translateY(1px);
             box-shadow: none;
         }
-        
+       
         .btn-back {
             background: transparent;
             color: var(--primary);
@@ -327,12 +307,12 @@
             gap: 6px;
             cursor: pointer;
         }
-        
+       
         .btn-back:hover {
             background: rgba(0,0,0,0.05);
             border-radius: 4px;
         }
-        
+       
         .progress-container {
             padding: 12px 24px;
             background: white;
@@ -342,7 +322,7 @@
             flex-shrink: 0;
             border-bottom: 1px solid var(--border);
         }
-        
+       
         .progress-bar {
             flex: 1;
             height: 8px;
@@ -352,14 +332,14 @@
             overflow: hidden;
             box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
         }
-        
+       
         .progress-fill {
             height: 100%;
             background: var(--success);
             width: 0%;
             transition: width 0.3s ease;
         }
-        
+       
         .progress-text {
             font-size: 12px;
             font-weight: 500;
@@ -367,7 +347,7 @@
             text-align: right;
             color: var(--text-dark);
         }
-        
+       
         .review-section {
             padding: 16px 24px;
             display: grid;
@@ -377,13 +357,13 @@
             flex-shrink: 0;
             background: white;
         }
-        
+       
         .info-group {
             display: flex;
             flex-direction: column;
             min-width: 0;
         }
-        
+       
         .info-group label {
             font-size: 11px;
             color: var(--text-light);
@@ -392,7 +372,7 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        
+       
         select, input {
             padding: 9px 12px;
             border: 1px solid var(--border);
@@ -403,7 +383,7 @@
             transition: all 0.2s ease;
             font-family: 'Roboto', sans-serif;
         }
-        
+       
         select {
             appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -412,13 +392,13 @@
             background-size: 14px;
             padding-right: 32px;
         }
-        
+       
         select:focus, input:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 2px rgba(44, 62, 80, 0.1);
         }
-        
+       
         .upload-preview {
             width: 100%;
             height: 100%;
@@ -434,17 +414,17 @@
             border-radius: 4px;
             transition: all 0.2s ease;
         }
-        
+       
         .upload-preview:hover {
             border-color: var(--primary);
             background-color: #f0f4f8;
         }
-        
+       
         .upload-preview i {
             font-size: 24px;
             color: var(--text-light);
         }
-        
+       
         .checklist-section {
             flex: 1;
             display: flex;
@@ -452,7 +432,7 @@
             overflow: hidden;
             background: white;
         }
-        
+       
         .checklist-header {
             padding: 12px 24px;
             background: var(--table-header);
@@ -462,7 +442,7 @@
             border-bottom: 1px solid var(--border);
             flex-shrink: 0;
         }
-        
+       
         .checklist-header h2 {
             margin: 0;
             font-size: 15px;
@@ -470,12 +450,12 @@
             color: var(--text-dark);
             letter-spacing: 0.3px;
         }
-        
+       
         .filters {
             display: flex;
             gap: 10px;
         }
-        
+       
         .filter-btn {
             padding: 6px 14px;
             border: 1px solid #ffffff;
@@ -489,60 +469,58 @@
             letter-spacing: 0.5px;
             color: #495057;
         }
-
         .filter-btn.active {
             background: #495057;
             color: white;
             border-color: #495057;
         }
-        
+       
         .counters {
             display: flex;
             gap: 16px;
         }
-        
+       
         .counter {
             font-size: 11px;
             font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-
-        .counter.pending { 
+        .counter.pending {
             color: #ff9800;
             font-weight: 600;
         }
-        
-        .counter.pass { 
+       
+        .counter.pass {
             color: #4caf50;
             font-weight: 600;
         }
-        
-        .counter.fail { 
+       
+        .counter.fail {
             color: #f44336;
             font-weight: 600;
         }
-        
+       
         .table-container {
             flex: 1;
             overflow: auto;
             padding: 0 24px 20px;
             position: relative;
         }
-        
+       
         table {
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
         }
-        
+       
         th, td {
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid var(--border);
             vertical-align: top;
         }
-            
+           
         th {
             background: var(--header-bg);
             color: var(--header-text);
@@ -555,31 +533,31 @@
             box-shadow: 0 2px 2px -1px rgba(0,0,0,0.2);
             border-bottom: 2px solid #34495e;
         }
-        
+       
         tr:hover {
             background: rgba(0,0,0,0.02);
         }
-        
+       
         .description-col {
             width: 40%;
         }
-        
+       
         .applicable-col {
             width: 12%;
         }
-        
+       
         .status-col {
             width: 18%;
         }
-        
+       
         .comment-col {
             width: 25%;
         }
-        
+       
         .actions-col {
             width: 5%;
         }
-        
+       
         .description-cell {
             white-space: normal;
             word-break: break-word;
@@ -589,7 +567,7 @@
             line-height: 1.4;
             position: relative;
         }
-        
+       
         .description-text {
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -597,12 +575,12 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
-        
+       
         .description-text.expanded {
             line-clamp: unset;
             -webkit-line-clamp: unset;
         }
-        
+       
         .show-more-btn {
             background: none;
             border: none;
@@ -613,7 +591,7 @@
             font-size: 12px;
             display: none;
         }
-        
+       
         .comment-cell {
             white-space: normal;
             word-break: break-word;
@@ -626,49 +604,49 @@
             -webkit-box-orient: vertical;
             line-height: 1.4;
         }
-        
+       
         select.applicable-yes {
             background-color: rgba(39, 174, 96, 0.08);
             border-color: rgba(39, 174, 96, 0.3);
             color: var(--success);
             font-weight: 500;
         }
-        
+       
         select.applicable-no {
             background-color: rgba(243, 156, 18, 0.08);
             border-color: rgba(243, 156, 18, 0.3);
             color: var(--warning);
             font-weight: 500;
         }
-        
+       
         select.applicable-not-applicable {
             background-color: rgba(127, 140, 141, 0.08);
             border-color: rgba(127, 140, 141, 0.3);
             color: var(--text-light);
             font-weight: 500;
         }
-        
+       
         select.status-action-needed {
             background-color: rgba(231, 76, 60, 0.08);
             border-color: rgba(231, 76, 60, 0.3);
             color: var(--danger);
             font-weight: 500;
         }
-        
+       
         select.status-completed {
             background-color: rgba(39, 174, 96, 0.08);
             border-color: rgba(39, 174, 96, 0.3);
             color: var(--success);
             font-weight: 500;
         }
-        
+       
         select.status-not-reviewed {
             background-color: rgba(243, 156, 18, 0.08);
             border-color: rgba(243, 156, 18, 0.3);
             color: var(--warning);
             font-weight: 500;
         }
-        
+       
         input.comment {
             font-size: 13px;
             padding: 8px 12px;
@@ -678,12 +656,12 @@
             transition: all 0.2s ease;
             font-family: 'Roboto', sans-serif;
         }
-        
+       
         input.comment:focus {
             border-color: var(--primary);
             box-shadow: 0 0 0 2px rgba(44, 62, 80, 0.1);
         }
-        
+       
         .action-btn {
             background: none;
             border: none;
@@ -692,34 +670,33 @@
             color: var(--text-light);
             font-size: 14px;
         }
-        
+       
         .action-btn:hover {
             color: var(--primary);
         }
-        
+       
         .action-btn.delete:hover {
             color: var(--danger);
         }
-        
+       
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
         }
-        
+       
         ::-webkit-scrollbar-track {
             background: #f0f4f8;
             border-radius: 4px;
         }
-        
+       
         ::-webkit-scrollbar-thumb {
             background: #95a5a6;
             border-radius: 4px;
         }
-        
+       
         ::-webkit-scrollbar-thumb:hover {
             background: #7f8c8d;
         }
-
         .image-view-container {
             position: fixed;
             top: 60px;
@@ -733,11 +710,9 @@
             display: flex;
             flex-direction: column;
         }
-
         .image-view-container.open {
             right: 0;
         }
-
         .image-view-header {
             padding: 14px 24px;
             background: #f8f9fa;
@@ -746,14 +721,12 @@
             justify-content: space-between;
             align-items: center;
         }
-
         .image-view-header h2 {
             margin: 0;
             font-size: 16px;
             font-weight: 500;
             color: #212529;
         }
-
         .image-view-content {
             flex: 1;
             padding: 20px;
@@ -763,13 +736,11 @@
             justify-content: center;
             background: var(--light);
         }
-
         .image-view-content img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
         }
-
         .toggle-image-view-btn {
             position: absolute;
             top: 50%;
@@ -784,16 +755,13 @@
             z-index: 1001;
             transition: all 0.2s ease;
         }
-
         .toggle-image-view-btn:hover {
             background: #f5f5f5;
         }
-
         .toggle-image-view-btn i {
             font-size: 16px;
             color: var(--text-dark);
         }
-
         .modal {
             display: none;
             position: fixed;
@@ -806,7 +774,6 @@
             justify-content: center;
             align-items: center;
         }
-
         .modal-content {
             background: white;
             padding: 20px;
@@ -815,14 +782,12 @@
             max-width: 500px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
-
         .modal-content h2 {
             margin: 0 0 20px;
             font-size: 16px;
             font-weight: 500;
             color: var(--text-dark);
         }
-
         .modal-content textarea {
             width: 100%;
             min-height: 100px;
@@ -834,13 +799,11 @@
             resize: vertical;
             margin-bottom: 10px;
         }
-
         .modal-actions {
             display: flex;
             justify-content: flex-end;
             gap: 10px;
         }
-
         /* Professional Loading Component for Checklist Table */
         .loading-overlay {
             display: none;
@@ -857,7 +820,9 @@
             align-items: center;
             backdrop-filter: blur(2px);
         }
-
+        .checklist-section {
+            position: relative; /* Ensure checklist-section is the positioning context */
+        }
         .loading-spinner {
             border: 5px solid #e0e0e0;
             border-top: 5px solid var(--primary);
@@ -867,19 +832,16 @@
             animation: spin 0.8s linear infinite;
             margin-bottom: 15px;
         }
-
         .loading-text {
             font-size: 14px;
             font-weight: 500;
             color: var(--text-dark);
             letter-spacing: 0.3px;
         }
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
         /* Enhanced Popup Styles */
         .popup {
             position: fixed;
@@ -900,21 +862,17 @@
             min-width: 300px;
             text-align: center;
         }
-
         .popup.show {
             display: block;
             opacity: 1;
             transform: translateX(-50%) translateY(0);
         }
-
         .popup.error {
             background: var(--danger);
         }
-
         .popup.warning {
             background: var(--warning);
         }
-
         /* Delete Confirmation Popup */
         .delete-confirm-popup {
             position: fixed;
@@ -933,63 +891,54 @@
             text-align: center;
             border: 1px solid var(--border);
         }
-
         .delete-confirm-popup.show {
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
-
         .delete-confirm-popup p {
             margin: 0;
             font-size: 15px;
             font-weight: 500;
             color: var(--text-dark);
         }
-
         .delete-confirm-popup h3 {
             margin: 0 0 10px;
             font-size: 18px;
             font-weight: 600;
             color: var(--danger);
         }
-
         .delete-confirm-actions {
             display: flex;
             justify-content: center;
             gap: 12px;
             margin-top: 10px;
         }
-
         .delete-confirm-actions .btn-primary.delete {
             background: var(--danger);
         }
-
         .delete-confirm-actions .btn-primary.delete:hover {
             background: #c0392b;
         }
-
         @media (max-width: 1024px) {
             .review-section {
                 grid-template-columns: 1fr 1fr 1fr;
                 gap: 15px;
             }
-            
+           
             .upload-preview {
                 grid-column: span 1;
                 height: 90px;
             }
-
             .image-view-container {
                 width: 300px;
                 right: -300px;
             }
-
             .delete-confirm-popup {
                 min-width: 300px;
             }
         }
-        
+       
         @media (max-width: 768px) {
             .fixed-header {
                 flex-direction: column;
@@ -997,75 +946,73 @@
                 gap: 10px;
                 padding: 10px 16px;
             }
-
             .header-left, .header-right {
                 width: 100%;
                 justify-content: space-between;
             }
-
             .header {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 10px;
                 padding: 12px 16px;
             }
-            
+           
             .header-info {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 8px;
             }
-            
+           
             .header-actions {
                 width: 100%;
                 justify-content: flex-end;
                 margin-left: 0;
                 margin-top: 8px;
             }
-            
+           
             .review-section {
                 grid-template-columns: 1fr 1fr;
                 padding: 12px 16px;
                 gap: 12px;
             }
-            
+           
             .upload-preview {
                 grid-column: span 2;
                 height: 70px;
             }
-            
+           
             .checklist-header {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 10px;
                 padding: 12px 16px;
             }
-            
+           
             .filters, .counters {
                 width: 100%;
                 justify-content: space-between;
             }
-            
+           
             .table-container {
                 padding: 0 16px 15px;
             }
-            
+           
             table, thead, tbody, th, td, tr {
                 display: block;
             }
-            
+           
             thead tr {
                 position: absolute;
                 top: -9999px;
                 left: -9999px;
             }
-            
+           
             tr {
                 border: 1px solid var(--border);
                 margin-bottom: 10px;
                 padding: 8px;
             }
-            
+           
             td {
                 border: none;
                 border-bottom: 1px solid var(--border);
@@ -1074,7 +1021,7 @@
                 padding-top: 10px;
                 padding-bottom: 10px;
             }
-            
+           
             td:before {
                 content: attr(data-label);
                 position: absolute;
@@ -1085,34 +1032,31 @@
                 font-size: 11px;
                 text-transform: uppercase;
             }
-            
-            .description-col, .applicable-col, 
+           
+            .description-col, .applicable-col,
             .status-col, .comment-col, .actions-col {
                 width: 100%;
             }
-            
+           
             .description-cell, .comment-cell {
                 line-clamp: unset;
                 -webkit-line-clamp: unset;
             }
-            
+           
             .show-more-btn {
                 display: block;
             }
-
             .image-view-container {
                 width: 100%;
                 right: -100%;
             }
-
             .delete-confirm-popup {
                 min-width: 90%;
             }
-
             .company-header {
                 padding: 0.75rem 1rem;
             }
-            
+           
             .company-logo {
                 width: 32px;
                 height: 32px;
@@ -1120,30 +1064,25 @@
                 background-color: #ffffff;
                 padding: 3px; /* Slightly less padding for smaller screens */
             }
-        
-
+       
             .company-name {
                 font-size: 1rem;
             }
-
             .app-name {
                 font-size: 0.875rem;
             }
-
             .profile-button span {
                 display: none;
             }
-
             .profile-button {
                 padding: 6px;
             }
-
             .profile-menu {
                 right: 16px;
                 min-width: 120px;
             }
         }
-        
+       
     </style>
 </head>
 <body>
@@ -1160,7 +1099,9 @@
                     <span id="username">{{ session['user']['name'] if session.get('user') and session['user'].get('name') else 'User' }}</span>
                 </button>
                 <div class="profile-menu" id="profile-menu">
-                    <a href="/profile"><i class="fas fa-user"></i> Open Profile</a>
+                    <a href="{% if session.get('user') and session['user'].get('role') == 'admin' %}/profile{% else %}/profile{% endif %}">
+                        <i class="fas fa-user"></i> Open Profile
+                    </a>
                     <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
                 </div>
             </div>
@@ -1194,7 +1135,7 @@
                 </button>
             </div>
         </div>
-        
+       
         <div class="progress-container">
             <span>Review Progress</span>
             <div class="progress-bar">
@@ -1202,15 +1143,15 @@
             </div>
             <span class="progress-text" id="progress-text">0%</span>
         </div>
-        
+       
         <div class="review-section">
             <div class="info-group">
                 <label>Reviewer</label>
-                <select id="reviewer"></select>
+                <input type="text" id="reviewer" value="{{ session['user']['name'] if session.get('user') and session['user'].get('name') else 'User' }}" readonly>
             </div>
             <div class="info-group">
-                <label>Layouter</label>
-                <select id="layouter"></select>
+                <label>Layouters</label>
+                <input type="text" id="layouter" value="" readonly>
             </div>
             <div class="info-group">
                 <label>Review Date</label>
@@ -1224,8 +1165,12 @@
                 <input type="file" id="fileInput" accept="image/jpeg,image/png" style="display:none;" onchange="previewImage()">
             </div>
         </div>
-        
+       
         <div class="checklist-section">
+            <div class="loading-overlay" id="loading-overlay">
+                <div class="loading-spinner"></div>
+                <div class="loading-text">Loading Checklist...</div>
+            </div>
             <div class="checklist-header">
                 <h2>Review Checklist</h2>
                 <div class="filters">
@@ -1240,12 +1185,10 @@
                     <span class="counter fail" id="fail-count">Rev & Action Needed: 0</span>
                 </div>
             </div>
-            
+           
             <div class="table-container">
-                <div class="loading-overlay" id="loading-overlay">
-                    <div class="loading-spinner"></div>
-                    <div class="loading-text">Loading Checklist...</div>
-                </div>
+    
+
                 <table id="checklist-table">
                     <thead>
                         <tr>
@@ -1260,7 +1203,6 @@
                 </table>
             </div>
         </div>
-
         <button class="toggle-image-view-btn" id="toggle-image-view">
             <i class="fas fa-arrow-left"></i>
         </button>
@@ -1275,7 +1217,6 @@
                 <img id="image-view-img" src="" alt="Cell Image">
             </div>
         </div>
-
         <div class="modal" id="checklist-modal">
             <div class="modal-content">
                 <h2 id="modal-title">Add New Checklist Item</h2>
@@ -1286,7 +1227,6 @@
                 </div>
             </div>
         </div>
-
         <div class="popup" id="popup-notification"></div>
         <div class="delete-confirm-popup" id="delete-confirm-popup">
             <h3>Confirm Deletion</h3>
@@ -1297,7 +1237,6 @@
             </div>
         </div>
     </div>
-
     <script>
         let checklistData = [];
         let reviewData = {};
@@ -1307,12 +1246,10 @@
         let projectData = null;
         let cellData = null;
         let deleteItemId = null;
-
         // Get project_id and cell_id from URL query parameters
         const urlParams = new URLSearchParams(window.location.search);
         const projectId = urlParams.get('project_id');
         const cellId = urlParams.get('cell_id');
-
         document.addEventListener('DOMContentLoaded', async function () {
             if (!projectId || !cellId) {
                 console.error('Missing project_id or cell_id in URL:', { projectId, cellId });
@@ -1320,7 +1257,6 @@
                 setTimeout(() => { window.location.href = '/projects'; }, 2000);
                 return;
             }
-
             try {
                 showLoading();
                 await fetchProjectData();
@@ -1337,14 +1273,12 @@
             } finally {
                 hideLoading();
             }
-
             // Set initial date if not fetched
             if (!document.getElementById('review-date').value) {
                 const now = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
                 const formattedDate = new Date(now).toISOString().slice(0, 16);
                 document.getElementById('review-date').value = formattedDate;
             }
-
             // Event listeners
             document.getElementById('add-checklist-btn').addEventListener('click', addChecklist);
             document.getElementById('cancel-checklist-btn').addEventListener('click', closeChecklistModal);
@@ -1363,10 +1297,6 @@
                 }
             });
         });
-
-
-
-
         async function fetchProjectData() {
             try {
                 const response = await fetch(`${API_BASE_URL}/projects/${projectId}`);
@@ -1383,7 +1313,6 @@
                 throw error;
             }
         }
-
         async function fetchCellData() {
             try {
                 const response = await fetch(`${API_BASE_URL}/cells/${cellId}?project_id=${projectId}`);
@@ -1395,12 +1324,11 @@
                 if (!cellData || !cellData.id) {
                     throw new Error('Cell not found or invalid data');
                 }
-
                 reviewData = {
                     title: `${cellData.name} Review`,
                     subtitle: `${cellData.layoutType.charAt(0).toUpperCase() + cellData.layoutType.slice(1)} Level • ${projectData.clientName || 'Unknown Client'}`,
                     reviewer: cellData.reviewer || '',
-                    layouter: cellData.layouters && cellData.layouters.length > 0 ? cellData.layouters[0] : '',
+                    layouter: Array.isArray(cellData.layouters) ? cellData.layouters : [], // Ensure layouters is an array
                     date: cellData.reviewdate || cellData.createdAt || '',
                     imageUrl: cellData.cellimage ? `${API_BASE_URL}/image/${cellData.cellimage}` : '',
                     tags: [
@@ -1408,10 +1336,9 @@
                         { class: (cellData.status || 'not-started'), text: (cellData.status || 'Not Started').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) }
                     ]
                 };
-
+                console.log('reviewData.layouter:', reviewData.layouter); // Debug log
                 document.getElementById('header-title').textContent = reviewData.title;
                 document.getElementById('header-subtitle').textContent = reviewData.subtitle;
-
                 const tagsContainer = document.getElementById('header-tags');
                 tagsContainer.innerHTML = '';
                 reviewData.tags.forEach(tag => {
@@ -1420,10 +1347,6 @@
                     span.textContent = tag.text;
                     tagsContainer.appendChild(span);
                 });
-
-                document.getElementById('reviewer').value = reviewData.reviewer;
-                document.getElementById('layouter').value = reviewData.layouter;
-
                 let dateStr = reviewData.date;
                 if (dateStr) {
                     if (dateStr.match(/^\d{2}\/\d{2}\/\d{4}/)) {
@@ -1438,7 +1361,6 @@
                     }
                 }
                 document.getElementById('review-date').value = dateStr ? dateStr.slice(0, 16) : '';
-
                 if (reviewData.imageUrl) {
                     const preview = document.getElementById('upload-preview');
                     preview.style.backgroundImage = `url(${reviewData.imageUrl})`;
@@ -1451,6 +1373,33 @@
             }
         }
 
+        async function fetchReviewersAndLayouters() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/employees`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch employees: ${response.status} ${response.statusText}`);
+                }
+                const employees = await response.json();
+                console.log('Fetched employees:', employees); // Debug log
+                const layouterInput = document.getElementById('layouter');
+                const layouterNames = Array.isArray(reviewData.layouter) && reviewData.layouter.length > 0
+                    ? reviewData.layouter.map(email => {
+                        const emp = employees.find(e => e.emailid === email);
+                        return emp ? emp.name || emp.emailid : email;
+                    }).filter(name => name).join(', ') // Filter out undefined/null names
+                    : 'Not Assigned';
+                console.log('Layouter names:', layouterNames); // Debug log
+                layouterInput.value = layouterNames;
+            } catch (error) {
+                console.error('Error fetching employees:', error);
+                const layouterInput = document.getElementById('layouter');
+                const layouterNames = Array.isArray(reviewData.layouter) && reviewData.layouter.length > 0
+                    ? reviewData.layouter.filter(email => email).join(', ')
+                    : 'Not Assigned';
+                console.log('Fallback layouter names:', layouterNames); // Debug log
+                layouterInput.value = layouterNames;
+            }
+        }
         async function fetchChecklistData() {
             try {
                 const response = await fetch(`${API_BASE_URL}/checklist?project_id=${projectId}&cell_id=${cellId}`);
@@ -1465,68 +1414,28 @@
             }
         }
 
-        async function fetchReviewersAndLayouters() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/employees`);
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch employees: ${response.status} ${response.statusText}`);
-                }
-                const employees = await response.json();
-                console.log('Fetched employees:', employees);
-
-                const reviewerSelect = document.getElementById('reviewer');
-                const layouterSelect = document.getElementById('layouter');
-                reviewerSelect.innerHTML = '<option value="">Select Reviewer</option>';
-                layouterSelect.innerHTML = '<option value="">Select Layouter</option>';
-
-                employees.forEach(emp => {
-                    if (emp.role.toLowerCase() === 'reviewer') {
-                        const option1 = document.createElement('option');
-                        option1.value = emp.emailid;
-                        option1.textContent = emp.name || emp.emailid;
-                        reviewerSelect.appendChild(option1);
-
-                        const option2 = document.createElement('option');
-                        option2.value = emp.emailid;
-                        option2.textContent = emp.name || emp.emailid;
-                        layouterSelect.appendChild(option2);
-                    }
-                });
-            } catch (error) {
-                console.error('Error fetching employees:', error);
-            }
-        }
-
         function renderTable(filter = 'all') {
             const tbody = document.querySelector('#checklist-table tbody');
             tbody.innerHTML = '';
-
             checklistData.forEach(item => {
                 if (filter !== 'all' && item.status !== filter) return;
-
                 const row = document.createElement('tr');
-
                 const descCell = document.createElement('td');
                 descCell.className = 'description-cell';
                 descCell.setAttribute('data-label', 'Description');
-
                 const descText = document.createElement('div');
                 descText.className = 'description-text';
                 descText.textContent = item.description;
-
                 const showMoreBtn = document.createElement('button');
                 showMoreBtn.className = 'show-more-btn';
                 showMoreBtn.textContent = 'More';
                 showMoreBtn.dataset.id = item.id;
-
                 descText.addEventListener('DOMSubtreeModified', function () {
                     checkTextOverflow(descText, showMoreBtn);
                 });
-
                 descCell.appendChild(descText);
                 descCell.appendChild(showMoreBtn);
                 row.appendChild(descCell);
-
                 const appCell = document.createElement('td');
                 const appSelect = document.createElement('select');
                 appSelect.className = `applicable-${item.applicable}`;
@@ -1539,7 +1448,6 @@
                 appCell.setAttribute('data-label', 'Applicable');
                 appCell.appendChild(appSelect);
                 row.appendChild(appCell);
-
                 const statusCell = document.createElement('td');
                 const statusSelect = document.createElement('select');
                 statusSelect.className = `status-${item.status.replace(' ', '-')}`;
@@ -1552,7 +1460,6 @@
                 statusCell.setAttribute('data-label', 'Status');
                 statusCell.appendChild(statusSelect);
                 row.appendChild(statusCell);
-
                 const commentCell = document.createElement('td');
                 const commentInput = document.createElement('input');
                 commentInput.type = 'text';
@@ -1563,7 +1470,6 @@
                 commentCell.setAttribute('data-label', 'Comment');
                 commentCell.appendChild(commentInput);
                 row.appendChild(commentCell);
-
                 const actionsCell = document.createElement('td');
                 actionsCell.setAttribute('data-label', 'Actions');
                 const editBtn = document.createElement('button');
@@ -1571,29 +1477,23 @@
                 editBtn.innerHTML = '<i class="fas fa-edit"></i>';
                 editBtn.dataset.id = item.id;
                 editBtn.addEventListener('click', () => editChecklistItem(item.id));
-
                 const deleteBtn = document.createElement('button');
                 deleteBtn.className = 'action-btn delete';
                 deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
                 deleteBtn.dataset.id = item.id;
                 deleteBtn.addEventListener('click', () => showDeleteConfirm(item.id));
-
                 actionsCell.appendChild(editBtn);
                 actionsCell.appendChild(deleteBtn);
                 row.appendChild(actionsCell);
-
                 tbody.appendChild(row);
             });
-
             document.querySelectorAll('.description-text').forEach(descText => {
                 const showMoreBtn = descText.nextElementSibling;
                 checkTextOverflow(descText, showMoreBtn);
             });
-
             updateCounters();
             updateProgress();
         }
-
         function checkTextOverflow(descText, showMoreBtn) {
             if (descText.scrollHeight > descText.clientHeight) {
                 showMoreBtn.style.display = 'block';
@@ -1601,43 +1501,34 @@
                 showMoreBtn.style.display = 'none';
             }
         }
-
         function toggleDescription(btn) {
             const descText = btn.previousElementSibling;
             descText.classList.toggle('expanded');
             btn.textContent = descText.classList.contains('expanded') ? 'Less' : 'More';
         }
-
         function updateCounters() {
             const pending = checklistData.filter(item => item.status === 'not-reviewed').length;
             const pass = checklistData.filter(item => item.status === 'completed').length;
             const fail = checklistData.filter(item => item.status === 'action-needed').length;
-
             document.getElementById('pending-count').textContent = `Pending: ${pending}`;
             document.getElementById('pass-count').textContent = `Pass: ${pass}`;
             document.getElementById('fail-count').textContent = `Fail: ${fail}`;
         }
-
         function updateProgress() {
             const totalItems = checklistData.length;
             const completedItems = checklistData.filter(item => item.status === 'completed').length;
             const progress = totalItems === 0 ? 0 : Math.round((completedItems / totalItems) * 100);
-
             document.getElementById('progress-text').textContent = `${progress}%`;
             document.getElementById('progress-fill').style.width = `${progress}%`;
         }
-
         async function handleChange(event) {
             const id = event.target.dataset.id;
             let item = checklistData.find(item => item.id == id);
-
             if (!item) {
                 console.error('Checklist item not found:', id);
                 return;
             }
-
             item = { ...item };
-
             if (event.target.tagName === 'SELECT' && event.target.options[0].value === 'yes') {
                 item.applicable = event.target.value;
                 event.target.className = `applicable-${event.target.value}`;
@@ -1647,40 +1538,32 @@
             } else if (event.target.classList.contains('comment')) {
                 item.comment = event.target.value;
             }
-
             const existingUpdateIndex = pendingChanges.update.findIndex(change => change.id == id);
             if (existingUpdateIndex !== -1) {
                 pendingChanges.update[existingUpdateIndex] = item;
             } else {
                 pendingChanges.update.push(item);
             }
-
             const checklistIndex = checklistData.findIndex(item => item.id == id);
             if (checklistIndex !== -1) {
                 checklistData[checklistIndex] = item;
             }
-
             updateCounters();
             updateProgress();
         }
-
         function handleFilter(event) {
             if (event.target.tagName !== 'BUTTON') return;
-
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-
             event.target.classList.add('active');
             renderTable(event.target.dataset.filter);
         }
-
         function handleShowMore(event) {
             if (event.target.classList.contains('show-more-btn')) {
                 toggleDescription(event.target);
             }
         }
-
         async function previewImage() {
             const file = document.getElementById('fileInput').files[0];
             if (file && (file.type === 'image/jpeg' || file.type === 'image/png') && file.size <= 5 * 1024 * 1024) {
@@ -1698,7 +1581,6 @@
                 document.getElementById('fileInput').value = '';
             }
         }
-
         async function uploadImage(file) {
             const formData = new FormData();
             formData.append('cellImage', file);
@@ -1721,36 +1603,17 @@
                 showPopup('Error uploading image.', 'error');
             }
         }
-
         async function saveReview() {
             showLoading();
             const reviewer = document.getElementById('reviewer').value;
-            const layouter = document.getElementById('layouter').value;
-            const now = new Date().toLocaleString('en-IN', { 
-                timeZone: 'Asia/Kolkata',
-                hour12: false,
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-            const [datePart, timePart] = now.split(', ');
-            const [day, month, year] = datePart.split('/');
-            const reviewdate = `${year}-${month}-${day}T${timePart}`;
-
-            document.getElementById('review-date').value = reviewdate;
-
+            const reviewdate = document.getElementById('review-date').value;
             const allCompleted = checklistData.every(item => item.status === 'completed');
             const status = allCompleted ? 'completed' : 'in-progress';
-
             try {
                 const formData = new FormData();
                 formData.append('reviewer', reviewer);
-                formData.append('layouters', layouter);
                 formData.append('reviewdate', reviewdate);
                 formData.append('status', status);
-
                 const cellResponse = await fetch(`${API_BASE_URL}/cells/${cellId}?project_id=${projectId}`, {
                     method: 'PUT',
                     body: formData
@@ -1762,7 +1625,6 @@
                     return;
                 }
                 await fetchCellData();
-
                 const createPromises = pendingChanges.create.map(async item => {
                     const response = await fetch(`${API_BASE_URL}/checklist?project_id=${projectId}&cell_id=${cellId}`, {
                         method: 'POST',
@@ -1774,7 +1636,6 @@
                     }
                     return { tempId: item.id, item: await response.json() };
                 });
-
                 const updatePromises = pendingChanges.update.map(async item => {
                     const response = await fetch(`${API_BASE_URL}/checklist/${item.id}?project_id=${projectId}&cell_id=${cellId}`, {
                         method: 'PUT',
@@ -1786,7 +1647,6 @@
                     }
                     return response.json();
                 });
-
                 const deletePromises = pendingChanges.delete.map(async id => {
                     const response = await fetch(`${API_BASE_URL}/checklist/${id}?project_id=${projectId}&cell_id=${cellId}`, {
                         method: 'DELETE'
@@ -1796,23 +1656,19 @@
                     }
                     return id;
                 });
-
                 const [createdItems, updatedItems, deletedIds] = await Promise.all([
                     Promise.all(createPromises),
                     Promise.all(updatePromises),
                     Promise.all(deletePromises)
                 ]);
-
                 createdItems.forEach(({ tempId, item }) => {
                     const index = checklistData.findIndex(data => data.id === tempId);
                     if (index !== -1) {
                         checklistData[index] = item.item;
                     }
                 });
-
                 checklistData = checklistData.filter(item => !deletedIds.includes(item.id));
                 pendingChanges = { create: [], update: [], delete: [] };
-
                 showPopup('Review saved successfully.');
                 renderTable(document.querySelector('.filter-btn.active')?.dataset.filter || 'all');
             } catch (error) {
@@ -1821,11 +1677,9 @@
             } finally {
                 hideLoading();
             }
-
             updateCounters();
             updateProgress();
         }
-
         function escapeCSVField(str) {
             if (str == null || str === '') {
                 return '';
@@ -1835,12 +1689,10 @@
             }
             return `"${str.replace(/"/g, '""')}"`;
         }
-
         function exportReport() {
             const reviewer = document.getElementById('reviewer').value || 'Not Assigned';
             const layouter = document.getElementById('layouter').value || 'Not Assigned';
             const reviewDate = document.getElementById('review-date').value || new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }).slice(0, 16);
-
             const headers = [
                 'Project ID',
                 'Cell ID',
@@ -1853,7 +1705,6 @@
                 'Status',
                 'Comment'
             ];
-
             const rows = checklistData.map(item => [
                 projectId,
                 cellId,
@@ -1866,12 +1717,10 @@
                 item.status || 'not-reviewed',
                 item.comment || ''
             ].map(escapeCSVField));
-
             const csvContent = [
                 headers.map(escapeCSVField).join(','),
                 ...rows.map(row => row.join(','))
             ].join('\n');
-
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1883,7 +1732,6 @@
             window.URL.revokeObjectURL(url);
             showPopup('Report exported successfully.');
         }
-
         function toggleImageView() {
             const imageView = document.getElementById('image-view');
             const toggleBtn = document.getElementById('toggle-image-view');
@@ -1891,12 +1739,10 @@
             imageView.classList.toggle('open');
             toggleBtn.querySelector('i').className = isOpen ? 'fas fa-arrow-left' : 'fas fa-arrow-right';
         }
-
         async function openChecklistModal(id = null) {
             const modal = document.getElementById('checklist-modal');
             const modalTitle = document.getElementById('modal-title');
             const descriptionInput = document.getElementById('checklist-description');
-
             if (id) {
                 const item = checklistData.find(item => item.id == id);
                 modalTitle.textContent = 'Edit Checklist Item';
@@ -1907,19 +1753,15 @@
                 descriptionInput.value = '';
                 editingItemId = null;
             }
-
             modal.style.display = 'flex';
             descriptionInput.focus();
         }
-
         function showLoading() {
             document.getElementById('loading-overlay').style.display = 'flex';
         }
-
         function hideLoading() {
             document.getElementById('loading-overlay').style.display = 'none';
         }
-
         function showPopup(message, type = 'success') {
             const popup = document.getElementById('popup-notification');
             popup.textContent = message;
@@ -1928,45 +1770,37 @@
                 popup.classList.remove('show');
             }, 3000);
         }
-
         function showDeleteConfirm(id) {
             deleteItemId = id;
             const popup = document.getElementById('delete-confirm-popup');
             popup.classList.add('show');
         }
-
         function closeDeleteConfirm() {
             const popup = document.getElementById('delete-confirm-popup');
             popup.classList.remove('show');
             deleteItemId = null;
         }
-
         async function confirmDelete() {
             if (!deleteItemId) return;
-
             showLoading();
             if (!deleteItemId.startsWith('temp-')) {
                 pendingChanges.delete.push(deleteItemId);
             }
-
             checklistData = checklistData.filter(item => item.id != deleteItemId);
             showPopup('Checklist item deleted successfully.');
             renderTable(document.querySelector('.filter-btn.active')?.dataset.filter || 'all');
-            
+           
             closeDeleteConfirm();
             hideLoading();
         }
-
         async function saveChecklistItem() {
             const description = document.getElementById('checklist-description').value.trim();
             if (!description) {
                 showPopup('Please enter a description.', 'error');
                 return;
             }
-
             closeChecklistModal();
             showLoading();
-
             if (editingItemId) {
                 const item = checklistData.find(item => item.id == editingItemId);
                 if (!item) {
@@ -1976,19 +1810,17 @@
                     return;
                 }
                 const updatedItem = { ...item, description };
-                
+               
                 const existingUpdateIndex = pendingChanges.update.findIndex(change => change.id == editingItemId);
                 if (existingUpdateIndex !== -1) {
                     pendingChanges.update[existingUpdateIndex] = updatedItem;
                 } else {
                     pendingChanges.update.push(updatedItem);
                 }
-
                 const checklistIndex = checklistData.findIndex(item => item.id == editingItemId);
                 if (checklistIndex !== -1) {
                     checklistData[checklistIndex] = updatedItem;
                 }
-
                 showPopup('Checklist item updated successfully.');
                 renderTable(document.querySelector('.filter-btn.active')?.dataset.filter || 'all');
             } else {
@@ -2000,37 +1832,29 @@
                     status: 'not-reviewed',
                     comment: ''
                 };
-
                 if (!pendingChanges.create.some(item => item.description === description)) {
                     pendingChanges.create.push(newItem);
                     checklistData.push(newItem);
                 }
-
                 showPopup('Checklist item added successfully.');
                 renderTable(document.querySelector('.filter-btn.active')?.dataset.filter || 'all');
             }
-
             hideLoading();
             editingItemId = null;
         }
-
         async function editChecklistItem(id) {
             openChecklistModal(id);
         }
-
         function closeChecklistModal() {
             document.getElementById('checklist-modal').style.display = 'none';
             editingItemId = null;
         }
-
         async function deleteChecklistItem(id) {
             showDeleteConfirm(id);
         }
-
         function addChecklist() {
             openChecklistModal();
         }
-
         function goBack() {
             const userRole = document.getElementById('user-role').value;
             if (userRole === 'admin') {

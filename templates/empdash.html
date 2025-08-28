@@ -691,7 +691,7 @@
       
       <div class="user-info">
         <i class="fas fa-user"></i>
-        <span class="user-text">{{ session['user']['email'] if session.get('user') else 'Admin' }}</span>
+        <span class="user-text">{{ session['user']['name'] if session.get('user') else 'Admin' }}</span>
       </div>
     </div>
   </aside>

@@ -363,13 +363,25 @@
     }
 
     .modal-footer {
-      padding: 1rem 1.5rem;
-      border-top: 1px solid #e5e7eb;
-      display: flex;
-      justify-content: flex-end;
-      gap: 0.75rem;
+        padding: 1rem 1.25rem;
+        border-top: 1px solid var(--gray-200);
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.6rem;
     }
 
+    #layouter-dropdown {
+        transition: all 0.2s ease;
+    }
+
+    #layouter-suggestions .hover\:bg-gray-100:hover {
+        background-color: #f3f4f6;
+    }
+
+    .layouter-input-group {
+        display: flex;
+        gap: 0.4rem;
+    }
     .file-upload {
       border: 2px dashed #d1d5db;
       border-radius: 0.5rem;
@@ -387,6 +399,10 @@
     .file-upload.dragover {
       border-color: #3b82f6;
       background-color: #eff6ff;
+    }
+    #current-image-preview {
+      display: block;
+      margin: 0 auto;
     }
 
     .reviewer-chip {
@@ -692,7 +708,7 @@
       
       <div class="user-info">
         <i class="fas fa-user"></i>
-        <span class="user-text">{{ session['user']['email'] if session.get('user') else 'Admin' }}</span>
+        <span class="user-text">{{ session['user']['name'] if session.get('user') else 'Admin' }}</span>
       </div>
     </div>
   </aside>
@@ -786,16 +802,19 @@
             </div>
           </div>
           
+
           <div class="space-y-1">
             <label class="block text-sm font-medium text-gray-700">Reviewers</label>
-            <div class="flex gap-2">
-              <input type="text" id="project-reviewers" class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500" placeholder="Add reviewers">
-              <button type="button" id="add-reviewer" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-md text-sm transition">
-                Add
-              </button>
+            <div class="relative">
+              <div id="reviewer-dropdown" class="w-full border border-gray-300 rounded-md px-3 py-2 bg-white cursor-pointer flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                <input type="text" id="reviewer-search" class="w-full border-none focus:outline-none text-sm bg-transparent" placeholder="Search or select reviewers...">
+                <i data-lucide="chevron-down" id="dropdown-arrow" class="w-5 h-5 text-gray-500"></i>
+              </div>
+              <div id="reviewer-suggestions" class="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto shadow-lg hidden"></div>
             </div>
             <div id="reviewers-list" class="flex flex-wrap gap-2 mt-2"></div>
           </div>
+
           
           <div class="space-y-1">
             <label class="block text-sm font-medium text-gray-700">Technologies (comma-separated)</label>
@@ -845,6 +864,7 @@
 <script>
   // Global state
   let allProjects = [];
+  let allReviewers = []; // Added: Proper declaration to avoid implicit global issues
 
   // DOM Elements
   const projectsList = document.getElementById('projects-list');
@@ -857,9 +877,7 @@
   const fileUploadArea = document.getElementById('file-upload-area');
   const projectImageInput = document.getElementById('project-image');
   const searchInput = document.getElementById('search-input');
-  const addReviewerBtn = document.getElementById('add-reviewer');
   const reviewersList = document.getElementById('reviewers-list');
-  const projectReviewersInput = document.getElementById('project-reviewers');
   const sidebar = document.getElementById('sidebar');
   const toggleBtn = document.getElementById('toggleBtn');
   const mobileMenuToggle = document.getElementById('mobileMenuToggle');
@@ -867,6 +885,13 @@
   const notificationMessage = document.getElementById('notification-message');
   const profileButton = document.getElementById('profile-button');
   const profileMenu = document.getElementById('profile-menu');
+
+  // Added: Declarations for reviewer-related elements (these were missing and causing undefined errors)
+  const reviewerDropdown = document.getElementById('reviewer-dropdown');
+  const reviewerSuggestions = document.getElementById('reviewer-suggestions');
+  const reviewerSearch = document.getElementById('reviewer-search');
+  const dropdownArrow = document.getElementById('dropdown-arrow');
+
   // Profile menu toggle functionality
   profileButton.addEventListener('click', () => {
     profileMenu.classList.toggle('active');
@@ -878,6 +903,7 @@
       profileMenu.classList.remove('active');
     }
   });
+
   // ----- SIDEBAR AND NAVIGATION -----
 
   // Sidebar toggle functionality
@@ -1037,6 +1063,9 @@
     document.getElementById('project-id').value = '';
     reviewersList.innerHTML = '';
     resetFileUploadArea();
+    reviewerSearch.value = '';
+    reviewerSuggestions.classList.add('hidden');
+    dropdownArrow.setAttribute('data-lucide', 'chevron-down');
 
     if (projectId) {
       modalTitle.textContent = "Edit Project";
@@ -1049,7 +1078,6 @@
         document.getElementById('project-version').value = project.version;
         document.getElementById('project-status').value = project.status ? project.status.toLowerCase().replace(' ', '-') : 'active';
         const reviewers = Array.isArray(project.reviewers) ? project.reviewers : (project.reviewers || '').split(',').map(s => s.trim()).filter(Boolean);
-        document.getElementById('project-reviewers').value = '';
         reviewers.forEach(reviewer => addReviewerToList(reviewer));
         document.getElementById('project-technologies').value = Array.isArray(project.technologies) ? project.technologies.join(', ') : (project.technologies || '');
         if (project.projectimage) {
@@ -1065,19 +1093,90 @@
     
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
+    loadReviewers();
     lucide.createIcons();
   }
-
+  async function loadReviewers() {
+    try {
+      const response = await fetch('/api/employees');
+      if (!response.ok) throw new Error('Failed to fetch employees');
+      allReviewers = (await response.json()).filter(emp => emp.role === 'Reviewer').map(emp => emp.name);
+      populateReviewerDropdown();
+    } catch (error) {
+      console.error('Failed to load reviewers:', error);
+    }
+  }
+  function populateReviewerDropdown() {
+    reviewerSuggestions.innerHTML = '';
+    const selectedReviewers = Array.from(reviewersList.querySelectorAll('.reviewer-chip span')).map(span => span.textContent.trim());
+    const availableReviewers = allReviewers.filter(reviewer => !selectedReviewers.includes(reviewer));
+    if (availableReviewers.length === 0) {
+      const div = document.createElement('div');
+      div.textContent = 'No reviewers available';
+      div.className = 'px-3 py-2 text-gray-500 text-sm';
+      reviewerSuggestions.appendChild(div);
+    } else {
+      availableReviewers.forEach(reviewer => {
+        const div = document.createElement('div');
+        div.textContent = reviewer;
+        div.className = 'px-3 py-2 hover:bg-green-50 cursor-pointer text-sm';
+        div.addEventListener('click', () => {
+          addReviewerToList(reviewer);
+          reviewerSearch.value = '';
+          populateReviewerDropdown();
+        });
+        reviewerSuggestions.appendChild(div);
+      });
+    }
+    reviewerSuggestions.classList.remove('hidden');
+    dropdownArrow.setAttribute('data-lucide', 'chevron-up');
+    lucide.createIcons();
+  }
+  function handleReviewerSearch() {
+    const searchTerm = reviewerSearch.value.toLowerCase();
+    reviewerSuggestions.innerHTML = '';
+    const selectedReviewers = Array.from(reviewersList.querySelectorAll('.reviewer-chip span')).map(span => span.textContent.trim());
+    const filteredReviewers = allReviewers.filter(reviewer => 
+      reviewer.toLowerCase().includes(searchTerm) && !selectedReviewers.includes(reviewer)
+    );
+    if (filteredReviewers.length === 0) {
+      const div = document.createElement('div');
+      div.textContent = 'No matching reviewers';
+      div.className = 'px-3 py-2 text-gray-500 text-sm';
+      reviewerSuggestions.appendChild(div);
+    } else {
+      filteredReviewers.forEach(reviewer => {
+        const div = document.createElement('div');
+        div.textContent = reviewer;
+        div.className = 'px-3 py-2 hover:bg-green-50 cursor-pointer text-sm';
+        div.addEventListener('click', () => {
+          addReviewerToList(reviewer);
+          reviewerSearch.value = '';
+          populateReviewerDropdown();
+        });
+        reviewerSuggestions.appendChild(div);
+      });
+    }
+    reviewerSuggestions.classList.remove('hidden');
+    dropdownArrow.setAttribute('data-lucide', 'chevron-up');
+    lucide.createIcons();
+  }
   function closeModalHandler() {
     modal.classList.remove('active');
     document.body.style.overflow = '';
     reviewersList.innerHTML = '';
+    reviewerSearch.value = '';
+    reviewerSuggestions.classList.add('hidden');
+    dropdownArrow.setAttribute('data-lucide', 'chevron-down');
+    lucide.createIcons();
   }
 
   function addReviewerToList(reviewer) {
     if (!reviewer.trim()) return;
+    const existing = Array.from(reviewersList.querySelectorAll('.reviewer-chip span')).map(span => span.textContent.trim());
+    if (existing.includes(reviewer)) return;
     const chip = document.createElement('div');
-    chip.className = 'reviewer-chip';
+    chip.className = 'reviewer-chip bg-gray-100 text-gray-800 px-2 py-1 rounded-full flex items-center text-sm';
     chip.innerHTML = `
       <span>${reviewer}</span>
       <button type="button" class="ml-2 text-gray-500 hover:text-gray-700">
@@ -1089,24 +1188,36 @@
     lucide.createIcons();
   }
 
-  addReviewerBtn.addEventListener('click', () => {
-    const reviewer = projectReviewersInput.value.trim();
-    if (reviewer) {
-      addReviewerToList(reviewer);
-      projectReviewersInput.value = '';
-    }
-  });
-
-  projectReviewersInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      const reviewer = projectReviewersInput.value.trim();
-      if (reviewer) {
-        addReviewerToList(reviewer);
-        projectReviewersInput.value = '';
+  // Add new code here
+  function toggleDropdown(e) {
+    e.preventDefault(); // Prevent default touch behavior (e.g., scrolling)
+    if (!reviewerSuggestions.contains(e.target)) {
+      if (reviewerSuggestions.classList.contains('hidden')) {
+        populateReviewerDropdown();
+        reviewerSearch.focus();
+        reviewerSuggestions.classList.remove('hidden');
+        dropdownArrow.setAttribute('data-lucide', 'chevron-up');
+      } else {
+        reviewerSuggestions.classList.add('hidden');
+        dropdownArrow.setAttribute('data-lucide', 'chevron-down');
       }
+      lucide.createIcons();
     }
-  });
+  }
+
+  function closeDropdownOnOutside(e) {
+    if (!reviewerDropdown.contains(e.target) && !reviewerSuggestions.contains(e.target)) {
+      reviewerSuggestions.classList.add('hidden');
+      dropdownArrow.setAttribute('data-lucide', 'chevron-down');
+      lucide.createIcons();
+    }
+  }
+
+  reviewerDropdown.addEventListener('click', toggleDropdown);
+  reviewerDropdown.addEventListener('touchstart', toggleDropdown);
+  document.addEventListener('click', closeDropdownOnOutside);
+  document.addEventListener('touchstart', closeDropdownOnOutside);
+  // Removed: addReviewerBtn and projectReviewersInput event listeners (they reference non-existent elements and aren't needed for your current dropdown setup)
 
   // Show notification popup
   function showNotification(message) {

@@ -1166,7 +1166,7 @@
             <div class="profile-section">
                 <button class="profile-button" id="profile-button">
                     <i class="fas fa-user-circle"></i>
-                    <span id="username">User Name</span>
+                    <span id="username">{{ session['user']['name'] if session.get('user') and session['user'].get('name') else 'User' }}</span>
                 </button>
                 <div class="profile-menu" id="profile-menu">
                     <a href="/profile"><i class="fas fa-user"></i> Open Profile</a>

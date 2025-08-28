@@ -812,6 +812,71 @@ def api_get_employees():
     except Exception as e:
         print(f"Error fetching employees: {e}")
         return jsonify(success=False, error=str(e)), 500
+@app.route("/api/profile", methods=["GET"])
+@login_required(required_role=None)  # Allow any logged-in user
+def api_get_profile():
+    try:
+        user_email = session['user']['email']
+        user = fetch_user_by_email(user_email)
+        if not user:
+            print(f"User not found for email: {user_email}")
+            return jsonify({"success": False, "error": "User not found"}), 404
+        return jsonify({
+            "name": user['name'],
+            "role": user['role'],
+            "status": user['status'],
+            "emailid": user['emailid'],
+            "mobile": user.get('mobile', ''),
+            "designation": user.get('designation', '')
+        })
+    except Exception as e:
+        print(f"Error fetching profile: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route("/api/profile/password", methods=["PUT"])
+@login_required(required_role=None)
+def api_update_password():
+    try:
+        data = request.get_json()
+        new_password = data.get('password')
+        if not new_password or len(new_password) < 8:
+            return jsonify({"success": False, "error": "Password must be at least 8 characters"}), 400
+        
+        user_email = session['user']['email']
+        ws = get_worksheet(USERS_SHEET_NAME)
+        rows = ws.get_all_values()
+        headers = [h.strip().lower() for h in rows[0]]
+        
+        try:
+            idx_email = headers.index("emailid")
+            idx_password = headers.index("password")
+        except ValueError:
+            return jsonify({"success": False, "error": "Sheet missing required headers"}), 500
+
+        target_row_idx = None
+        for i, r in enumerate(rows[1:], start=2):
+            if len(r) > idx_email and r[idx_email].strip().lower() == user_email.lower():
+                target_row_idx = i
+                break
+        
+        if target_row_idx is None:
+            print(f"User not found for email: {user_email}")
+            return jsonify({"success": False, "error": "User not found"}), 404
+
+        ws.update_cell(target_row_idx, idx_password + 1, new_password)
+        print(f"Password updated for user: {user_email}")
+        return jsonify({"success": True, "message": "Password updated successfully"})
+    except Exception as e:
+        print(f"Error updating password: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+@app.route("/profile")
+@login_required(required_role=None)
+def profile_page():
+    return render_template("profile.html")
+@app.route("/eprofile")
+@login_required(required_role=None)
+def eprofile_page():
+    return render_template("eprofile.html")
 
 @app.route('/api/projects/<int:project_id>', methods=['GET'])
 @login_required()

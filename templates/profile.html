@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>User Profile | Workforce Review</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=stylesheet">
+  <style>
+    :root {
+      --primary: #2c3e50;
+      --primary-light: #34495e;
+      --secondary: #7f8c8d;
+      --success: #27ae60;
+      --success-light: #2ecc71;
+      --warning: #f39c12;
+      --danger: #e74c3c;
+      --light: #ecf0f1;
+      --light-gray: #dfe6e9;
+      --border: #bdc3c7;
+      --border-dark: #95a5a6;
+      --text-light: #7f8c8d;
+      --text-dark: #2c3e50;
+      --table-header: #f5f6f7;
+    }
+
+    body {
+      font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-color: var(--light-gray);
+    }
+
+    /* Sidebar Styles */
+    #sidebar {
+      width: 250px;
+      background-color: #f7fdfa;
+      border-right: 1px solid #e6e6e6;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s ease;
+      position: relative;
+      z-index: 100;
+    }
+
+    #sidebar.collapsed {
+      width: 70px;
+    }
+
+    .sidebar-content {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    #sidebar.collapsed .brand,
+    #sidebar.collapsed .nav-text,
+    #sidebar.collapsed .user-text {
+      display: none;
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .brand {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text-dark);
+      white-space: nowrap;
+    }
+
+    .sidebar-nav {
+      flex-grow: 1;
+    }
+
+    .sidebar-nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar-nav li {
+      margin-bottom: 10px;
+    }
+
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--text-dark);
+      padding: 10px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .sidebar-nav a.active,
+    .sidebar-nav a:hover {
+      background-color: rgba(39, 174, 96, 0.1);
+      color: var(--success);
+    }
+
+    .sidebar-nav i {
+      min-width: 20px;
+      text-align: center;
+    }
+
+    .user-info {
+      background-color: rgba(39, 174, 96, 0.1);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--success);
+      margin-top: auto;
+    }
+
+    #sidebar.collapsed .user-info {
+      padding: 12px 8px;
+      justify-content: center;
+    }
+
+    .user-info i {
+      font-size: 24px;
+    }
+
+    .user-text {
+      max-width: 170px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-text .name {
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .user-text .role {
+      font-size: 0.8rem;
+      color: var(--success);
+    }
+
+    .toggle-btn {
+      width: 30px;
+      height: 30px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: all 0.2s ease;
+    }
+
+    .toggle-btn:hover {
+      background: #f5f5f5;
+    }
+
+    .toggle-btn i {
+      color: var(--success);
+      font-size: 14px;
+      transition: transform 0.3s ease;
+    }
+
+    #sidebar.collapsed .toggle-btn i {
+      transform: rotate(180deg);
+    }
+
+    /* Mobile menu toggle */
+    .mobile-menu-toggle {
+      display: none;
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      background: var(--success);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 15px;
+      z-index: 90;
+      cursor: pointer;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 992px) {
+      #sidebar {
+        position: fixed;
+        transform: translateX(-100%);
+      }
+
+      #sidebar.active {
+        transform: translateX(0);
+      }
+
+      .mobile-menu-toggle {
+        display: flex;
+        align-items: center;
+      }
+
+      main {
+        margin-left: 0;
+      }
+    }
+
+    /* Header Styles */
+    .company-header {
+      background-color: #138D83;
+      color: white;
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .company-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      object-fit: contain;
+    }
+
+    .company-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .app-name {
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .profile-section {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .profile-button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .profile-button:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .profile-button i {
+      font-size: 1.25rem;
+    }
+
+    .profile-button span {
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .profile-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      min-width: 160px;
+      z-index: 1300;
+      overflow: hidden;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+    }
+
+    .profile-menu.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .profile-menu a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      color: #374151;
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: background-color 0.2s ease;
+    }
+
+    .profile-menu a:hover {
+      background-color: #f3f4f6;
+    }
+
+    /* Modal Styles */
+    .modal {
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      z-index: 1000;
+    }
+
+    .modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      transform: translateY(20px);
+      opacity: 0;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      background-color: white;
+    }
+
+    .modal.active .modal-content {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .modal-header {
+      padding: 1.5rem 1.5rem 1rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .modal-footer {
+      padding: 1rem 1.25rem;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.6rem;
+    }
+
+    /* Notification Popup Styles */
+    .notification-popup {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-10px);
+      z-index: 1200;
+      background-color: #10b981;
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      max-width: 300px;
+    }
+
+    .notification-popup.active {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .notification-popup i {
+      font-size: 1.25rem;
+    }
+
+    .notification-popup span {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    /* Loading Spinner Styles */
+    .loading-modal {
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      z-index: 1100;
+    }
+
+    .loading-modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid #10b981;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+      .company-header {
+        padding: 0.75rem 1rem;
+      }
+
+      .company-logo {
+        width: 32px;
+        height: 32px;
+      }
+
+      .company-title {
+        font-size: 1rem;
+      }
+
+      .app-name {
+        font-size: 0.875rem;
+      }
+
+      .profile-button span {
+        display: none;
+      }
+
+      .profile-button {
+        padding: 6px;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+  <!-- Company Header -->
+  <header class="company-header">
+    <div class="flex items-center gap-3">
+      <img src="static/image/Logo.png" alt="EPICAL Layouts Pvt Ltd Logo" class="company-logo bg-white p-1 rounded-lg">
+      <div>
+        <h1 class="company-title">EPICAL LAYOUTS PVT LTD</h1>
+      </div>
+    </div>
+    <div class="flex items-center gap-8">
+      <div class="app-name">EPRM – Epical Project Review Management</div>
+      <div class="profile-section">
+        <button class="profile-button" id="profile-button">
+          <i class="fas fa-user-circle"></i>
+          <span>{{ session['user']['name'] if session.get('user') and session['user'].get('name') else 'User' }}</span>
+        </button>
+        <div class="profile-menu" id="profile-menu">
+          <a href="/profile" class="active"><i class="fas fa-user"></i> Open Profile</a>
+          <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile menu toggle button -->
+  <button class="mobile-menu-toggle" id="mobileMenuToggle">
+    <i class="fas fa-bars"></i> Menu
+  </button>
+
+  <div class="flex min-h-screen">
+    <!-- Toggleable Sidebar -->
+    <aside id="sidebar">
+      <div class="sidebar-content">
+        <div class="sidebar-header">
+          <div class="brand">User Profile</div>
+          <button class="toggle-btn" id="toggleBtn">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+        </div>
+        <nav class="sidebar-nav">
+          <ul>
+            <li>
+              <a href="{{ url_for('projects_page') }}">
+                <i class="fas fa-chart-bar"></i>
+                <span class="nav-text">Projects</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('admin_dashboard') }}">
+                <i class="fas fa-users"></i>
+                <span class="nav-text">Employees</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="user-info">
+          <i class="fas fa-user"></i>
+          <span class="user-text">{{ session['user']['name'] if session.get('user') else 'User' }}</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+        <main class="flex-1 overflow-hidden flex flex-col">
+        <section class="flex-1 flex items-center justify-center py-8 transform -translate-y-8">
+            <article class="bg-white rounded-xl shadow-xl max-w-3xl w-full mx-auto p-8 md:p-10 animate-fade-in" aria-labelledby="profile-name">
+            <header class="flex flex-col items-center mb-8">
+                <div id="profile-icon" class="w-20 h-20 rounded-full bg-green-600 flex items-center justify-center text-white text-3xl font-bold transition-transform hover:scale-105 md:w-24 md:h-24 md:text-4xl" aria-label="User avatar"></div>
+                <h2 id="profile-name" class="mt-4 text-3xl font-bold text-gray-900 text-center">Loading...</h2>
+                <p id="profile-role" class="mt-1 text-lg text-gray-500 text-center">Role</p>
+            </header>
+            <div class="space-y-6">
+                <div class="flex items-center justify-between border-b border-gray-200 py-3">
+                <span class="text-base font-medium text-gray-700">Email</span>
+                <span id="profile-email" class="text-base text-gray-900">Loading...</span>
+                </div>
+                <div class="flex items-center justify-between border-b border-gray-200 py-3">
+                <span class="text-base font-medium text-gray-700">Status</span>
+                <span id="profile-status" class="inline-flex items-center px-4 py-1.5 text-sm font-semibold text-green-800 bg-green-100 rounded-full border border-green-200">Loading...</span>
+                </div>
+                <div class="flex items-center justify-between py-3">
+                <span class="text-base font-medium text-gray-700">Password</span>
+                <button id="change-password-btn" class="px-5 py-2.5 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700 transition-colors duration-200" aria-label="Change user password">Change Password</button>
+                </div>
+            </div>
+            </article>
+        </section>
+        </main>
+  </div>
+
+  <!-- Password Change Modal -->
+  <div id="password-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 opacity-0 invisible">
+    <div class="modal-content bg-white">
+      <div class="modal-header flex justify-between items-center p-6 border-b border-gray-200">
+        <h3 class="text-xl font-semibold text-gray-900">Change Password</h3>
+        <button id="close-password-modal" class="text-gray-500 hover:text-gray-700 rounded-full p-1 hover:bg-gray-100 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div class="p-6">
+        <form id="password-form">
+          <div class="space-y-4">
+            <div class="space-y-1">
+              <label class="block text-sm font-medium text-gray-700">New Password</label>
+              <input type="password" id="new-password" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500" placeholder="Enter new password" required minlength="8">
+            </div>
+            <div class="space-y-1">
+              <label class="block text-sm font-medium text-gray-700">Confirm Password</label>
+              <input type="password" id="confirm-password" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500" placeholder="Confirm new password" required minlength="8">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="cancel-password" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition">Cancel</button>
+        <button type="button" id="save-password" class="px-4 py-2 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700 transition">Save Password</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Modal -->
+  <div id="loading-modal" class="loading-modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 invisible">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Notification Popup -->
+  <div id="notification-popup" class="notification-popup">
+    <i class="fas fa-check-circle"></i>
+    <span id="notification-message"></span>
+  </div>
+
+  <script>
+    // DOM Elements
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('toggleBtn');
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const profileButton = document.getElementById('profile-button');
+    const profileMenu = document.getElementById('profile-menu');
+    const passwordModal = document.getElementById('password-modal');
+    const passwordForm = document.getElementById('password-form');
+    const savePasswordBtn = document.getElementById('save-password');
+    const changePasswordBtn = document.getElementById('change-password-btn');
+    const notificationPopup = document.getElementById('notification-popup');
+    const notificationMessage = document.getElementById('notification-message');
+    const loadingModal = document.getElementById('loading-modal');
+    const profileIcon = document.getElementById('profile-icon');
+
+    // Dynamic avatar background color based on name
+    function getAvatarColor(name) {
+      const colors = [
+        'bg-blue-600',
+        'bg-purple-600',
+        'bg-green-600',
+        'bg-indigo-600',
+        'bg-pink-600',
+        'bg-teal-600',
+        'bg-cyan-600'
+      ];
+      let hash = 0;
+      for (let i = 0; i < name.length; i++) {
+        hash = name.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      return colors[Math.abs(hash) % colors.length];
+    }
+
+    // Fetch user profile data
+    async function fetchProfile() {
+      try {
+        loadingModal.classList.add('active');
+        const response = await fetch('/api/profile');
+        if (!response.ok) throw new Error('Failed to fetch profile');
+        const user = await response.json();
+        document.getElementById('profile-name').textContent = user.name || 'Unknown';
+        document.getElementById('profile-role').textContent = user.role || 'Unknown';
+        document.getElementById('profile-email').textContent = user.emailid || 'Unknown';
+        const statusEl = document.getElementById('profile-status');
+        statusEl.textContent = user.status ? user.status.charAt(0).toUpperCase() + user.status.slice(1) : 'Unknown';
+        statusEl.className = `inline-flex items-center px-4 py-1.5 text-sm font-semibold rounded-full border ${
+          user.status === 'active' ? 'bg-green-100 text-green-800 border-green-200' : 'bg-red-100 text-red-800 border-red-200'
+        }`;
+        // Set avatar first letter and color
+        const firstLetter = user.name ? user.name.charAt(0).toUpperCase() : '?';
+        profileIcon.textContent = firstLetter;
+        profileIcon.className = `w-20 h-20 rounded-full ${getAvatarColor(user.name || 'Unknown')} flex items-center justify-center text-white text-3xl font-bold transition-transform hover:scale-105 md:w-24 md:h-24 md:text-4xl`;
+        profileIcon.setAttribute('aria-label', `Avatar for ${user.name || 'User'}`);
+      } catch (error) {
+        console.error('Failed to fetch profile:', error);
+        showNotification(`Error: ${error.message}`);
+      } finally {
+        loadingModal.classList.remove('active');
+      }
+    }
+
+    // Profile menu toggle functionality
+    profileButton.addEventListener('click', () => {
+      profileMenu.classList.toggle('active');
+    });
+
+    // Close profile menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!profileButton.contains(e.target) && !profileMenu.contains(e.target)) {
+        profileMenu.classList.remove('active');
+      }
+    });
+
+    // Sidebar toggle functionality
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+    });
+
+    mobileMenuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
+
+    // Update active link based on current page
+    function updateActiveNav() {
+      const currentPath = window.location.pathname;
+      const navLinks = document.querySelectorAll('.sidebar-nav a');
+      navLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href === currentPath || (currentPath === '/' && href === '/profile')) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+    }
+
+    // Handle navigation clicks
+    document.querySelectorAll('.sidebar-nav a').forEach(link => {
+      link.addEventListener('click', (e) => {
+        const href = link.getAttribute('href');
+        if (window.location.pathname === href) {
+          e.preventDefault();
+          return;
+        }
+        document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+        link.classList.add('active');
+      });
+    });
+
+    // Open password change modal
+    changePasswordBtn.addEventListener('click', () => {
+      passwordForm.reset();
+      passwordModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      lucide.createIcons();
+    });
+
+    // Close password modal
+    function closePasswordModal() {
+      passwordModal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('close-password-modal').addEventListener('click', closePasswordModal);
+    document.getElementById('cancel-password').addEventListener('click', closePasswordModal);
+
+    // Save password
+    savePasswordBtn.addEventListener('click', async () => {
+      const newPassword = document.getElementById('new-password').value;
+      const confirmPassword = document.getElementById('confirm-password').value;
+
+      if (!passwordForm.checkValidity()) {
+        passwordForm.reportValidity();
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        showNotification('Passwords do not match');
+        return;
+      }
+
+      loadingModal.classList.add('active');
+      try {
+        const response = await fetch('/api/profile/password', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: newPassword })
+        });
+        const result = await response.json();
+        if (response.ok) {
+          showNotification('Password updated successfully!');
+          closePasswordModal();
+        } else {
+          showNotification(`Error: ${result.error || 'Failed to update password'}`);
+        }
+      } catch (error) {
+        console.error('Failed to update password:', error);
+        showNotification(`Error: ${error.message}`);
+      } finally {
+        loadingModal.classList.remove('active');
+      }
+    });
+
+    // Show notification popup
+    function showNotification(message) {
+      notificationMessage.textContent = message;
+      notificationPopup.classList.add('active');
+      setTimeout(() => {
+        notificationPopup.classList.remove('active');
+      }, 3000);
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchProfile();
+      updateActiveNav();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

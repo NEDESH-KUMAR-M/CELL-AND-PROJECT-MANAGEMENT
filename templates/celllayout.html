@@ -1603,17 +1603,31 @@
                 showPopup('Error uploading image.', 'error');
             }
         }
+  // ... (previous code remains unchanged until the saveReview function) ...
+
         async function saveReview() {
             showLoading();
             const reviewer = document.getElementById('reviewer').value;
-            const reviewdate = document.getElementById('review-date').value;
+            
+            // Set current date and time in Chennai (Asia/Kolkata) timezone
+            const now = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
+            const reviewdate = new Date(now).toISOString().slice(0, 16); // Format: YYYY-MM-DDThh:mm
+            
+            // Calculate progress percentage
+            const totalItems = checklistData.length;
+            const completedItems = checklistData.filter(item => item.status === 'completed').length;
+            const completionPercentage = totalItems === 0 ? 0 : Math.round((completedItems / totalItems) * 100);
+            
             const allCompleted = checklistData.every(item => item.status === 'completed');
             const status = allCompleted ? 'completed' : 'in-progress';
+            
             try {
                 const formData = new FormData();
                 formData.append('reviewer', reviewer);
                 formData.append('reviewdate', reviewdate);
                 formData.append('status', status);
+                formData.append('completionPercentage', completionPercentage.toString());
+                
                 const cellResponse = await fetch(`${API_BASE_URL}/cells/${cellId}?project_id=${projectId}`, {
                     method: 'PUT',
                     body: formData
@@ -1625,6 +1639,7 @@
                     return;
                 }
                 await fetchCellData();
+                
                 const createPromises = pendingChanges.create.map(async item => {
                     const response = await fetch(`${API_BASE_URL}/checklist?project_id=${projectId}&cell_id=${cellId}`, {
                         method: 'POST',
@@ -1636,6 +1651,7 @@
                     }
                     return { tempId: item.id, item: await response.json() };
                 });
+                
                 const updatePromises = pendingChanges.update.map(async item => {
                     const response = await fetch(`${API_BASE_URL}/checklist/${item.id}?project_id=${projectId}&cell_id=${cellId}`, {
                         method: 'PUT',
@@ -1647,6 +1663,7 @@
                     }
                     return response.json();
                 });
+                
                 const deletePromises = pendingChanges.delete.map(async id => {
                     const response = await fetch(`${API_BASE_URL}/checklist/${id}?project_id=${projectId}&cell_id=${cellId}`, {
                         method: 'DELETE'
@@ -1656,17 +1673,20 @@
                     }
                     return id;
                 });
+                
                 const [createdItems, updatedItems, deletedIds] = await Promise.all([
                     Promise.all(createPromises),
                     Promise.all(updatePromises),
                     Promise.all(deletePromises)
                 ]);
+                
                 createdItems.forEach(({ tempId, item }) => {
                     const index = checklistData.findIndex(data => data.id === tempId);
                     if (index !== -1) {
                         checklistData[index] = item.item;
                     }
                 });
+                
                 checklistData = checklistData.filter(item => !deletedIds.includes(item.id));
                 pendingChanges = { create: [], update: [], delete: [] };
                 showPopup('Review saved successfully.');
@@ -1680,6 +1700,8 @@
             updateCounters();
             updateProgress();
         }
+
+// ... (rest of the code remains unchanged) ...
         function escapeCSVField(str) {
             if (str == null || str === '') {
                 return '';

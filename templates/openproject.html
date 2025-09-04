@@ -6,6 +6,29 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <style>
+/* Add to your existing <style> block in openproject.html */
+        .print-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 20px;
+            z-index: 2000;
+            min-width: 300px;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .print-popup-title {
+            margin: 0 0 15px 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
         /* NEW HEADER STYLES - Added at the top without affecting existing code */
         .company-header {
             background-color: #138D83;
@@ -1405,9 +1428,8 @@
             </div>
         </div>
     </div>
-
 <script>
-    // Profile menu functionality - NEW CODE ADDED
+    // Profile menu functionality
     const profileButton = document.getElementById('profile-button');
     const profileMenu = document.getElementById('profile-menu');
 
@@ -1417,7 +1439,6 @@
             profileMenu.classList.toggle('active');
         });
         
-        // Close profile menu when clicking outside
         document.addEventListener('click', (e) => {
             if (!profileButton.contains(e.target) && !profileMenu.contains(e.target)) {
                 profileMenu.classList.remove('active');
@@ -1429,459 +1450,555 @@
     const usernameElement = document.getElementById('username');
     if (usernameElement) {
         // You can set the username dynamically here
-        // For example: usernameElement.textContent = userData.name;
     }
 
-// API Configuration (use relative path so it works in deployed environment)
-const API_BASE_URL = '/api';
+    // API Configuration
+    const API_BASE_URL = '/api';
 
-// DOM Elements
-const cellsTableBody = document.getElementById("cellsTableBody");
-const addCellBtn = document.getElementById("addCellBtn");
-const printBtn = document.getElementById("printBtn");
-const cellModal = document.getElementById("cellModal");
-const closeModalBtn = document.getElementById("closeModalBtn");
-const cancelBtn = document.getElementById("cancelBtn");
-const saveBtn = document.getElementById("saveBtn");
-const modalTitle = document.getElementById("modalTitle");
-const cellNameInput = document.getElementById("cellName");
-const layoutTypeSelect = document.getElementById("layoutType");
-const statusSelect = document.getElementById("status");
-const layouterInput = document.getElementById("layouterInput");
-const addLayouterBtn = document.getElementById("addLayouterBtn");
-const layouterTags = document.getElementById("layouterTags");
-const searchInput = document.getElementById("searchInput");
-const totalCellsHeader = document.getElementById("totalCellsHeader");
-const layoutTypeFilter = document.getElementById("layoutTypeFilter");
-const sortSelect = document.getElementById("sortSelect");
-const fromDate = document.getElementById("fromDate");
-const toDate = document.getElementById("toDate");
-const configOrderBtn = document.getElementById("configOrderBtn");
-const orderModal = document.getElementById("orderModal");
-const closeOrderModal = document.getElementById("closeOrderModal");
-const saveOrderBtn = document.getElementById("saveOrderBtn");
-const progressFill = document.getElementById("progressFill");
-const progressPercent = document.getElementById("progressPercent");
-const loadingOverlay = document.getElementById("loadingOverlay");
-const notification = document.getElementById("notification");
-const projectLogo = document.getElementById("projectLogo");
-const projectTitle = document.getElementById("projectTitle");
-const projectClient = document.getElementById("projectClient");
-const projectVersion = document.getElementById("projectVersion");
-const projectStatusText = document.getElementById("projectStatusText");
-const projectStatusIcon = document.getElementById("projectStatusIcon");
-const sidebar = document.getElementById('sidebar');
-const toggleBtn = document.getElementById('toggleBtn');
-const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-const deleteModal = document.getElementById("deleteModal");
-const closeDeleteModal = document.getElementById("closeDeleteModal");
-const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
-const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+    // DOM Elements
+    const cellsTableBody = document.getElementById("cellsTableBody");
+    const addCellBtn = document.getElementById("addCellBtn");
+    const printBtn = document.getElementById("printBtn");
+    const cellModal = document.getElementById("cellModal");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const saveBtn = document.getElementById("saveBtn");
+    const modalTitle = document.getElementById("modalTitle");
+    const cellNameInput = document.getElementById("cellName");
+    const layoutTypeSelect = document.getElementById("layoutType");
+    const statusSelect = document.getElementById("status");
+    const layouterInput = document.getElementById("layouterInput");
+    const addLayouterBtn = document.getElementById("addLayouterBtn");
+    const layouterTags = document.getElementById("layouterTags");
+    const searchInput = document.getElementById("searchInput");
+    const totalCellsHeader = document.getElementById("totalCellsHeader");
+    const layoutTypeFilter = document.getElementById("layoutTypeFilter");
+    const sortSelect = document.getElementById("sortSelect");
+    const fromDate = document.getElementById("fromDate");
+    const toDate = document.getElementById("toDate");
+    const configOrderBtn = document.getElementById("configOrderBtn");
+    const orderModal = document.getElementById("orderModal");
+    const closeOrderModal = document.getElementById("closeOrderModal");
+    const saveOrderBtn = document.getElementById("saveOrderBtn");
+    const progressFill = document.getElementById("progressFill");
+    const progressPercent = document.getElementById("progressPercent");
+    const loadingOverlay = document.getElementById("loadingOverlay");
+    const notification = document.getElementById("notification");
+    const projectLogo = document.getElementById("projectLogo");
+    const projectTitle = document.getElementById("projectTitle");
+    const projectClient = document.getElementById("projectClient");
+    const projectVersion = document.getElementById("projectVersion");
+    const projectStatusText = document.getElementById("projectStatusText");
+    const projectStatusIcon = document.getElementById("projectStatusIcon");
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('toggleBtn');
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const deleteModal = document.getElementById("deleteModal");
+    const closeDeleteModal = document.getElementById("closeDeleteModal");
+    const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+    const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
 
-// Sidebar toggle functionality
-toggleBtn.addEventListener('click', () => {
-  sidebar.classList.toggle('collapsed');
-});
+    // Sidebar toggle functionality
+    toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+    });
 
-mobileMenuToggle.addEventListener('click', () => {
-  sidebar.classList.toggle('active');
-});
+    mobileMenuToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+    });
 
-// State
-let cells = [];
-let filteredCells = [];
-let layouters = [];
-let isEditing = false;
-let currentEditId = null;
-let currentDeleteId = null;
-let currentFilter = "all";
-let currentLayoutFilter = "all";
-let currentSort = "";
-const layoutTypes = ['io', 'cell', 'top', 'tapeout', 'custom'];
-let layoutOrder = [...layoutTypes];
-let projectId = null;
-let projectData = null;
+    // State
+    let cells = [];
+    let filteredCells = [];
+    let layouters = [];
+    let isEditing = false;
+    let currentEditId = null;
+    let currentDeleteId = null;
+    let currentFilter = "all";
+    let currentLayoutFilter = "all";
+    let currentSort = "";
+    const layoutTypes = ['io', 'cell', 'top', 'tapeout', 'custom'];
+    let layoutOrder = [...layoutTypes];
+    let projectId = null;
+    let projectData = null;
 
-// Helper: get project id from query string or template
-function getProjectId() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('id') || params.get('project_id') || projectId;
-}
-
-// API Functions
-async function fetchCells() {
-    showLoading();
-    try {
-        projectId = getProjectId();
-        if (!projectId) throw new Error('Missing project id');
-        const response = await fetch(`${API_BASE_URL}/cells?project_id=${projectId}`);
-        if (!response.ok) throw new Error('Failed to fetch cells');
-
-        cells = await response.json();
-        cells = cells.map(c => ({
-            id: c.id || c.row || c._id || String(c.id),
-            name: c.name || c.cellname || c.title || 'Untitled',
-            layoutType: c.layoutType || c.layout_type || c.type || 'customlayout',
-            status: c.status || (c.reviewStatus || 'not-started'),
-            layouters: c.layouters || c.reviewers || c.assigned || [],
-            createdAt: c.createdAt || c.createdate || c.date || new Date().toISOString(),
-        }));
-
-        filteredCells = [...cells];
-        renderCells();
-        updateProgress();
-        showNotification('Cells loaded successfully', 'success');
-    } catch (error) {
-        console.error('Error fetching cells:', error);
-        showNotification('Failed to load cells', 'error');
-    } finally {
-        hideLoading();
+    // Helper: get project id from query string or template
+    function getProjectId() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('id') || params.get('project_id') || projectId;
     }
-}
 
-async function fetchProject() {
-    if (!projectId) return;
-    try {
-        const res = await fetch(`${API_BASE_URL}/projects/${projectId}`);
-        if (!res.ok) throw new Error('Failed to fetch project');
-        projectData = await res.json();
-        setHeaderFromProject(projectData);
-    } catch (err) {
-        console.error('Error fetching project:', err);
-        showNotification('Failed to load project info', 'error');
+    // API Functions
+    async function fetchCells() {
+        showLoading();
+        try {
+            projectId = getProjectId();
+            if (!projectId) throw new Error('Missing project id');
+            const response = await fetch(`${API_BASE_URL}/cells?project_id=${projectId}`);
+            if (!response.ok) throw new Error('Failed to fetch cells');
+
+            cells = await response.json();
+            cells = cells.map(c => ({
+                id: c.id || c.row || c._id || String(c.id),
+                name: c.name || c.cellname || c.title || 'Untitled',
+                layoutType: c.layoutType || c.layout_type || c.type || 'customlayout',
+                status: c.status || (c.reviewStatus || 'not-started'),
+                layouters: c.layouters || c.reviewers || c.assigned || [],
+                createdAt: c.createdAt || c.createdate || c.date || new Date().toISOString(),
+            }));
+
+            filteredCells = [...cells];
+            renderCells();
+            updateProgress();
+            showNotification('Cells loaded successfully', 'success');
+        } catch (error) {
+            console.error('Error fetching cells:', error);
+            showNotification('Failed to load cells', 'error');
+        } finally {
+            hideLoading();
+        }
     }
-}
 
-function setHeaderFromProject(p) {
-    projectTitle.textContent = p.projectName || p.projectname || 'Untitled Project';
-    projectClient.textContent = p.clientName || p.clientname || '';
-    projectVersion.textContent = p.version ? `Version: ${p.version}` : (p.versionText || '');
-    const st = (p.status || p.statusText || 'Active').toString();
-    projectStatusText.textContent = st.charAt(0).toUpperCase() + st.slice(1);
-    if (st.toLowerCase().includes('completed')) {
-        projectStatusIcon.style.color = 'green';
-    } else if (st.toLowerCase().includes('in-progress') || st.toLowerCase().includes('in progress')) {
-        projectStatusIcon.style.color = 'orange';
-    } else {
-        projectStatusIcon.style.color = '#10b981';
+    async function fetchProject() {
+        if (!projectId) return;
+        try {
+            const res = await fetch(`${API_BASE_URL}/projects/${projectId}`);
+            if (!res.ok) throw new Error('Failed to fetch project');
+            projectData = await res.json();
+            setHeaderFromProject(projectData);
+        } catch (err) {
+            console.error('Error fetching project:', err);
+            showNotification('Failed to load project info', 'error');
+        }
     }
-    const initials = computeInitials(p.clientName || p.projectName || '');
-    projectLogo.textContent = initials;
-}
 
-function computeInitials(text) {
-    if (!text) return '--';
-    const words = text.trim().split(/\s+/);
-    if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
-    return (words[0][0] + words[1][0]).toUpperCase();
-}
+    function setHeaderFromProject(p) {
+        projectTitle.textContent = p.projectName || p.projectname || 'Untitled Project';
+        projectClient.textContent = p.clientName || p.clientname || '';
+        projectVersion.textContent = p.version ? `Version: ${p.version}` : (p.versionText || '');
+        const st = (p.status || p.statusText || 'Active').toString();
+        projectStatusText.textContent = st.charAt(0).toUpperCase() + st.slice(1);
+        if (st.toLowerCase().includes('completed')) {
+            projectStatusIcon.style.color = 'green';
+        } else if (st.toLowerCase().includes('in-progress') || st.toLowerCase().includes('in progress')) {
+            projectStatusIcon.style.color = 'orange';
+        } else {
+            projectStatusIcon.style.color = '#10b981';
+        }
+        const initials = computeInitials(p.clientName || p.projectName || '');
+        projectLogo.textContent = initials;
+    }
 
-async function saveCellToAPI(cellData) {
-    showLoading();
-    try {
-        const url = isEditing ? `${API_BASE_URL}/cells/${currentEditId}?project_id=${projectId}` : `${API_BASE_URL}/cells?project_id=${projectId}`;
-        const method = isEditing ? 'PUT' : 'POST';
-        const response = await fetch(url, {
-            method: method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(cellData)
+    function computeInitials(text) {
+        if (!text) return '--';
+        const words = text.trim().split(/\s+/);
+        if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+        return (words[0][0] + words[1][0]).toUpperCase();
+    }
+
+    async function saveCellToAPI(cellData) {
+        showLoading();
+        try {
+            const url = isEditing ? `${API_BASE_URL}/cells/${currentEditId}?project_id=${projectId}` : `${API_BASE_URL}/cells?project_id=${projectId}`;
+            const method = isEditing ? 'PUT' : 'POST';
+            const response = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(cellData)
+            });
+            if (!response.ok) throw new Error('Failed to save cell');
+            await fetchCells();
+            showNotification(`Cell ${isEditing ? 'updated' : 'added'} successfully`, 'success');
+        } catch (error) {
+            console.error('Error saving cell:', error);
+            showNotification(`Failed to ${isEditing ? 'update' : 'add'} cell`, 'error');
+        } finally {
+            hideLoading();
+        }
+    }
+
+    async function deleteCellFromAPI(id) {
+        showLoading();
+        try {
+            const response = await fetch(`${API_BASE_URL}/cells/${id}?project_id=${projectId}`, { method: 'DELETE' });
+            if (!response.ok) throw new Error('Failed to delete cell');
+            await fetchCells();
+            showNotification('Cell deleted successfully', 'success');
+        } catch (error) {
+            console.error('Error deleting cell:', error);
+            showNotification('Failed to delete cell', 'error');
+        } finally {
+            hideLoading();
+        }
+    }
+
+    // Print Functionality
+
+    function showPrintPopup() {
+        console.log("showPrintPopup called");
+        // Hide other modals
+        document.getElementById('cellModal').style.display = 'none';
+        document.getElementById('orderModal').style.display = 'none';
+        document.getElementById('deleteModal').style.display = 'none';
+        document.getElementById('loadingOverlay').style.display = 'none';
+
+        let printPopup = document.getElementById('printPopup');
+        if (!printPopup) {
+            console.log("Creating new print popup");
+            printPopup = document.createElement('div');
+            printPopup.id = 'printPopup';
+            printPopup.className = 'print-popup';
+            printPopup.innerHTML = `
+                <h3 class="print-popup-title">Export Options</h3>
+                <button class="btn btn-primary" id="exportPdfBtn">Export as PDF</button>
+                <button class="btn btn-primary" id="exportCsvBtn">Export as CSV</button>
+                <button class="btn btn-outline" id="cancelPrintBtn">Cancel</button>
+            `;
+            document.body.appendChild(printPopup);
+
+            // Attach event listeners to popup buttons
+            const exportPdfBtn = document.getElementById('exportPdfBtn');
+            const exportCsvBtn = document.getElementById('exportCsvBtn');
+            const cancelPrintBtn = document.getElementById('cancelPrintBtn');
+
+            if (exportPdfBtn && exportCsvBtn && cancelPrintBtn) {
+                console.log("Attaching event listeners to popup buttons");
+                exportPdfBtn.addEventListener('click', () => {
+                    console.log("Export PDF clicked");
+                    exportFile('pdf');
+                });
+                exportCsvBtn.addEventListener('click', () => {
+                    console.log("Export CSV clicked");
+                    exportFile('csv');
+                });
+                cancelPrintBtn.addEventListener('click', () => {
+                    console.log("Cancel clicked");
+                    printPopup.style.display = 'none';
+                });
+            } else {
+                console.error("Popup buttons not found");
+            }
+        }
+        printPopup.style.display = 'flex';
+        console.log("Popup display set to flex");
+
+        // Handle clicks outside the popup to close it
+        document.addEventListener('click', function closePopup(e) {
+            if (!printPopup.contains(e.target) && e.target !== printBtn) {
+                console.log("Closing popup due to outside click");
+                printPopup.style.display = 'none';
+                document.removeEventListener('click', closePopup);
+            }
         });
-        if (!response.ok) throw new Error('Failed to save cell');
-        await fetchCells(); // Refresh cells after saving
-        showNotification(`Cell ${isEditing ? 'updated' : 'added'} successfully`, 'success');
-    } catch (error) {
-        console.error('Error saving cell:', error);
-        showNotification(`Failed to ${isEditing ? 'update' : 'add'} cell`, 'error');
-    } finally {
-        hideLoading();
     }
-}
 
-async function deleteCellFromAPI(id) {
-    showLoading();
-    try {
-        const response = await fetch(`${API_BASE_URL}/cells/${id}?project_id=${projectId}`, { method: 'DELETE' });
-        if (!response.ok) throw new Error('Failed to delete cell');
-        await fetchCells(); // Refresh cells after deletion
-        showNotification('Cell deleted successfully', 'success');
-    } catch (error) {
-        console.error('Error deleting cell:', error);
-        showNotification('Failed to delete cell', 'error');
-    } finally {
-        hideLoading();
+    async function exportFile(format) {
+        const printPopup = document.getElementById('printPopup');
+        showLoading();
+        try {
+            const url = `${API_BASE_URL}/export/${format}?project_id=${projectId}`;
+            const response = await fetch(url);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `Failed to export ${format.toUpperCase()}`);
+            }
+
+            const blob = await response.blob();
+            const contentDisposition = response.headers.get('Content-Disposition');
+            let filename = `Project_${projectId}_Report.${format}`;
+            if (contentDisposition) {
+                const match = contentDisposition.match(/filename="([^"]+)"/);
+                if (match) filename = match[1];
+            }
+
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+            window.URL.revokeObjectURL(link.href);
+
+            showNotification(`Exported ${format.toUpperCase()} successfully`, 'success');
+        } catch (error) {
+            console.error(`Error exporting ${format}:`, error);
+            showNotification(`Failed to export ${format.toUpperCase()}`, 'error');
+        } finally {
+            hideLoading();
+            // Ensure popup is closed even if export fails
+            if (printPopup) {
+                printPopup.style.display = 'none';
+                console.log(`Popup closed after ${format} export`);
+            }
+        }
     }
-}
+    // UI Functions
+    function showLoading() {
+        loadingOverlay.style.display = 'flex';
+    }
 
-// UI Functions
-function showLoading() {
-    loadingOverlay.style.display = 'flex';
-}
+    function hideLoading() {
+        loadingOverlay.style.display = 'none';
+    }
 
-function hideLoading() {
-    loadingOverlay.style.display = 'none';
-}
+    function showNotification(message, type) {
+        notification.textContent = message;
+        notification.className = `notification ${type}`;
+        notification.classList.add('show');
+        setTimeout(() => {
+            notification.classList.remove('show');
+            notification.className = 'notification';
+        }, 3000);
+    }
 
-function showNotification(message, type) {
-    notification.textContent = message;
-    notification.className = `notification ${type}`;
-    notification.classList.add('show');
-    setTimeout(() => {
-        notification.classList.remove('show');
-        notification.className = 'notification'; // Reset class to avoid lingering styles
-    }, 3000);
-}
+    function updateProgress() {
+        const totalCells = cells.length;
+        const completedCells = cells.filter(cell => cell.status === 'completed').length;
+        const progress = totalCells > 0 ? Math.round((completedCells / totalCells) * 100) : 0;
+        progressFill.style.width = `${progress}%`;
+        progressPercent.textContent = `${progress}%`;
+        totalCellsHeader.textContent = totalCells;
+    }
 
-function updateProgress() {
-    const totalCells = cells.length;
-    const completedCells = cells.filter(cell => cell.status === 'completed').length;
-    const progress = totalCells > 0 ? Math.round((completedCells / totalCells) * 100) : 0;
-    progressFill.style.width = `${progress}%`;
-    progressPercent.textContent = `${progress}%`;
-    totalCellsHeader.textContent = totalCells;
-}
+    function showDeleteModal(id) {
+        currentDeleteId = id;
+        deleteModal.style.display = 'flex';
+    }
 
-function showDeleteModal(id) {
-    currentDeleteId = id;
-    deleteModal.style.display = 'flex';
-}
+    function hideDeleteModal() {
+        deleteModal.style.display = 'none';
+        currentDeleteId = null;
+    }
 
-function hideDeleteModal() {
-    deleteModal.style.display = 'none';
-    currentDeleteId = null;
-}
-
-function renderCells(cellsToRender = filteredCells) {
-    cellsTableBody.innerHTML = "";
-    if (cellsToRender.length === 0) {
-        cellsTableBody.innerHTML = `
-            <tr>
-                <td colspan="6" style="text-align: center; padding: 20px;">
-                    No cells found matching your criteria
+    function renderCells(cellsToRender = filteredCells) {
+        cellsTableBody.innerHTML = "";
+        if (cellsToRender.length === 0) {
+            cellsTableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 20px;">
+                        No cells found matching your criteria
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        cellsToRender.forEach(cell => {
+            const row = document.createElement("tr");
+            row.dataset.id = cell.id;
+            let statusClass = "", statusText = "";
+            switch (cell.status) {
+                case "not-started": statusClass = "status-not-started"; statusText = "Not Started"; break;
+                case "in-progress": statusClass = "status-in-progress"; statusText = "In Progress"; break;
+                case "completed": statusClass = "status-completed"; statusText = "Completed"; break;
+            }
+            let layoutersHTML = cell.layouters.map(layouter => `<span class="layouter-tag">${layouter}</span>`).join('');
+            if (cell.layouters.length === 0) layoutersHTML = '<span class="layouter-tag">None</span>';
+            row.innerHTML = `
+                <td>${cell.name}</td>
+                <td>${cell.layoutType.charAt(0).toUpperCase() + cell.layoutType.slice(1)}</td>
+                <td><span class="status ${statusClass}">${statusText}</span></td>
+                <td>${new Date(cell.createdAt).toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })}</td>
+                <td><div class="layouter-tags">${layoutersHTML}</div></td>
+                <td>
+                    <div class="actions">
+                        <button class="action-btn edit-btn" data-id="${cell.id}"><i class="fas fa-pencil-alt"></i></button>
+                        <button class="action-btn delete-btn" data-id="${cell.id}"><i class="fas fa-trash"></i></button>
+                        <button class="action-btn open-btn" data-id="${cell.id}"><i class="fas fa-external-link-alt"></i></button>
+                    </div>
                 </td>
-            </tr>
-        `;
-        return;
+            `;
+            cellsTableBody.appendChild(row);
+        });
+        document.querySelectorAll(".edit-btn").forEach(btn => btn.addEventListener("click", (e) => editCell(btn.dataset.id)));
+        document.querySelectorAll(".delete-btn").forEach(btn => btn.addEventListener("click", (e) => {
+            showDeleteModal(btn.dataset.id);
+        }));
+        document.querySelectorAll(".open-btn").forEach(btn => btn.addEventListener("click", (e) => openCell(btn.dataset.id)));
     }
-    cellsToRender.forEach(cell => {
-        const row = document.createElement("tr");
-        row.dataset.id = cell.id;
-        let statusClass = "", statusText = "";
-        switch (cell.status) {
-            case "not-started": statusClass = "status-not-started"; statusText = "Not Started"; break;
-            case "in-progress": statusClass = "status-in-progress"; statusText = "In Progress"; break;
-            case "completed": statusClass = "status-completed"; statusText = "Completed"; break;
+
+    function applyFilters() {
+        const query = searchInput.value.toLowerCase();
+        filteredCells = cells.filter(cell => 
+            cell.name.toLowerCase().includes(query) || cell.layouters.some(l => l.toLowerCase().includes(query))
+        );
+        if (currentFilter !== "all") filteredCells = filteredCells.filter(cell => cell.status === currentFilter);
+        if (currentLayoutFilter !== "all") filteredCells = filteredCells.filter(cell => cell.layoutType === currentLayoutFilter);
+        const from = fromDate.value ? new Date(fromDate.value) : null;
+        const to = toDate.value ? new Date(toDate.value + 'T23:59:59') : null;
+        if (from || to) filteredCells = filteredCells.filter(cell => {
+            const cellDate = new Date(cell.createdAt);
+            return (!from || cellDate >= from) && (!to || cellDate <= to);
+        });
+        if (currentSort) {
+            switch (currentSort) {
+                case "name-asc": filteredCells.sort((a, b) => a.name.localeCompare(b.name)); break;
+                case "name-desc": filteredCells.sort((a, b) => b.name.localeCompare(b.name)); break;
+                case "date-asc": filteredCells.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)); break;
+                case "date-desc": filteredCells.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); break;
+                case "layout-custom": filteredCells.sort((a, b) => layoutOrder.indexOf(a.layoutType) - layoutOrder.indexOf(b.layoutType)); break;
+            }
         }
-        let layoutersHTML = cell.layouters.map(layouter => `<span class="layouter-tag">${layouter}</span>`).join('');
-        if (cell.layouters.length === 0) layoutersHTML = '<span class="layouter-tag">None</span>';
-        row.innerHTML = `
-            <td>${cell.name}</td>
-            <td>${cell.layoutType.charAt(0).toUpperCase() + cell.layoutType.slice(1)}</td>
-            <td><span class="status ${statusClass}">${statusText}</span></td>
-            <td>${new Date(cell.createdAt).toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })}</td>
-            <td><div class="layouter-tags">${layoutersHTML}</div></td>
-            <td>
-                <div class="actions">
-                    <button class="action-btn edit-btn" data-id="${cell.id}"><i class="fas fa-pencil-alt"></i></button>
-                    <button class="action-btn delete-btn" data-id="${cell.id}"><i class="fas fa-trash"></i></button>
-                    <button class="action-btn open-btn" data-id="${cell.id}"><i class="fas fa-external-link-alt"></i></button>
-                </div>
-            </td>
-        `;
-        cellsTableBody.appendChild(row);
-    });
-    document.querySelectorAll(".edit-btn").forEach(btn => btn.addEventListener("click", (e) => editCell(btn.dataset.id)));
-    document.querySelectorAll(".delete-btn").forEach(btn => btn.addEventListener("click", (e) => {
-        showDeleteModal(btn.dataset.id);
-    }));
-    document.querySelectorAll(".open-btn").forEach(btn => btn.addEventListener("click", (e) => openCell(btn.dataset.id)));
-}
+        renderCells();
+    }
 
-function applyFilters() {
-    const query = searchInput.value.toLowerCase();
-    filteredCells = cells.filter(cell => 
-        cell.name.toLowerCase().includes(query) || cell.layouters.some(l => l.toLowerCase().includes(query))
-    );
-    if (currentFilter !== "all") filteredCells = filteredCells.filter(cell => cell.status === currentFilter);
-    if (currentLayoutFilter !== "all") filteredCells = filteredCells.filter(cell => cell.layoutType === currentLayoutFilter);
-    const from = fromDate.value ? new Date(fromDate.value) : null;
-    const to = toDate.value ? new Date(toDate.value + 'T23:59:59') : null;
-    if (from || to) filteredCells = filteredCells.filter(cell => {
-        const cellDate = new Date(cell.createdAt);
-        return (!from || cellDate >= from) && (!to || cellDate <= to);
-    });
-    if (currentSort) {
-        switch (currentSort) {
-            case "name-asc": filteredCells.sort((a, b) => a.name.localeCompare(b.name)); break;
-            case "name-desc": filteredCells.sort((a, b) => b.name.localeCompare(b.name)); break;
-            case "date-asc": filteredCells.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)); break;
-            case "date-desc": filteredCells.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); break;
-            case "layout-custom": filteredCells.sort((a, b) => layoutOrder.indexOf(a.layoutType) - layoutOrder.indexOf(b.layoutType)); break;
+    function openCell(id) {
+        const cell = filteredCells.find(c => c.id === id);
+        if (!cell) return;
+        const layoutPageMap = {
+            'io': 'iolayout',
+            'cell': 'celllayout',
+            'top': 'top-out',
+            'tapeout': 'tapelayout',
+            'custom': 'customlayout'
+        };
+        const targetPage = layoutPageMap[cell.layoutType.toLowerCase()] || 'celllayout';
+        window.location.href = `/${targetPage}?project_id=${projectId}&cell_id=${id}`;
+    }
+
+    function editCell(id) {
+        const cell = cells.find(c => c.id === id);
+        if (!cell) return;
+        isEditing = true; currentEditId = id; modalTitle.textContent = "Edit Cell";
+        cellNameInput.value = cell.name; layoutTypeSelect.value = cell.layoutType;
+        statusSelect.value = cell.status; layouters = [...cell.layouters]; updateLayouterTags();
+        cellModal.style.display = "block";
+    }
+
+    function addNewCell() {
+        isEditing = false; currentEditId = null; modalTitle.textContent = "Add New Cell";
+        cellNameInput.value = ""; layoutTypeSelect.value = "io"; statusSelect.value = "not-started";
+        layouters = []; updateLayouterTags(); cellModal.style.display = "block";
+    }
+
+    function updateLayouterTags() {
+        layouterTags.innerHTML = "";
+        layouters.forEach((layouter, index) => {
+            const tag = document.createElement("span");
+            tag.className = "layouter-tag";
+            tag.innerHTML = `${layouter}<span class="remove-tag" data-index="${index}"><i class="fas fa-times" style="font-size: 8px;"></i></span>`;
+            layouterTags.appendChild(tag);
+        });
+        document.querySelectorAll(".remove-tag").forEach(btn => btn.addEventListener("click", (e) => {
+            layouters.splice(parseInt(btn.dataset.index), 1); updateLayouterTags();
+        }));
+    }
+
+    function saveCell() {
+        const name = cellNameInput.value.trim();
+        const layoutType = layoutTypeSelect.value;
+        const status = statusSelect.value;
+        if (!name) { 
+            showNotification('Please enter a cell name', 'error');
+            return; 
         }
+        const cellData = { name, layoutType, status, layouters: [...layouters] };
+        saveCellToAPI(cellData); 
+        cellModal.style.display = "none";
     }
-    renderCells();
-}
 
-function openCell(id) {
-    const cell = filteredCells.find(c => c.id === id);
-    if (!cell) return;
+    function openOrderModal() {
+        const list = document.getElementById("layoutOrderList");
+        list.innerHTML = ""; layoutOrder.forEach(type => {
+            const li = document.createElement("li"); li.draggable = true; li.dataset.type = type;
+            li.innerHTML = `<i class="fas fa-grip-lines" style="margin-right: 10px; color: var(--gray-500);"></i> ${type.toUpperCase()}`;
+            li.style.padding = "10px"; li.style.borderBottom = "1px solid var(--gray-200)"; li.style.cursor = "move";
+            list.appendChild(li);
+        });
+        list.addEventListener("dragstart", (e) => e.target.tagName === "LI" && e.target.classList.add("dragging"));
+        list.addEventListener("dragover", (e) => { e.preventDefault(); const dragging = document.querySelector(".dragging");
+            if (!dragging) return; const afterElement = getDragAfterElement(list, e.clientY);
+            if (afterElement == null) list.appendChild(dragging); else list.insertBefore(dragging, afterElement);
+        });
+        list.addEventListener("dragend", (e) => e.target.tagName === "LI" && e.target.classList.remove("dragging"));
+        orderModal.style.display = "block";
+    }
 
-    // Map layoutType to Flask routes
-    const layoutPageMap = {
-        'io': 'iolayout',
-        'cell': 'celllayout',
-        'top': 'top-out',
-        'tapeout': 'tapelayout',
-        'custom': 'customlayout'
-    };
+    function getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll("li:not(.dragging)")];
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            return offset < 0 && offset > closest.offset ? { offset: offset, element: child } : closest;
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
 
-    const targetPage = layoutPageMap[cell.layoutType.toLowerCase()] || 'celllayout';
-    window.location.href = `/${targetPage}?project_id=${projectId}&cell_id=${id}`;
-}
-
-function editCell(id) {
-    const cell = cells.find(c => c.id === id);
-    if (!cell) return;
-    isEditing = true; currentEditId = id; modalTitle.textContent = "Edit Cell";
-    cellNameInput.value = cell.name; layoutTypeSelect.value = cell.layoutType;
-    statusSelect.value = cell.status; layouters = [...cell.layouters]; updateLayouterTags();
-    cellModal.style.display = "block";
-}
-
-function addNewCell() {
-    isEditing = false; currentEditId = null; modalTitle.textContent = "Add New Cell";
-    cellNameInput.value = ""; layoutTypeSelect.value = "io"; statusSelect.value = "not-started";
-    layouters = []; updateLayouterTags(); cellModal.style.display = "block";
-}
-
-function updateLayouterTags() {
-    layouterTags.innerHTML = "";
-    layouters.forEach((layouter, index) => {
-        const tag = document.createElement("span");
-        tag.className = "layouter-tag";
-        tag.innerHTML = `${layouter}<span class="remove-tag" data-index="${index}"><i class="fas fa-times" style="font-size: 8px;"></i></span>`;
-        layouterTags.appendChild(tag);
+    // Event Listeners
+    addCellBtn.addEventListener("click", addNewCell);
+    closeModalBtn.addEventListener("click", () => cellModal.style.display = "none");
+    cancelBtn.addEventListener("click", () => cellModal.style.display = "none");
+    saveBtn.addEventListener("click", saveCell);
+    addLayouterBtn.addEventListener("click", () => {
+        const name = layouterInput.value.trim();
+        if (name && !layouters.includes(name)) { 
+            layouters.push(name); 
+            updateLayouterTags(); 
+            layouterInput.value = ""; 
+        } else if (!name) {
+            showNotification('Please enter a layouter name', 'error');
+        }
     });
-    document.querySelectorAll(".remove-tag").forEach(btn => btn.addEventListener("click", (e) => {
-        layouters.splice(parseInt(btn.dataset.index), 1); updateLayouterTags();
+    layouterInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            addLayouterBtn.click();
+        }
+    });
+    searchInput.addEventListener("input", applyFilters);
+    document.querySelectorAll(".filter-btn").forEach(btn => btn.addEventListener("click", () => {
+        document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active"); 
+        currentFilter = btn.dataset.filter; 
+        applyFilters();
     }));
-}
-
-function saveCell() {
-    const name = cellNameInput.value.trim();
-    const layoutType = layoutTypeSelect.value;
-    const status = statusSelect.value;
-    if (!name) { 
-        showNotification('Please enter a cell name', 'error');
-        return; 
-    }
-    const cellData = { name, layoutType, status, layouters: [...layouters] };
-    saveCellToAPI(cellData); 
-    cellModal.style.display = "none";
-}
-
-function openOrderModal() {
-    const list = document.getElementById("layoutOrderList");
-    list.innerHTML = ""; layoutOrder.forEach(type => {
-        const li = document.createElement("li"); li.draggable = true; li.dataset.type = type;
-        li.innerHTML = `<i class="fas fa-grip-lines" style="margin-right: 10px; color: var(--gray-500);"></i> ${type.toUpperCase()}`;
-        li.style.padding = "10px"; li.style.borderBottom = "1px solid var(--gray-200)"; li.style.cursor = "move";
-        list.appendChild(li);
+    layoutTypeFilter.addEventListener("change", (e) => { 
+        currentLayoutFilter = e.target.value; 
+        applyFilters(); 
     });
-    list.addEventListener("dragstart", (e) => e.target.tagName === "LI" && e.target.classList.add("dragging"));
-    list.addEventListener("dragover", (e) => { e.preventDefault(); const dragging = document.querySelector(".dragging");
-        if (!dragging) return; const afterElement = getDragAfterElement(list, e.clientY);
-        if (afterElement == null) list.appendChild(dragging); else list.insertBefore(dragging, afterElement);
+    sortSelect.addEventListener("change", (e) => { 
+        currentSort = e.target.value; 
+        applyFilters(); 
     });
-    list.addEventListener("dragend", (e) => e.target.tagName === "LI" && e.target.classList.remove("dragging"));
-    orderModal.style.display = "block";
-}
+    fromDate.addEventListener("change", applyFilters);
+    toDate.addEventListener("change", applyFilters);
+    configOrderBtn.addEventListener("click", openOrderModal);
+    closeOrderModal.addEventListener("click", () => orderModal.style.display = "none");
+    saveOrderBtn.addEventListener("click", () => {
+        const items = document.querySelectorAll("#layoutOrderList li");
+        layoutOrder = Array.from(items).map(li => li.dataset.type);
+        orderModal.style.display = "none";
+        if (currentSort === "layout-custom") applyFilters();
+    });
+    closeDeleteModal.addEventListener("click", hideDeleteModal);
+    cancelDeleteBtn.addEventListener("click", hideDeleteModal);
+    confirmDeleteBtn.addEventListener("click", () => {
+        if (currentDeleteId) {
+            deleteCellFromAPI(currentDeleteId);
+            hideDeleteModal();
+        }
+    });
 
-function getDragAfterElement(container, y) {
-    const draggableElements = [...container.querySelectorAll("li:not(.dragging)")];
-    return draggableElements.reduce((closest, child) => {
-        const box = child.getBoundingClientRect();
-        const offset = y - box.top - box.height / 2;
-        return offset < 0 && offset > closest.offset ? { offset: offset, element: child } : closest;
-    }, { offset: Number.NEGATIVE_INFINITY }).element;
-}
-
-// Event Listeners
-addCellBtn.addEventListener("click", addNewCell);
-printBtn.addEventListener("click", () => window.print());
-
-closeModalBtn.addEventListener("click", () => cellModal.style.display = "none");
-cancelBtn.addEventListener("click", () => cellModal.style.display = "none");
-saveBtn.addEventListener("click", saveCell);
-addLayouterBtn.addEventListener("click", () => {
-    const name = layouterInput.value.trim();
-    if (name && !layouters.includes(name)) { 
-        layouters.push(name); 
-        updateLayouterTags(); 
-        layouterInput.value = ""; 
-    } else if (!name) {
-        showNotification('Please enter a layouter name', 'error');
-    }
-});
-layouterInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-        addLayouterBtn.click();
-    }
-});
-searchInput.addEventListener("input", applyFilters);
-document.querySelectorAll(".filter-btn").forEach(btn => btn.addEventListener("click", () => {
-    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active"); 
-    currentFilter = btn.dataset.filter; 
-    applyFilters();
-}));
-layoutTypeFilter.addEventListener("change", (e) => { 
-    currentLayoutFilter = e.target.value; 
-    applyFilters(); 
-});
-sortSelect.addEventListener("change", (e) => { 
-    currentSort = e.target.value; 
-    applyFilters(); 
-});
-fromDate.addEventListener("change", applyFilters);
-toDate.addEventListener("change", applyFilters);
-configOrderBtn.addEventListener("click", openOrderModal);
-closeOrderModal.addEventListener("click", () => orderModal.style.display = "none");
-saveOrderBtn.addEventListener("click", () => {
-    const items = document.querySelectorAll("#layoutOrderList li");
-    layoutOrder = Array.from(items).map(li => li.dataset.type);
-    orderModal.style.display = "none";
-    if (currentSort === "layout-custom") applyFilters();
-});
-closeDeleteModal.addEventListener("click", hideDeleteModal);
-cancelDeleteBtn.addEventListener("click", hideDeleteModal);
-confirmDeleteBtn.addEventListener("click", () => {
-    if (currentDeleteId) {
-        deleteCellFromAPI(currentDeleteId);
-        hideDeleteModal();
-    }
-});
-
-// Initialize
-document.addEventListener('DOMContentLoaded', async () => {
-    // Explicitly ensure delete modal is hidden on page load
-    deleteModal.style.display = 'none';
-    
-    projectId = "{{ project.id }}"; // This will be replaced by Flask with the actual project ID
-    if (!projectId) {
-        showNotification('Missing project id in URL or template', 'error');
-        return;
-    }
-    await fetchProject();
-    await fetchCells();
-
-    // Set default dates (last 30 days)
-    const today = new Date();
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(today.getDate() - 30);
-    fromDate.valueAsDate = thirtyDaysAgo;
-    toDate.valueAsDate = today;
-});
+    // Initialize
+    document.addEventListener('DOMContentLoaded', async () => {
+        deleteModal.style.display = 'none';
+        projectId = "{{ project.id }}";
+        if (!projectId) {
+            showNotification('Missing project id in URL or template', 'error');
+            return;
+        }
+        await fetchProject();
+        await fetchCells();
+        const today = new Date();
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(today.getDate() - 30);
+        fromDate.valueAsDate = thirtyDaysAgo;
+        toDate.valueAsDate = today;
+        const printBtn = document.getElementById("printBtn");
+        if (printBtn) {
+            printBtn.addEventListener("click", showPrintPopup);
+            console.log("Print button event listener attached");
+        } else {
+            console.error("Print button not found in the DOM");
+        }
+    });
 </script>
-<script src="sidebar.js"></script>
+
+
 </body>
 </html>

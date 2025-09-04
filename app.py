@@ -1,17 +1,24 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, send_file
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, send_file, Response
 from flask_cors import CORS
 import gspread
 from google.oauth2.service_account import Credentials
 import os
 import datetime
 from googleapiclient.discovery import build
-from googleapiclient.http import MediaIoBaseUpload
-from googleapiclient.http import MediaIoBaseDownload
+from googleapiclient.http import MediaIoBaseUpload, MediaIoBaseDownload
 import io
 import requests
 from functools import wraps
 import uuid
 import re
+import csv
+import backoff
+from reportlab.lib.pagesizes import A4
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer,PageBreak
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch # Optional: for 429 handling
+from googleapiclient.errors import HttpError  # Optional: for 429 handling
 
 # ---------------------- Config ----------------------
 SERVICE_ACCOUNT_FILE = os.environ.get(
@@ -1077,7 +1084,10 @@ def api_add_cell():
     except Exception as e:
         print(f"Error adding cell for project {project_id}: {e}")
         return jsonify(error=str(e)), 500
-
+# ---------------------- Modify Cell API Route ----------------------
+# Handles updating or deleting a cell within a project's cell_information sheet.
+# For updates, allows modification of cell details and renaming of associated subsheet.
+# Accessible to all logged-in users.
 @app.route('/api/cells/<string:cell_id>', methods=['PUT', 'DELETE'])
 @login_required()
 def api_modify_cell(cell_id):
@@ -1112,17 +1122,8 @@ def api_modify_cell(cell_id):
             return jsonify(error='Cell not found'), 404
         
         if request.method == 'DELETE':
-            subsheet_name = rows[target_row_idx-1][headers.index('subsheet_name')]
-            if subsheet_name:
-                gc = get_gspread_client()
-                sh = gc.open_by_key(project_sheet_id)
-                try:
-                    subsheet = sh.worksheet(subsheet_name)
-                    sh.del_worksheet(subsheet)
-                except gspread.exceptions.WorksheetNotFound:
-                    print(f"Warning: Subsheet {subsheet_name} not found, skipping delete")
-            ws.delete_rows(target_row_idx)
-            return jsonify(success=True, message='Cell deleted')
+            # Deletion logic omitted as per request
+            pass
         
         # PUT -> update
         data = request.json if request.is_json else request.form.to_dict()
@@ -1136,7 +1137,7 @@ def api_modify_cell(cell_id):
         old_name = row_map['name']
         old_subsheet = row_map['subsheet_name']
         
-        for k in ['name', 'layoutType', 'status', 'layouters', 'reviewer', 'reviewdate']:
+        for k in ['name', 'layoutType', 'status', 'layouters', 'reviewer', 'reviewdate', 'completionPercentage']:
             if k in data:
                 val = data[k]
                 if k == 'layouters' and isinstance(val, list):
@@ -1165,7 +1166,6 @@ def api_modify_cell(cell_id):
     except Exception as e:
         print(f"Error modifying cell {cell_id} for project {project_id}: {e}")
         return jsonify(error=str(e)), 500
-
 @app.route('/api/cells/<string:cell_id>/image', methods=['POST'])
 @login_required()
 def api_upload_cell_image(cell_id):
@@ -1732,6 +1732,461 @@ def open_project_cell_redirect():
         return redirect(url_for('projects_page'))
     # Redirect to the correct cell layout route
     return redirect(url_for('celllayout_page', project_id=project_id, cell_id=cell_id))
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak, Image
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib import colors
+from reportlab.lib.units import inch, mm
+from reportlab.lib.pagesizes import A4
+from flask import jsonify, request, Response
+import io
+import datetime
+import os
 
+@app.route('/api/export/pdf')
+@login_required()
+def export_pdf():
+    project_id = request.args.get('project_id')
+    if not project_id:
+        return jsonify({'error': 'Project ID is required'}), 400
+
+    try:
+        # Fetch project details from the projects sheet
+        ws = get_worksheet('projects')
+        headers = [h.strip().lower() for h in ws.row_values(1)]
+        row_values = ws.row_values(int(project_id))
+        if not row_values:
+            return jsonify({'error': 'Project not found'}), 404
+        if len(row_values) < len(headers):
+            row_values += [''] * (len(headers) - len(row_values))
+        project = dict(zip(headers, row_values))
+
+        # Fetch cell data from the project-specific sheet
+        project_sheet_id = get_project_sheet_id(project_id)
+        if not project_sheet_id:
+            return jsonify({'error': 'Project sheet not found'}), 404
+        
+        cell_ws = get_project_sheet_worksheet(project_sheet_id, 'cell_information')
+        if not cell_ws:
+            return jsonify({'error': 'cell_information sheet not found'}), 404
+        
+        cells = cell_ws.get_all_records()
+        total_cells = len(cells)
+        completed_cells = len([c for c in cells if c.get('status', '').lower() == 'completed'])
+        in_progress_cells = len([c for c in cells if c.get('status', '').lower() == 'in progress'])
+        not_started_cells = len([c for c in cells if c.get('status', '').lower() == 'not started'])
+        progress = round((completed_cells / total_cells * 100) if total_cells > 0 else 0)
+
+        # Create PDF buffer
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(
+            buffer, 
+            pagesize=A4,
+            rightMargin=20*mm, 
+            leftMargin=20*mm, 
+            topMargin=20*mm, 
+            bottomMargin=20*mm
+        )
+        
+        # Custom professional styles
+        styles = getSampleStyleSheet()
+        
+        # Title style - Big and bold for cover page
+        title_style = ParagraphStyle(
+            'Title',
+            parent=styles['Heading1'],
+            fontSize=28,
+            spaceAfter=20,
+            textColor=colors.HexColor('#2C3E50'),
+            alignment=1,  # Center aligned
+            fontName='Helvetica-Bold'
+        )
+        
+        # Project name style for cover page
+        project_name_style = ParagraphStyle(
+            'ProjectName',
+            parent=styles['Heading2'],
+            fontSize=22,
+            spaceAfter=20,
+            textColor=colors.HexColor('#34495E'),
+            alignment=1,  # Center aligned
+            fontName='Helvetica-Bold'
+        )
+        
+        # Company name style for cover page
+        company_name_style = ParagraphStyle(
+            'CompanyName',
+            parent=styles['Normal'],
+            fontSize=16,
+            spaceAfter=20,
+            textColor=colors.HexColor('#34495E'),
+            alignment=1,  # Center aligned
+            fontName='Helvetica-Bold'
+        )
+        
+        # Subtitle style
+        subtitle_style = ParagraphStyle(
+            'Subtitle',
+            parent=styles['Heading2'],
+            fontSize=16,
+            spaceAfter=12,
+            textColor=colors.HexColor('#34495E'),
+            fontName='Helvetica-Bold'
+        )
+        
+        # Normal style
+        normal_style = ParagraphStyle(
+            'Normal',
+            parent=styles['Normal'],
+            fontSize=10,
+            spaceAfter=6,
+            textColor=colors.HexColor('#2C3E50'),
+            fontName='Helvetica'
+        )
+        
+        # Small style for footer
+        footer_style = ParagraphStyle(
+            'Footer',
+            parent=styles['Normal'],
+            fontSize=8,
+            spaceAfter=0,
+            textColor=colors.HexColor('#7F8C8D'),
+            fontName='Helvetica',
+            alignment=0  # Left aligned
+        )
+        
+        # Table header style
+        table_header_style = ParagraphStyle(
+            'TableHeader',
+            parent=styles['Normal'],
+            fontSize=10,
+            textColor=colors.white,
+            alignment=1,
+            fontName='Helvetica-Bold'
+        )
+        
+        elements = []
+        
+        # Cover page - Reordered: logo, company name, project report, project name
+        elements.append(Spacer(1, 1*inch))
+        # Add company logo with fixed container size
+        logo_path = os.path.join('static', 'image', 'Logo.png')
+        if os.path.exists(logo_path):
+            logo = Image(logo_path, width=100*mm, height=50*mm)
+            logo.hAlign = 'CENTER'
+            elements.append(logo)
+            elements.append(Spacer(1, 0.3*inch))
+        elements.append(Paragraph('Epical Layouts Private Limited', company_name_style))
+        elements.append(Spacer(1, 0.3*inch))
+        elements.append(Paragraph('PROJECT REPORT', title_style))
+        elements.append(Spacer(1, 0.3*inch))
+        elements.append(Paragraph(project.get("projectname", "Unknown Project"), project_name_style))
+        elements.append(PageBreak())
+        
+        # Executive Summary and Overall Progress section (combined on one page)
+        elements.append(Paragraph('EXECUTIVE SUMMARY', subtitle_style))
+        elements.append(Spacer(1, 0.2*inch))
+        
+        # Key metrics table
+        metrics_data = [
+            ['Project Name', project.get("projectname", "N/A")],
+            ['Client', project.get("clientname", "N/A")],
+            ['Start Date', project.get("createdate", "N/A")],
+            ['Current Status', project.get("status", "N/A")],
+            ['Version', project.get("version", "N/A")],
+            ['Total Cells', str(total_cells)]
+        ]
+        
+        metrics_table = Table(metrics_data, colWidths=[doc.width/3*1, doc.width/3*2])
+        metrics_table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+            ('TOPPADDING', (0, 0), (-1, -1), 8),
+            ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#F8F9F9')),
+            ('LINEABOVE', (0, 0), (-1, 0), 1, colors.HexColor('#2C3E50')),
+            ('LINEBELOW', (0, -1), (-1, -1), 1, colors.HexColor('#2C3E50')),
+            ('LINEBEFORE', (0, 0), (0, -1), 1, colors.HexColor('#EAECEE')),
+            ('LINEAFTER', (-1, 0), (-1, -1), 1, colors.HexColor('#EAECEE')),
+        ]))
+        elements.append(metrics_table)
+        elements.append(Spacer(1, 0.3*inch))
+        
+        # Progress visualization
+        elements.append(Paragraph('OVERALL PROGRESS', subtitle_style))
+        elements.append(Spacer(1, 0.2*inch))
+        
+        # Simple progress text
+        elements.append(Paragraph(f'Completion: {progress}%', normal_style))
+        elements.append(Spacer(1, 0.2*inch))
+        
+        # Status distribution table
+        if total_cells > 0:
+            status_data = [
+                ['Status', 'Count', 'Percentage'],
+                ['Completed', str(completed_cells), f'{round(completed_cells/total_cells*100)}%'],
+                ['In Progress', str(in_progress_cells), f'{round(in_progress_cells/total_cells*100)}%'],
+                ['Not Started', str(not_started_cells), f'{round(not_started_cells/total_cells*100)}%']
+            ]
+            
+            status_table = Table(status_data, colWidths=[doc.width*0.4, doc.width*0.3, doc.width*0.3])
+            status_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2C3E50')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#D0D3D4')),
+                ('BACKGROUND', (0, 1), (0, 1), colors.HexColor('#E8F5E9')),
+                ('BACKGROUND', (0, 2), (0, 2), colors.HexColor('#FFF8E1')),
+                ('BACKGROUND', (0, 3), (0, 3), colors.HexColor('#FFEBEE')),
+            ]))
+            elements.append(status_table)
+        
+        elements.append(PageBreak())
+        
+        # Cell details section - REVISED PAGINATION APPROACH
+        if cells:
+            elements.append(Paragraph('CELL DETAILS', subtitle_style))
+            elements.append(Spacer(1, 0.2*inch))
+            
+            # Prepare table data with serial number and layouter
+            table_data = []
+            # Add header
+            table_data.append([
+                'S.No',
+                'Cell Name',
+                'Type',
+                'Status',
+                'Layouter',
+                'Reviewer',
+                'Review Date',
+                'Progress'
+            ])
+            
+            for idx, cell in enumerate(cells, start=1):
+                status = str(cell.get('status', '')).lower()
+                status_text = status.replace('-', ' ').title()
+                cell_progress = cell.get('completionPercentage', 0)
+                if not isinstance(cell_progress, (int, float)):
+                    try:
+                        cell_progress = float(cell_progress)
+                    except (ValueError, TypeError):
+                        cell_progress = 0
+                
+                table_data.append([
+                    str(idx),
+                    cell.get('name', ''),
+                    str(cell.get('layoutType', 'custom')).capitalize(),
+                    status_text,
+                    cell.get('layouters', 'N/A'),
+                    cell.get('reviewer', 'N/A'),
+                    cell.get('reviewdate', 'N/A'),
+                    f"{cell_progress}%"
+                ])
+            
+            # Create the table with adjusted column widths
+            col_widths = [
+                doc.width * 0.08,  # S.No
+                doc.width * 0.22,  # Name
+                doc.width * 0.12,  # Type
+                doc.width * 0.12,  # Status
+                doc.width * 0.15,  # Layouter
+                doc.width * 0.15,  # Reviewer
+                doc.width * 0.16,  # Review Date
+                doc.width * 0.10   # Progress
+            ]
+            
+            # Use repeatRows=1 to ensure header appears on every page
+            table = Table(table_data, colWidths=col_widths, repeatRows=1)
+            
+            # Table style
+            table_style = TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2C3E50')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 10),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+                ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+                ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 1), (-1, -1), 9),
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#D0D3D4')),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('ALIGN', (0, 0), (0, -1), 'CENTER'),  # S.No centered
+                ('ALIGN', (7, 0), (7, -1), 'CENTER'),  # Progress centered
+                ('LEFTPADDING', (0, 0), (-1, -1), 6),
+                ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+                ('TOPPADDING', (0, 0), (-1, -1), 8),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+            ])
+            
+            # Add row colors based on status
+            start_row = 1
+            for i in range(start_row, len(table_data)):
+                status = str(table_data[i][3]).lower()
+                if 'complete' in status:
+                    table_style.add('BACKGROUND', (0, i), (-1, i), colors.HexColor('#E8F5E9'))
+                elif 'progress' in status:
+                    table_style.add('BACKGROUND', (0, i), (-1, i), colors.HexColor('#FFF8E1'))
+                elif 'not' in status and 'start' in status:
+                    table_style.add('BACKGROUND', (0, i), (-1, i), colors.HexColor('#FFEBEE'))
+            
+            # Add alternating row colors for rows without status-based coloring
+            for i in range(start_row, len(table_data)):
+                status = str(table_data[i][3]).lower()
+                if i % 2 == 0 and not any([
+                    'complete' in status,
+                    'progress' in status,
+                    'not' in status and 'start' in status
+                ]):
+                    table_style.add('BACKGROUND', (0, i), (-1, i), colors.HexColor('#F8F9F9'))
+            
+            table.setStyle(table_style)
+            elements.append(table)
+        else:
+            elements.append(Paragraph('No cell data available for this project.', normal_style))
+        
+        # Build PDF with footer on every page
+        doc.build(elements, onFirstPage=lambda canvas, doc: add_footer(canvas, doc, project),
+                 onLaterPages=lambda canvas, doc: add_footer(canvas, doc, project))
+        
+        buffer.seek(0)
+        
+        # Create filename without special characters
+        project_name = project.get("projectname", project_id)
+        safe_filename = "".join(c for c in project_name if c.isalnum() or c in (' ', '-', '_')).rstrip()
+        safe_filename = safe_filename.replace(' ', '_') + '_Report.pdf'
+        
+        return Response(
+            buffer, 
+            mimetype='application/pdf', 
+            headers={
+                'Content-Disposition': f'attachment;filename={safe_filename}'
+            }
+        )
+    except Exception as e:
+        print(f"Error generating PDF for project {project_id}: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+def add_footer(canvas, doc, project):
+    """
+    Add footer with generation date, company name, and copyright
+    """
+    canvas.saveState()
+    canvas.setFont('Helvetica', 8)
+    canvas.setFillColor(colors.HexColor('#7F8C8D'))
+    
+    # Add "Generated on" text at bottom left
+    generated_text = f"Generated on {datetime.datetime.now().strftime('%Y-%m-%d at %H:%M:%S')}"
+    canvas.drawString(20*mm, 15*mm, generated_text)
+    
+    # Add company name and copyright at bottom center
+    company_text = "© Epical Layouts Pvt. Ltd. All Rights Reserved."
+    canvas.drawCentredString(doc.pagesize[0]/2, 15*mm, company_text)
+    
+    canvas.restoreState()
+@app.route('/api/export/csv')
+@login_required()
+def export_csv():
+    project_id = request.args.get('project_id')
+    if not project_id:
+        return jsonify({'error': 'Project ID is required'}), 400
+
+    try:
+        # Fetch project details from the projects sheet
+        ws = get_worksheet('projects')
+        headers = [h.strip().lower() for h in ws.row_values(1)]
+        row_values = ws.row_values(int(project_id))
+        if not row_values:
+            return jsonify({'error': 'Project not found'}), 404
+        if len(row_values) < len(headers):
+            row_values += [''] * (len(headers) - len(row_values))
+        project = dict(zip(headers, row_values))
+
+        # Fetch cell data from the project-specific sheet
+        project_sheet_id = get_project_sheet_id(project_id)
+        if not project_sheet_id:
+            return jsonify({'error': 'Project sheet not found'}), 404
+        
+        cell_ws = get_project_sheet_worksheet(project_sheet_id, 'cell_information')
+        if not cell_ws:
+            return jsonify({'error': 'cell_information sheet not found'}), 404
+        
+        cells = cell_ws.get_all_records()
+        total_cells = len(cells)
+        completed_cells = len([c for c in cells if c.get('status', '').lower() == 'completed'])
+        progress = round((completed_cells / total_cells * 100) if total_cells > 0 else 0)
+
+        # Create CSV buffer
+        buffer = io.StringIO()
+        buffer.write('\ufeff')  # Add UTF-8 BOM for Excel compatibility
+        writer = csv.writer(buffer, lineterminator='\n')
+
+        # Write Project Details
+        writer.writerow([f'Project Report: {project.get("projectname", "Unknown")}'])
+        details = [
+            f'Project Name: {project.get("projectname", "N/A")}',
+            f'Client Name: {project.get("clientname", "N/A")}',
+            f'Created Date: {project.get("createdate", "N/A")}',
+            f'Status: {project.get("status", "N/A")}',
+            f'Version: {project.get("version", "N/A")}',
+            f'Progress: {progress}% ({completed_cells}/{total_cells} cells completed)'
+        ]
+        for detail in details:
+            writer.writerow([detail])
+        writer.writerow([])  # Empty row for spacing
+
+        # Write Table Headers
+        table_headers = ['Name', 'Layout Type', 'Review Status', 'Reviewers', 'Reviewed Date', 'Layouters', 'Progress']
+        writer.writerow(table_headers)
+
+        # Function to parse multiple date formats
+        def parse_review_date(review_date):
+            if not review_date or review_date == 'N/A':
+                return 'N/A'
+            try:
+                # Try DD/MM/YYYY HH:MM:SS
+                parsed_date = datetime.datetime.strptime(review_date, '%d/%m/%Y %H:%M:%S')
+                return parsed_date.strftime('%d/%m/%Y %H:%M')  # Output as DD/MM/YYYY HH:MM
+            except ValueError:
+                try:
+                    # Try YYYY-MM-DD HH:MM
+                    parsed_date = datetime.datetime.strptime(review_date, '%Y-%m-%d %H:%M')
+                    return parsed_date.strftime('%d/%m/%Y %H:%M')  # Output as DD/MM/YYYY HH:MM
+                except ValueError:
+                    print(f"Error parsing reviewdate '{review_date}' for cell {cell.get('name', 'Unknown')}")
+                    return 'N/A'
+
+        # Write Table Data
+        for cell in cells:
+            # Parse and format reviewdate
+            review_date = cell.get('reviewdate', 'N/A')
+            formatted_date = parse_review_date(review_date)
+
+            writer.writerow([
+                cell.get('name', ''),
+                cell.get('layoutType', 'custom').capitalize(),
+                cell.get('status', 'not-started').replace('-', ' ').title(),
+                cell.get('reviewer', 'N/A'),
+                formatted_date,
+                cell.get('layouters', 'N/A'),
+                f"{cell.get('completionPercentage', 0)}%"
+            ])
+
+        # Prepare response
+        buffer.seek(0)
+        return Response(
+            buffer.getvalue(),
+            mimetype='text/csv',
+            headers={'Content-Disposition': f'attachment;filename=Project_{project_id}_Report.csv'}
+        )
+    except Exception as e:
+        print(f"Error generating CSV for project {project_id}: {e}")
+        return jsonify({'error': str(e)}), 500
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)

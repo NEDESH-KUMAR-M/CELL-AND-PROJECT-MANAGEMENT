@@ -1,0 +1,8 @@
+Flask==3.0.3  # Or latest compatible
+Flask-Cors==4.0.0
+gspread==6.1.2
+google-auth==2.35.0
+google-api-python-client==2.111.0
+requests==2.32.3
+backoff==2.2.1
+reportlab==4.2.2

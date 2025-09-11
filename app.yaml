@@ -1,0 +1,37 @@
+runtime: python312  # Use Python 3.12 (or python39 if needed)
+entrypoint: python app.py  # Assumes your file is app.py; adjust if different
+
+# Instance class (F1 is smallest/cheapest; scale up if needed for CPU/memory)
+instance_class: F1
+
+# Automatic scaling (adjust based on traffic)
+automatic_scaling:
+  min_instances: 0
+  max_instances: 5
+  target_cpu_utilization: 0.65
+
+# Environment variables (set secrets here)
+env_variables:
+  SECRET_KEY: "your-secure-random-secret-key-change-me"  # Generate a strong one
+  SERVICE_ACCOUNT_JSON: '{"type": "service_account", "project_id": "your-project-id", ...}'  # Paste FULL JSON content of your service account key here (escape quotes if needed)
+  # Add other env vars from your code, e.g.:
+  # GSA_KEY_FILE: "your-key.json"  # But we're using SERVICE_ACCOUNT_JSON instead
+  # SHEET_ID: "your-sheet-id"  # If you want to override constants
+
+# Handlers (default serves all via Flask)
+handlers:
+- url: /.*
+  script: auto
+  secure: always  # Force HTTPS
+
+# Include any static files (e.g., templates, static folder)
+includes:
+- skip_files: ^(.git|.pyc|.pyo|*.egg-info|_pycache_)$
+
+# Network settings (if needed for outbound requests)
+network:
+  session_affinity: true  # For session stickiness
+
+# VPC access if connecting to other GCP services (optional)
+vpc_access_connector:
+  name: projects/your-project-id/locations/your-region/connectors/your-connector-name

@@ -2083,11 +2083,11 @@ def add_footer(canvas, doc, project):
     canvas.setFillColor(colors.HexColor('#7F8C8D'))
     
     # Add "Generated on" text at bottom left
-    generated_text = f"Generated on {datetime.datetime.now().strftime('%Y-%m-%d at %H:%M:%S')}"
+    generated_text = f"Generated on {datetime.datetime.now().strftime('%Y-%m-%d ')}"
     canvas.drawString(20*mm, 15*mm, generated_text)
     
     # Add company name and copyright at bottom center
-    company_text = "© Epical Layouts Pvt. Ltd. All Rights Reserved."
+    company_text = ""
     canvas.drawCentredString(doc.pagesize[0]/2, 15*mm, company_text)
     
     canvas.restoreState()

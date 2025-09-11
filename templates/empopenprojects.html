@@ -1527,10 +1527,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Set default dates (last 30 days)
     const today = new Date();
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(today.getDate() - 30);
-    fromDate.valueAsDate = thirtyDaysAgo;
-    toDate.valueAsDate = today;
+
+    fromDate.valueAsDate = '';
+    toDate.valueAsDate = '';
 });
 
 // API Functions

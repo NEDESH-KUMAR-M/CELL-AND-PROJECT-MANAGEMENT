@@ -1984,11 +1984,7 @@
         }
         await fetchProject();
         await fetchCells();
-        const today = new Date();
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(today.getDate() - 30);
-        fromDate.valueAsDate = thirtyDaysAgo;
-        toDate.valueAsDate = today;
+        
         const printBtn = document.getElementById("printBtn");
         if (printBtn) {
             printBtn.addEventListener("click", showPrintPopup);

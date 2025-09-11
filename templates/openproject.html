@@ -1331,6 +1331,8 @@
                                         <th>Review Status</th>
                                         <th>Reviewed Date</th>
                                         <th>Layouters</th>
+                                        <th>Reviewer</th>  <!-- New -->
+                                        <th>Progress</th>  <!-- New -->
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -1545,8 +1547,10 @@
                 status: c.status || (c.reviewStatus || 'not-started'),
                 layouters: c.layouters || c.reviewers || c.assigned || [],
                 createdAt: c.createdAt || c.createdate || c.date || new Date().toISOString(),
+                reviewer: c.reviewer || '',
+                completionPercentage: c.completionPercentage || 0,
+                reviewdate: c.reviewdate || ''  // New: map reviewdate from backend
             }));
-
             filteredCells = [...cells];
             renderCells();
             updateProgress();
@@ -1795,8 +1799,10 @@
                 <td>${cell.name}</td>
                 <td>${cell.layoutType.charAt(0).toUpperCase() + cell.layoutType.slice(1)}</td>
                 <td><span class="status ${statusClass}">${statusText}</span></td>
-                <td>${new Date(cell.createdAt).toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })}</td>
+                <td>${cell.reviewdate ? new Date(cell.reviewdate).toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }) : 'N/A'}</td>  <!-- Updated: use reviewdate -->
                 <td><div class="layouter-tags">${layoutersHTML}</div></td>
+                <td>${cell.reviewer || 'N/A'}</td>
+                <td>${cell.completionPercentage}%</td>
                 <td>
                     <div class="actions">
                         <button class="action-btn edit-btn" data-id="${cell.id}"><i class="fas fa-pencil-alt"></i></button>

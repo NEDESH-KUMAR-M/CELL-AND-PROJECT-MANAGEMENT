@@ -1772,13 +1772,14 @@ function editCell(id) {
     if (!cell) return;
     isEditing = true; currentEditId = id; modalTitle.textContent = "Edit Cell";
     cellNameInput.value = cell.name; layoutTypeSelect.value = cell.layoutType;
+    layoutTypeSelect.disabled = true;
     statusSelect.value = cell.status; layouters = [...cell.layouters]; updateLayouterTags();
     cellModal.style.display = "block";
 }
 
 function addNewCell() {
     isEditing = false; currentEditId = null; modalTitle.textContent = "Add New Cell";
-    cellNameInput.value = ""; layoutTypeSelect.value = "io"; statusSelect.value = "not-started";
+    cellNameInput.value = ""; layoutTypeSelect.value = "";layoutTypeSelect.disabled = false; statusSelect.value = "not-started";
     layouters = []; updateLayouterTags(); cellModal.style.display = "block";
 }
 

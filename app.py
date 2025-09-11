@@ -149,7 +149,7 @@ def get_project_sheet_worksheet(project_sheet_id, sheet_name, create_if_missing=
         return None
 
 # Headers used for the cell_information sheet
-CELL_INFO_HEADERS = ['id', 'name', 'layoutType', 'status', 'layouters', 'createdAt', 'subsheet_name', 'cellimage', 'reviewer', 'reviewdate']
+CELL_INFO_HEADERS = ['id', 'name', 'layoutType', 'status', 'layouters', 'createdAt', 'subsheet_name', 'cellimage', 'reviewer', 'reviewdate', 'completionPercentage']
 
 def initialize_cell_information_sheet(project_sheet_id):
     """Initialize the cell_information worksheet in the project sheet"""
@@ -985,7 +985,8 @@ def api_get_cells():
                 'subsheet_name': r.get('subsheet_name') or '',
                 'cellimage': r.get('cellimage') or '',
                 'reviewer': r.get('reviewer') or '',
-                'reviewdate': r.get('reviewdate') or ''
+                'reviewdate': r.get('reviewdate') or '',
+                'completionPercentage': r.get('completionPercentage', 0)  # New: defaults to 0
             })
         return jsonify(out)
     except Exception as e:

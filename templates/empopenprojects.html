@@ -1620,12 +1620,17 @@ async function saveCellToAPI(cellData) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(cellData)
         });
-        if (!response.ok) throw new Error('Failed to save cell');
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Failed to save cell: ${errorText}`);
+        }
+        const result = await response.json();
+        console.log('Save cell response:', result); // Debug log
         await fetchCells(); // Refresh cells after saving
         showNotification(`Cell ${isEditing ? 'updated' : 'added'} successfully`, 'success');
     } catch (error) {
-        console.error('Error saving cell:', error);
-        showNotification(`Failed to ${isEditing ? 'update' : 'add'} cell`, 'error');
+        console.error('Error saving cell:', error.message);
+        showNotification(`Failed to ${isEditing ? 'update' : 'add'} cell: ${error.message}`, 'error');
     } finally {
         hideLoading();
     }
@@ -1683,7 +1688,20 @@ function hideDeleteModal() {
     deleteModal.style.display = 'none';
     currentDeleteId = null;
 }
-
+function formatDateToDDMMYY(dateString) {
+    if (!dateString) return 'N/A';
+    try {
+        const date = new Date(dateString);
+        if (isNaN(date)) return 'N/A';
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = String(date.getFullYear()).slice(-2);
+        return `${day}-${month}-${year}`;
+    } catch (e) {
+        console.error('Error formatting date:', dateString, e);
+        return 'N/A';
+    }
+}
 function renderCells(cellsToRender = filteredCells) {
     cellsTableBody.innerHTML = "";
     if (cellsToRender.length === 0) {
@@ -1711,7 +1729,7 @@ function renderCells(cellsToRender = filteredCells) {
                 <td>${cell.name}</td>
                 <td>${cell.layoutType.charAt(0).toUpperCase() + cell.layoutType.slice(1)}</td>
                 <td><span class="status ${statusClass}">${statusText}</span></td>
-                <td>${cell.reviewdate ? new Date(cell.reviewdate).toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }) : 'N/A'}</td>  <!-- Updated: use reviewdate -->
+                <td>${cell.reviewdate ? formatDateToDDMMYY(cell.reviewdate) : 'N/A'}</td>
                 <td><div class="layouter-tags">${layoutersHTML}</div></td>
                 <td>${cell.reviewer || 'N/A'}</td>
                 <td>${cell.completionPercentage}%</td>
@@ -1776,11 +1794,19 @@ function openCell(id) {
 
 function editCell(id) {
     const cell = cells.find(c => c.id === id);
-    if (!cell) return;
-    isEditing = true; currentEditId = id; modalTitle.textContent = "Edit Cell";
-    cellNameInput.value = cell.name; layoutTypeSelect.value = cell.layoutType;
-    layoutTypeSelect.disabled = true;
-    statusSelect.value = cell.status; layouters = [...cell.layouters]; updateLayouterTags();
+    if (!cell) {
+        showNotification('Cell not found', 'error');
+        return;
+    }
+    isEditing = true;
+    currentEditId = id;
+    modalTitle.textContent = "Edit Cell";
+    cellNameInput.value = cell.name || '';
+    layoutTypeSelect.value = cell.layoutType || 'custom';
+    layoutTypeSelect.disabled = true; // Disable layout type during edit
+    statusSelect.value = cell.status || 'not-started';
+    layouters = [...(cell.layouters || [])]; // Ensure layouters is an array
+    updateLayouterTags();
     cellModal.style.display = "block";
 }
 
@@ -1802,18 +1828,47 @@ function updateLayouterTags() {
         layouters.splice(parseInt(btn.dataset.index), 1); updateLayouterTags();
     }));
 }
-
+function resetModal() {
+    cellNameInput.value = '';
+    layoutTypeSelect.value = '';
+    layoutTypeSelect.disabled = false;
+    statusSelect.value = 'not-started';
+    layouters = [];
+    updateLayouterTags();
+    isEditing = false;
+    currentEditId = null;
+}
 function saveCell() {
     const name = cellNameInput.value.trim();
     const layoutType = layoutTypeSelect.value;
     const status = statusSelect.value;
-    if (!name) { 
+    
+    if (!name) {
         showNotification('Please enter a cell name', 'error');
-        return; 
+        return;
     }
-    const cellData = { name, layoutType, status, layouters: [...layouters] };
-    saveCellToAPI(cellData); 
+    if (!layoutType && !isEditing) {
+        showNotification('Please select a layout type', 'error');
+        return;
+    }
+    if (!status) {
+        showNotification('Please select a status', 'error');
+        return;
+    }
+
+    const cellData = {
+        name,
+        layoutType: isEditing ? cells.find(c => c.id === currentEditId).layoutType : layoutType, // Use existing layoutType for edit
+        status,
+        layouters: [...layouters],
+        reviewer: cells.find(c => c.id === currentEditId)?.reviewer || '', // Preserve reviewer if editing
+        reviewdate: cells.find(c => c.id === currentEditId)?.reviewdate || null, // Preserve reviewdate if editing
+        completionPercentage: cells.find(c => c.id === currentEditId)?.completionPercentage || 0 // Preserve completionPercentage
+    };
+
+    saveCellToAPI(cellData);
     cellModal.style.display = "none";
+    resetModal();
 }
 
 function openOrderModal() {
@@ -1845,8 +1900,14 @@ function getDragAfterElement(container, y) {
 // Event Listeners
 addCellBtn.addEventListener("click", addNewCell);
 printBtn.addEventListener("click", () => window.print());
-closeModalBtn.addEventListener("click", () => cellModal.style.display = "none");
-cancelBtn.addEventListener("click", () => cellModal.style.display = "none");
+closeModalBtn.addEventListener("click", () => {
+    cellModal.style.display = "none";
+    resetModal();
+});
+cancelBtn.addEventListener("click", () => {
+    cellModal.style.display = "none";
+    resetModal();
+});
 saveBtn.addEventListener("click", saveCell);
 addLayouterBtn.addEventListener("click", () => {
     const name = layouterInput.value.trim();

@@ -1540,17 +1540,30 @@
             if (!response.ok) throw new Error('Failed to fetch cells');
 
             cells = await response.json();
-            cells = cells.map(c => ({
-                id: c.id || c.row || c._id || String(c.id),
-                name: c.name || c.cellname || c.title || 'Untitled',
-                layoutType: c.layoutType || c.layout_type || c.type || 'customlayout',
-                status: c.status || (c.reviewStatus || 'not-started'),
-                layouters: c.layouters || c.reviewers || c.assigned || [],
-                createdAt: c.createdAt || c.createdate || c.date || new Date().toISOString(),
-                reviewer: c.reviewer || '',
-                completionPercentage: c.completionPercentage || 0,
-                reviewdate: c.reviewdate || ''  // New: map reviewdate from backend
-            }));
+            cells = cells.map(c => {
+                // Normalize layoutType to lowercase
+                const layoutType = (c.layoutType || c.layout_type || c.type || 'custom').toLowerCase();
+                // Parse reviewdate (DD/MM/YY format) to Date object
+                let parsedDate = null;
+                if (c.reviewdate) {
+                    const [day, month, year] = c.reviewdate.split('/');
+                    // Assuming years are in 20xx (e.g., 25 -> 2025)
+                    parsedDate = new Date(`20${year}-${month}-${day}`);
+                    if (isNaN(parsedDate)) parsedDate = null; // Handle invalid dates
+                }
+
+                return {
+                    id: c.id || c.row || c._id || String(c.id),
+                    name: c.name || c.cellname || c.title || 'Untitled',
+                    layoutType: ['io', 'cell', 'top', 'tapeout', 'custom'].includes(layoutType) ? layoutType : 'custom',
+                    status: c.status || (c.reviewStatus || 'not-started'),
+                    layouters: c.layouters || c.reviewers || c.assigned || [],
+                    createdAt: parsedDate || c.createdAt || c.createdate || c.date || new Date().toISOString(),
+                    reviewer: c.reviewer || '',
+                    completionPercentage: c.completionPercentage || 0,
+                    reviewdate: c.reviewdate || '' // Keep original for display
+                };
+            });
             filteredCells = [...cells];
             renderCells();
             updateProgress();
@@ -1799,7 +1812,7 @@
                 <td>${cell.name}</td>
                 <td>${cell.layoutType.charAt(0).toUpperCase() + cell.layoutType.slice(1)}</td>
                 <td><span class="status ${statusClass}">${statusText}</span></td>
-                <td>${cell.reviewdate ? new Date(cell.reviewdate).toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }) : 'N/A'}</td>  <!-- Updated: use reviewdate -->
+                <td>${cell.reviewdate ? new Date(cell.reviewdate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' }) : 'N/A'}</td>
                 <td><div class="layouter-tags">${layoutersHTML}</div></td>
                 <td>${cell.reviewer || 'N/A'}</td>
                 <td>${cell.completionPercentage}%</td>
@@ -1821,28 +1834,68 @@
     }
 
     function applyFilters() {
-        const query = searchInput.value.toLowerCase();
-        filteredCells = cells.filter(cell => 
-            cell.name.toLowerCase().includes(query) || cell.layouters.some(l => l.toLowerCase().includes(query))
-        );
-        if (currentFilter !== "all") filteredCells = filteredCells.filter(cell => cell.status === currentFilter);
-        if (currentLayoutFilter !== "all") filteredCells = filteredCells.filter(cell => cell.layoutType === currentLayoutFilter);
+        let filteredCells = [...cells];
+
+        // Apply search filter
+        const query = searchInput.value.trim().toLowerCase();
+        if (query) {
+            filteredCells = filteredCells.filter(cell => 
+                cell.name.toLowerCase().includes(query) || 
+                cell.layouters.some(l => l.toLowerCase().includes(query))
+            );
+        }
+
+        // Apply status filter
+        if (currentFilter !== "all") {
+            filteredCells = filteredCells.filter(cell => cell.status === currentFilter);
+        }
+
+        // Apply layout type filter
+        if (currentLayoutFilter !== "all") {
+            filteredCells = filteredCells.filter(cell => cell.layoutType === currentLayoutFilter);
+        }
+
+        // Apply date range filter
         const from = fromDate.value ? new Date(fromDate.value) : null;
         const to = toDate.value ? new Date(toDate.value + 'T23:59:59') : null;
-        if (from || to) filteredCells = filteredCells.filter(cell => {
-            const cellDate = new Date(cell.createdAt);
-            return (!from || cellDate >= from) && (!to || cellDate <= to);
-        });
-        if (currentSort) {
-            switch (currentSort) {
-                case "name-asc": filteredCells.sort((a, b) => a.name.localeCompare(b.name)); break;
-                case "name-desc": filteredCells.sort((a, b) => b.name.localeCompare(b.name)); break;
-                case "date-asc": filteredCells.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)); break;
-                case "date-desc": filteredCells.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); break;
-                case "layout-custom": filteredCells.sort((a, b) => layoutOrder.indexOf(a.layoutType) - layoutOrder.indexOf(b.layoutType)); break;
-            }
+        if (from || to) {
+            filteredCells = filteredCells.filter(cell => {
+                const cellDate = new Date(cell.reviewdate);
+                return (!from || (cellDate && cellDate >= from)) && (!to || (cellDate && cellDate <= to));
+            });
         }
-        renderCells();
+
+        // Apply sorting
+        if (currentSort) {
+            filteredCells.sort((a, b) => {
+                switch (currentSort) {
+                    case "name-asc":
+                        return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+                    case "name-desc":
+                        return b.name.localeCompare(a.name, undefined, { sensitivity: 'base' });
+                    case "date-asc":
+                        // Handle invalid or missing dates
+                        const aDate = a.reviewdate ? new Date(a.reviewdate) : new Date(0);
+                        const bDate = b.reviewdate ? new Date(b.reviewdate) : new Date(0);
+                        return aDate - bDate;
+                    case "date-desc":
+                        const aDateDesc = a.reviewdate ? new Date(a.reviewdate) : new Date(0);
+                        const bDateDesc = b.reviewdate ? new Date(b.reviewdate) : new Date(0);
+                        return bDateDesc - aDateDesc;
+                    case "layout-custom":
+                        const order = layoutOrder.length === layoutTypes.length ? layoutOrder : layoutTypes;
+                        const aIndex = order.indexOf(a.layoutType.toLowerCase());
+                        const bIndex = order.indexOf(b.layoutType.toLowerCase());
+                        return (aIndex === -1 ? Infinity : aIndex) - (bIndex === -1 ? Infinity : bIndex);
+                    default:
+                        return 0;
+                }
+            });
+        }
+
+        // Update filteredCells and render
+        filteredCells = filteredCells;
+        renderCells(filteredCells);
     }
 
     function openCell(id) {

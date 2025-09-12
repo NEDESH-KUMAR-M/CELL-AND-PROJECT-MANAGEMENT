@@ -1013,16 +1013,20 @@ def api_add_cell():
         data = request.json if request.is_json else request.form.to_dict()
         
         name = data.get('name')
-        layoutType = data.get('layoutType', 'customlayout').lower().strip()  # Normalize layoutType
-        # Map legacy/shorthand layoutType values to expected values
+        layoutType = data.get('layoutType', 'Custom').lower().strip()  # Normalize layoutType
+        # Map input layoutType values to standardized spellings
         layoutType_map = {
-            'io': 'iolayout',
-            'tapeout': 'tapelayout',
-            'top': 'toplayout',
-            'cell': 'cell',
-            'customlayout': 'customlayout'
+            'io': 'IO',
+            'iolayout': 'IO',
+            'cell': 'Cell',
+            'top': 'Top',
+            'toplayout': 'Top',
+            'tapeout': 'Tape Out',
+            'tapelayout': 'Tape Out',
+            'custom': 'Custom',
+            'customlayout': 'Custom'
         }
-        mapped_layoutType = layoutType_map.get(layoutType, layoutType)
+        mapped_layoutType = layoutType_map.get(layoutType, 'Custom')  # Default to 'Custom' if unknown
         
         status = data.get('status')
         layouters = data.get('layouters')

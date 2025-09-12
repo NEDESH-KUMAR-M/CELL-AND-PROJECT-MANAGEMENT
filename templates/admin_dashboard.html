@@ -523,7 +523,7 @@
     color: white;
     font-size: 12px;
     font-weight: 600;
-    text-transform: lowercase;
+    
   }
   
   .admin {
@@ -540,7 +540,7 @@
     color: white;
     font-size: 12px;
     font-weight: 600;
-    text-transform: lowercase;
+   
   }
   
   .active {
@@ -855,7 +855,7 @@
       <select id="roleFilter">
         <option value="all">All Roles</option>
         <option value="admin">Admin</option>
-        <option value="reviewer">Reviewer</option>
+        <option value="reviewer">Employee</option>
       </select>
       <select id="statusFilter">
         <option value="all">All Status</option>
@@ -902,7 +902,7 @@
       <div class="form-group">
         <label>Role</label>
         <select name="role" required>
-          <option value="Reviewer" selected>Reviewer</option>
+          <option value="Reviewer" selected>Employee</option>
           <option value="Admin">Admin</option>
         </select>
       </div>
@@ -941,7 +941,7 @@
       <div class="form-group">
         <label>Role</label>
         <select id="editRole" name="role" required>
-          <option value="Reviewer">Reviewer</option>
+          <option value="Reviewer">Employee</option>
           <option value="Admin">Admin</option>
         </select>
       </div>
@@ -1106,12 +1106,16 @@ async function fetchEmployees() {
     employees.forEach(emp => {
       const roleLower = emp.role.toLowerCase();
       const statusLower = emp.status.toLowerCase();
+      // Map "reviewer" to "employee" for display, keep "admin" as is
+      const displayRole = roleLower === 'reviewer' ? 'Employee' : 'Admin   ';
+      const capitalizedRole = displayRole.charAt(0).toUpperCase() + displayRole.slice(1).toLowerCase();
+      const capitalizedStatus = statusLower.charAt(0).toUpperCase() + statusLower.slice(1);
       const html = `
         <tr>
           <td>${emp.name}</td>
           <td>${emp.emailid}</td>
-          <td><span class="role-badge ${roleLower}">${roleLower}</span></td>
-          <td><span class="status-badge ${statusLower}">${statusLower}</span></td>
+          <td><span class="role-badge ${roleLower}">${capitalizedRole}</span></td>
+          <td><span class="status-badge ${statusLower}">${capitalizedStatus}</span></td>
           <td class="actions">
             <span class="edit-icon" data-name="${emp.name}" data-email="${emp.emailid}" data-role="${emp.role}" data-status="${emp.status}"><i class="fa-regular fa-pen-to-square"></i></span>
           </td>
@@ -1124,7 +1128,7 @@ async function fetchEmployees() {
       `;
       tbody.insertAdjacentHTML('beforeend', html);
     });
-    
+
     // Add event listeners to toggle buttons
     document.querySelectorAll('.activate-btn, .deactivate-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1133,30 +1137,31 @@ async function fetchEmployees() {
         toggleStatus(email, status);
       });
     });
-    
+
     filterEmployees(); // Apply filters after populating
   } catch (error) {
     console.error('Error fetching employees:', error);
     showNotification('Error fetching employees: ' + error.message, true);
   }
 }
-
 // Filter functionality
 function filterEmployees() {
   const searchTerm = searchInput.value.toLowerCase();
-  const roleValue = roleFilter.value;
+  const roleValue = roleFilter.value; // This will be 'all', 'admin', or 'reviewer'
   const statusValue = statusFilter.value;
   const rows = document.querySelectorAll('#employeesTbody tr');
   rows.forEach(row => {
     const name = row.cells[0].textContent.toLowerCase();
     const email = row.cells[1].textContent.toLowerCase();
-    const role = row.cells[2].querySelector('.role-badge').textContent.toLowerCase();
+    const role = row.cells[2].querySelector('.role-badge').textContent.toLowerCase(); // This is now 'employee' or 'admin'
     const status = row.cells[3].querySelector('.status-badge').textContent.toLowerCase();
-    
+
     const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm);
-    const matchesRole = roleValue === 'all' || role === roleValue;
+    // Map filter role value to match displayed role
+    const filterRole = roleValue === 'reviewer' ? 'employee' : roleValue;
+    const matchesRole = filterRole === 'all' || role === filterRole;
     const matchesStatus = statusValue === 'all' || status === statusValue;
-    
+
     row.style.display = (matchesSearch && matchesRole && matchesStatus) ? '' : 'none';
   });
 }
